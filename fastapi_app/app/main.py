@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 
-app = FastAPI()
+from .database import Base, engine
 
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI()
 
 @app.get("/")
 def read_root():
