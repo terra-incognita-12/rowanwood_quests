@@ -8,7 +8,7 @@ class UserBaseScheme(BaseModel):
 	photo: str
 
 	class Config:
-		orm_more = True
+		orm_mode = True
 
 class CreateUserScheme(UserBaseScheme):
 	password: constr(min_length=8)
@@ -20,7 +20,17 @@ class LoginUserScheme(BaseModel):
 	email: EmailStr
 	password: constr(min_length=8)
 
+class ForgetPasswordUserScheme(BaseModel):
+	email: EmailStr
+
+class ChangePasswordWithTokenUserScheme(BaseModel):
+	username: str
+	password_token: str
+	new_password: constr(min_length=8)
+	new_password_confirm: str
+
 class UserResponse(UserBaseScheme):
 	id: uuid.UUID
+	role: str
 	created_at: datetime
 	updated_at: datetime

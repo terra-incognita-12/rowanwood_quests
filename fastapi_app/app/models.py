@@ -13,6 +13,7 @@ class User(Base):
 	password = Column(String)
 	photo = Column(String, nullable=True)
 	is_email_verified = Column(Boolean, default=False)
+	password_token = Column(String, nullable=True, unique=True)
 	role = Column(String, default='user')
 	created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
 	updated_at = Column(TIMESTAMP(timezone=True), server_default=text("now()"))

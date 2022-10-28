@@ -52,5 +52,8 @@ class Email:
 		fm = FastMail(conf)
 		await fm.send_message(message)
 
-	async def send_verification_code(self):
+	async def send_verification_email_link(self):
 		await self.send_mail('Your verification code (Valid for 10 min)', 'verify_email_template')
+
+	async def send_verification_change_password_link(self):
+		await self.send_mail('Your verification code (Valid for 10 min)', 'verify_change_password_template')
