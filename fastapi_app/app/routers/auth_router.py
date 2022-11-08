@@ -34,7 +34,7 @@ async def create_user(payload: user_scheme.CreateUserScheme, request: Request, d
 	
 	check_user = db.query(User).filter(User.email == EmailStr(payload.email.lower())).first()
 	if check_user:
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Account already exist')
+		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Account with this credentials already exists')
 
 	payload.password = Hasher.get_password_hash(payload.password)
 	del payload.password_confirm
@@ -62,7 +62,8 @@ async def create_user(payload: user_scheme.CreateUserScheme, request: Request, d
 async def login(payload: user_scheme.LoginUserScheme, request: Request, response: Response, db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
 	user = db.query(User).filter(User.email == EmailStr(payload.email.lower())).first()
 	if not user or not Hasher.verify_password(payload.password, user.password):
-		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Incorrect Email or Password')
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Incorrect Email or Password')
+	
 	if not user.is_email_verified:
 		try:
 			token = EmailToken.get_email_token(payload.username, settings.EMAIL_TOKEN_EXPIRES_SECONDS)
@@ -71,7 +72,7 @@ async def login(payload: user_scheme.LoginUserScheme, request: Request, response
 		except Exception as error:
 			print(error)
 			raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Your email is not verified, but it was an error sending email, try to login next time')
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Your email is not verified, please verify your email address, link was sent on your email')
+		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Your email is not verified, please verify your email address, link was sent on your email')
 
 	access_token = Authorize.create_access_token(subject=str(user.id), expires_time=timedelta(minutes=ACCESS_X))
 	refresh_token = Authorize.create_refresh_token(subject=str(user.id), expires_time=timedelta(minutes=REFRESH_X))
@@ -82,7 +83,7 @@ async def login(payload: user_scheme.LoginUserScheme, request: Request, response
 
 	return {'status': 'success', 'role': user.role, 'access_token': access_token}
 
-@router.get('/logout', status_code=status.HTTP_200_OK)
+@router.get('/logout')
 def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = Depends(require_user)):
 	Authorize.unset_jwt_cookies()
 	response.set_cookie('logged_in', '', -1)
@@ -95,7 +96,7 @@ def email_verification(token: str, db: Session = Depends(get_db)):
 	username = token_decode[0]
 	expire_time = token_decode[1]
 	if time.time() > expire_time:
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Link is expired')
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Link is expired')
 
 	user_query = db.query(User).filter(User.username == username)
 	check_user = user_query.first()
@@ -116,7 +117,7 @@ def email_verification(token: str, db: Session = Depends(get_db)):
 async def forget_password(payload: user_scheme.ForgetPasswordUserScheme, request: Request, db: Session = Depends(get_db)):
 	user = db.query(User).filter(User.email == EmailStr(payload.email.lower())).first()
 	if not user:
-		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User with this email don't exsist")
+		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User with this email don't exsist")
 	
 	token = EmailToken.get_email_token(user.username, settings.EMAIL_TOKEN_EXPIRES_SECONDS)
 	try:
@@ -132,7 +133,7 @@ async def forget_password(payload: user_scheme.ForgetPasswordUserScheme, request
 		print(error)
 		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='There was an error sending email')
 
-	raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Your email is not verified, please verify your email address, link was sent on your email')
+	raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Your email is not verified, please verify your email address, link was sent on your email')
 
 @router.get('/verify_change_password/{token}')
 def change_password_verification(token: str, db: Session = Depends(get_db)):
@@ -140,7 +141,7 @@ def change_password_verification(token: str, db: Session = Depends(get_db)):
 	username = token_decode[0]
 	expire_time = token_decode[1]
 	if time.time() > expire_time:
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Link is expired')
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Link is expired')
 
 	user_query = db.query(User).filter(User.username == username)
 	check_user = user_query.first()
@@ -187,10 +188,10 @@ def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Dep
 
 		user_id = Authorize.get_jwt_subject()
 		if not user_id:
-			raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Can't refresh access token")
+			raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Can't refresh access token")
 		user = db.query(User).filter(User.id == user_id).first()
 		if not user:
-			raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='The user belonging to this token no logger exist')
+			raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='The user belonging to this token no logger exist')
 		access_token = Authorize.create_access_token(subject=str(user.id), expires_time=timedelta(minutes=ACCESS_X))
 	except Exception as e:
 		error = e.__class__.__name__
