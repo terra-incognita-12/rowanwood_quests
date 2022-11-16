@@ -11,6 +11,7 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session
 from pydantic import EmailStr
+from fastapi.responses import RedirectResponse
 
 from send_email.email import Email
 from oauth2 import AuthJWT, require_user
@@ -66,9 +67,9 @@ async def login(payload: user_scheme.LoginUserScheme, request: Request, response
 	
 	if not user.is_email_verified:
 		try:
-			token = EmailToken.get_email_token(payload.username, settings.EMAIL_TOKEN_EXPIRES_SECONDS)
+			token = EmailToken.get_email_token(user.username, settings.EMAIL_TOKEN_EXPIRES_SECONDS)
 			url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/auth/verify_email/{token}"
-			await Email(new_user, url, [payload.email]).send_verification_email_link()
+			await Email(user, url, [payload.email]).send_verification_email_link()
 		except Exception as error:
 			print(error)
 			raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Your email is not verified, but it was an error sending email, try to login next time')
@@ -90,7 +91,7 @@ def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = De
 
 	return {'status': 'success'}
 
-@router.get('/verify_email/{token}')
+@router.get('/verify_email/{token}', response_class=RedirectResponse, status_code=302)
 def email_verification(token: str, db: Session = Depends(get_db)):
 	token_decode = EmailToken.decode_token(token)
 	username = token_decode[0]
@@ -108,10 +109,11 @@ def email_verification(token: str, db: Session = Depends(get_db)):
 	user_query.update({'is_email_verified': True}, synchronize_session=False)
 	db.commit()
 
-	return {
-		"status": "success",
-		"message": "Account verified successfully"
-	}
+	# return {
+	# 	"status": "success",
+	# 	"message": "Account verified successfully"
+	# }
+	return "http://localhost:3000/login"
 
 @router.post('/forget_password')
 async def forget_password(payload: user_scheme.ForgetPasswordUserScheme, request: Request, db: Session = Depends(get_db)):
@@ -135,7 +137,7 @@ async def forget_password(payload: user_scheme.ForgetPasswordUserScheme, request
 
 	raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Your email is not verified, please verify your email address, link was sent on your email')
 
-@router.get('/verify_change_password/{token}')
+@router.get('/verify_change_password/{token}', response_class=RedirectResponse, status_code=302)
 def change_password_verification(token: str, db: Session = Depends(get_db)):
 	token_decode = EmailToken.decode_token(token)
 	username = token_decode[0]
@@ -148,22 +150,30 @@ def change_password_verification(token: str, db: Session = Depends(get_db)):
 	if not check_user:
 		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token or user doesn't exist")
 
-	password_token = EmailToken.get_email_token(str(random.randint(10000, 99999)), settings.EMAIL_TOKEN_EXPIRES_SECONDS)
+	# password_token = EmailToken.get_email_token(str(random.randint(10000, 99999)), settings.EMAIL_TOKEN_EXPIRES_SECONDS)
+	password_token = EmailToken.get_email_token(check_user.username, settings.EMAIL_TOKEN_EXPIRES_SECONDS)
 	user_query.update({'password_token': password_token}, synchronize_session=False)
 	db.commit()
 
-	return {
-		"status": "success",
-		"username": username,
-		"password_token": password_token
-	}
+	# return {
+	# 	"status": "success",
+	# 	"username": username,
+	# 	"password_token": password_token
+	# }
+	return f"http://localhost:3000/changepass/{password_token}"
 
-@router.post('/confirm_change_password')
+@router.post('/confirm_change_password', response_class=RedirectResponse, status_code=302)
 def confirm_change_password(payload: user_scheme.ChangePasswordWithTokenUserScheme, db: Session = Depends(get_db)):
 	if payload.new_password != payload.new_password_confirm:
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Passwords do not match')
 
-	user_query = db.query(User).filter(User.username == payload.username)
+	token_decode = EmailToken.decode_token(payload.password_token)
+	username = token_decode[0]
+	expire_time = token_decode[1]
+	if time.time() > expire_time:
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Link is expired')
+
+	user_query = db.query(User).filter(User.username == username)
 	check_user = user_query.first()
 
 	if not check_user:
@@ -176,10 +186,19 @@ def confirm_change_password(payload: user_scheme.ChangePasswordWithTokenUserSche
 	user_query.update({'password': payload.new_password, 'password_token': None}, synchronize_session=False)
 	db.commit()
 
-	return {
-		"status": "success",
-		"message": "Password changed successfully"
-	}
+	# return {
+	# 	"status": "success",
+	# 	"message": "Password changed successfully"
+	# }
+	return "http://localhost:3000/login"
+
+@router.post('/check_valid_change_password_token')
+def check_valid_change_password_token(payload: user_scheme.ChangePasswordTokenScheme, db: Session = Depends(get_db)):
+	check_user = db.query(User).filter(User.password_token == payload.password_token).first()
+	if not check_user:
+		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User doesn't exist")
+
+	return {"status": "success"}
 
 @router.get('/refresh')
 def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
