@@ -119,7 +119,7 @@ def email_verification(token: str, db: Session = Depends(get_db)):
 async def forget_password(payload: user_scheme.ForgetPasswordUserScheme, request: Request, db: Session = Depends(get_db)):
 	user = db.query(User).filter(User.email == EmailStr(payload.email.lower())).first()
 	if not user:
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User with this email don't exsist")
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User with this email don't exsist")
 	
 	token = EmailToken.get_email_token(user.username, settings.EMAIL_TOKEN_EXPIRES_SECONDS)
 	try:
@@ -162,7 +162,7 @@ def change_password_verification(token: str, db: Session = Depends(get_db)):
 	# }
 	return f"http://localhost:3000/changepass/{password_token}"
 
-@router.post('/confirm_change_password', response_class=RedirectResponse, status_code=302)
+@router.post('/confirm_change_password')
 def confirm_change_password(payload: user_scheme.ChangePasswordWithTokenUserScheme, db: Session = Depends(get_db)):
 	if payload.new_password != payload.new_password_confirm:
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Passwords do not match')
@@ -186,11 +186,10 @@ def confirm_change_password(payload: user_scheme.ChangePasswordWithTokenUserSche
 	user_query.update({'password': payload.new_password, 'password_token': None}, synchronize_session=False)
 	db.commit()
 
-	# return {
-	# 	"status": "success",
-	# 	"message": "Password changed successfully"
-	# }
-	return "http://localhost:3000/login"
+	return {
+		"status": "success",
+		"message": "Password changed successfully"
+	}
 
 @router.post('/check_valid_change_password_token')
 def check_valid_change_password_token(payload: user_scheme.ChangePasswordTokenScheme, db: Session = Depends(get_db)):

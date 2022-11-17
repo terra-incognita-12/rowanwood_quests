@@ -3,13 +3,23 @@ import { useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
+import Button from "react-bootstrap/Button"
+import Alert from "react-bootstrap/Alert"
 
 import axios from "../../api/axios"
+import ErrMsg from "../ErrMsg"
 
 const ForgetPass = () => {
 	const navigate = useNavigate()
 
 	const [email, setEmail] = useState("")
+
+	const [errMsg, setErrMsg] = useState("")
+	const [showErrMsg, setShowErrMsg] = useState(false)
+
+	const handleShowErr = (e) => {
+		setShowErrMsg(e)
+	}
 
 	const handleSubmit = async (e) => {
 		e.preventDefault()
@@ -26,13 +36,29 @@ const ForgetPass = () => {
 
 			navigate("/login", { replace: true})
 		} catch (err) {
-			console.log(err)
+			if (!err?.response) {
+				setErrMsg("No server respone")
+			} else if (err.response?.status === 401) {
+				setErrMsg("User with this email don't exsist")
+			} else if (err.response?.status === 403) {
+				setErrMsg("Your email is not verified, please verify your email address, link was sent on your email")
+			} else if (err.response?.status === 500) {
+				setErrMsg("There was an error sending email")
+			} else {
+                setErrMsg("Registration Failed")
+            }
+            handleShowErr(true)
 		}	
 	}
 
 	return (
 		<Row className="justify-content-center mt-5">
 			<Col xs={12} lg={4}>
+				{showErrMsg 
+					?
+					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
+				    : null
+				}
 				<form onSubmit={handleSubmit}>
 					<label htmlFor="email">Recovery email</label>
 					<input 
@@ -44,9 +70,9 @@ const ForgetPass = () => {
 						autoComplete="off"
 						required 
 					/>
-					<button className="btn btn-success mt-2 w-100">Send recovery link</button>
-					<Link to="/login">Back to login</Link>
+					<Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Send recovery link" />
 				</form>
+				<Link to="/login" className="text-decoration-none">Back to login</Link>
 			</Col>
 		</Row>
 	)

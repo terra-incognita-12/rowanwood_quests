@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import Alert from "react-bootstrap/Alert"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
-import Card from 'react-bootstrap/Card'
+import Card from "react-bootstrap/Card"
+import Button from "react-bootstrap/Button"
 
 import axios from "../../api/axios"
+import ErrMsg from "../ErrMsg"
 
 // Must start with the lower or upper case letter and after must followed by 3 to 23 char that can be lowercase, upper, number, - and _
 const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-_]{3,23}$/
@@ -32,16 +35,41 @@ const Register = () => {
 	const [photo, setPhoto] = useState("")
 
 	const [errMsg, setErrMsg] = useState("")
+	const [showErrMsg, setShowErrMsg] = useState(false)
+
+	useEffect(() => {
+		const result = USERNAME_REGEX.test(username)
+		setValidUsername(result)
+	}, [username])
+
+	useEffect(() => {
+		const result = EMAIL_REGEX.test(email)
+		setValidEmail(result)
+	}, [email])
+
+	useEffect(() => {
+		const result = PASS_REGEX.test(pass)
+		setValidPass(result)
+	}, [pass])
+
+	useEffect(() => {
+		setValidConfPass(pass === confPass && validPass) 
+	}, [confPass])
+
+	const handleShowErr = (e) => {
+		setShowErrMsg(e)
+	}
 
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 
-		const i1 = USERNAME_REGEX.test(username)
-		const i2 = EMAIL_REGEX.test(email)
-		const i3 = PASS_REGEX.test(pass)
+		const valid1 = USERNAME_REGEX.test(username)
+		const valid2 = EMAIL_REGEX.test(email)
+		const valid3 = PASS_REGEX.test(pass)
 
-		if (!i1 || !i2 || !i3 || pass !== confPass) {
+		if (!valid1 || !valid2 || !valid3 || pass !== confPass) {
 			setErrMsg("Invalid entry")
+			handleShowErr(true)
 			return
 		}
 
@@ -63,7 +91,7 @@ const Register = () => {
 			if (!err?.response) {
 				setErrMsg("No server respone")
 			} else if (err.response?.status === 400) {
-				setErrMsg("asswords do not match")
+				setErrMsg("Passwords do not match")
 			} else if (err.response?.status === 403) {
 				setErrMsg("Account with this credentials already exists")
 			} else if (err.response?.status === 500) {
@@ -71,32 +99,18 @@ const Register = () => {
 			} else {
                 setErrMsg("Registration Failed")
             }
+            handleShowErr(true)
 		}
 	}
-
-	useEffect(() => {
-		const result = USERNAME_REGEX.test(username)
-		setValidUsername(result)
-	}, [username])
-
-	useEffect(() => {
-		const result = EMAIL_REGEX.test(email)
-		setValidEmail(result)
-	})
-
-	useEffect(() => {
-		const result = PASS_REGEX.test(pass)
-		setValidPass(result)
-	}, [pass])
-
-	useEffect(() => {
-		setValidConfPass(pass === confPass && validPass) 
-	}, [confPass])
 
 	return (
 		<Row className="justify-content-center mt-5">
 			<Col xs={12} lg={4}>
-				<span className={errMsg ? "text-danger": "d-none"}>{errMsg}</span>
+				{showErrMsg 
+					?
+					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
+				    : null
+				}
 				<form onSubmit={handleSubmit}>
 					<label htmlFor="username">Username</label>
 					<input
@@ -166,7 +180,7 @@ const Register = () => {
 						autoComplete="off"
 						required
 					/>
-	                <button className="btn btn-success mt-2 w-100">Sign up</button>
+	                <Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Sign up" />
 				</form>
 			</Col>
 

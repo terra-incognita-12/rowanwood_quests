@@ -1,21 +1,28 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
+import Button from "react-bootstrap/Button"
 
 import axios from "../../api/axios"
 import useAuth from "../../hooks/useAuth"
+import ErrMsg from "../ErrMsg"
 
 const Login = () => {
 	const [user, setUser] = useState("")
 	const [pass, setPass] = useState("")
 	const [errMsg, setErrMsg] = useState("")
+	const [showErrMsg, setShowErrMsg] = useState(false)
 
 	const navigate = useNavigate()
 	const location = useLocation()
 	const from = location.state?.from?.pathname || "/"
 
 	const { setAuth } = useAuth()
+
+	const handleShowErr = (e) => {
+		setShowErrMsg(e)
+	}
 
 	const handleSubmit = async (e) => {
 		e.preventDefault()
@@ -44,24 +51,27 @@ const Login = () => {
 			navigate(from, { replace: true })
 
 		} catch (err) {
-			console.log(err)
 			if (!err?.response) {
 				setErrMsg("No response from server")
-			} else if (err.response?.status === 422) {
-				setErrMsg("Input error")
-			} else if (err.response?.status === 401) {
+			} else if (err.response?.status === 401 || err.response?.status === 422) {
 				setErrMsg("Incorrect Email or Password")
 			} else if (err.response?.status === 403) {
 				setErrMsg("Your email is not verified, please verify your email address, link was sent on your email")
 			} else {
 				setErrMsg("Login Failed")
 			}
+			handleShowErr(true)
 		}
 	}
 
 	return (
 		<Row className="justify-content-center mt-5">
 			<Col xs={12} lg={4}>
+				{showErrMsg 
+					?
+					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
+				    : null
+				}
 				<form onSubmit={handleSubmit}>
 					<label htmlFor="email">Email</label>
 					<input 
@@ -82,10 +92,9 @@ const Login = () => {
 	                    value={pass}
 	                    required
 	                />
-	                <button className="btn btn-success mt-2 w-100">Sign in</button>
-	                <span className={errMsg ? "text-danger": "d-none"}>{errMsg}</span>
-	                <Link to="/forgetpass">Forget Password?</Link>
+	                <Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Sign in" />
 				</form>
+				<Link to="/forgetpass" className="text-decoration-none">Forget Password?</Link>
 			</Col>
 		</Row>
 	)
