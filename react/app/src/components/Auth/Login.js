@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import Button from "react-bootstrap/Button"
+import Form from "react-bootstrap/Form"
 
 import axios from "../../api/axios"
 import useAuth from "../../hooks/useAuth"
@@ -18,7 +19,7 @@ const Login = () => {
 	const location = useLocation()
 	const from = location.state?.from?.pathname || "/"
 
-	const { setAuth } = useAuth()
+	const { setAuth, persist, setPersist } = useAuth()
 
 	const handleShowErr = (e) => {
 		setShowErrMsg(e)
@@ -40,9 +41,6 @@ const Login = () => {
 
 			const accessToken = response?.data?.access_token
 			const role = response?.data?.role
-
-			console.log(accessToken)
-			console.log(role)
 
 			setAuth({ user, pass, accessToken, role })
 
@@ -72,29 +70,33 @@ const Login = () => {
 					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
 				    : null
 				}
-				<form onSubmit={handleSubmit}>
-					<label htmlFor="email">Email</label>
-					<input 
-						type="email" 
-						id="email" 
-						className="form-control"
-						onChange={(e) => setUser(e.target.value)}
-						value={user}
-						autoComplete="off"
-						required
-					/>
-					<label htmlFor="password">Password:</label>
-	                <input
-	                    type="password"
-	                    className="form-control"
-	                    id="password" 
-	                    onChange={(e) => setPass(e.target.value)}
-	                    value={pass}
-	                    required
-	                />
-	                <Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Sign in" />
-				</form>
-				<Link to="/forgetpass" className="text-decoration-none">Forget Password?</Link>
+				<Form onSubmit={handleSubmit}>
+					<Form.Group className="mb-1">
+						<Form.Label htmlFor="email">Email</Form.Label>
+						<Form.Control 
+							type="email"
+							id="email"
+							onChange={(e) => setUser(e.target.value)}
+							value={user}
+							autoComplete="off"
+							required
+						/>
+					</Form.Group> 
+					<Form.Group className="mb-1">
+						<Form.Label htmlFor="password">Password</Form.Label>
+						<Form.Control 
+		                    type="password"
+		                    id="password" 
+		                    onChange={(e) => setPass(e.target.value)}
+		                    value={pass}
+		                    required
+						/> 
+					</Form.Group>
+					<Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Sign in" />
+				</Form>
+				<div className="text-center mt-1">
+					<Link to="/forgetpass" className="text-decoration-none">Forget Password?</Link>
+				</div>
 			</Col>
 		</Row>
 	)

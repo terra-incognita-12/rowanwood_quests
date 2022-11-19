@@ -6,6 +6,7 @@ import Login from "./components/Auth/Login"
 import Register from "./components/Auth/Register"
 import Logout from "./components/Auth/Logout"
 import RequireAuth from "./components/Auth/RequireAuth"
+import PersistLogin from "./components/Auth/PersistLogin"
 import Main from "./components/Pages/Main"
 import ForgetPass from "./components/Pages/ForgetPass"
 import ChangePass from "./components/Pages/ChangePass"
@@ -17,8 +18,14 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route path="unauthorized" element={<Unauthorized />} />
             
+          <Route path="unauthorized" element={<Unauthorized />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="forgetpass" element={<ForgetPass />} />
+          <Route exact path="changepass/:token" element={<ChangePass />} />
+          
+          <Route element={<PersistLogin />}>
             <Route element={<RequireAuth allowedRoles={['user', 'admin']} />}>
               <Route path="" element={<Main />} />
               <Route path="logout" element={<Logout />} />
@@ -26,12 +33,8 @@ function App() {
 
             <Route element={<RequireAuth allowedRoles={['admin']} />}>
               <Route path="/admin" element={<AdminPanel/>} />
-            </Route>  
-
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
-          <Route path="forgetpass" element={<ForgetPass />} />
-          <Route exact path="changepass/:token" element={<ChangePass />} />
+            </Route>
+          </Route>
         </Route>
       </Routes>
     </>

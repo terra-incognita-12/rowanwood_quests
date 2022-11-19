@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import Card from "react-bootstrap/Card"
+import Button from "react-bootstrap/Button"
+import Form from "react-bootstrap/Form"
 
 import axios from "../../api/axios"
 import ErrMsg from "../ErrMsg"
@@ -98,37 +100,41 @@ const ChangePass = () => {
 					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
 				    : null
 				}
-				<form onSubmit={handleSubmit}>
-					<label htmlFor="password">New password</label>
-					<input
-	                    type="password"
-	                    id="password" 
-	                    className={validPass && pass
-						 	? "is-valid form-control" 
-						 	: !validPass && pass
-						 		? "is-invalid form-control"
-						 		: "form-control"
-						}
-	                    onChange={(e) => setPass(e.target.value)}
-	                    value={pass}
-	                    required
-	                />
-	                <label htmlFor="confirmPassword">Confirm new Password</label>
-	                <input
-	                	type="password"
-	                	id="confirmPassword"
-	                	className={validConfPass && confPass
-						 	? "is-valid form-control" 
-						 	: !validConfPass && confPass
-						 		? "is-invalid form-control"
-						 		: "form-control"
-						}
-	                	onChange={(e) => setConfPass(e.target.value)}
-	                	value={confPass}
-	                	required
-	                />
-					<button className="btn btn-success mt-2 w-100">Submit</button>
-				</form>
+				<Form onSubmit={handleSubmit}>
+					<Form.Group className="mb-1">
+						<Form.Label htmlFor="password">New Password</Form.Label>
+						<Form.Control 
+		                    type="password"
+	                    	id="password" 
+	                    	className={validPass && pass
+						 		? "is-valid" 
+						 		: !validPass && pass
+						 			? "is-invalid"
+						 			: ""
+							}
+	                    	onChange={(e) => setPass(e.target.value)}
+	                    	value={pass}
+	                    	required
+						/> 
+					</Form.Group>
+					<Form.Group className="mb-1">
+						<Form.Label htmlFor="confPassword">Confirm Password</Form.Label>
+						<Form.Control 
+		                    type="password"
+	                    	id="confPassword" 
+	                    	className={validConfPass && confPass
+						 		? "is-valid" 
+						 		: !validConfPass && confPass
+						 			? "is-invalid"
+						 			: ""
+							}
+	                    	onChange={(e) => setConfPass(e.target.value)}
+	                    	value={confPass}
+	                    	required
+						/> 
+					</Form.Group>
+					<Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Submit" />
+				</Form>
 			</Col>
 
 			<Col xs={12} lg={4}>

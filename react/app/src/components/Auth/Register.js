@@ -5,6 +5,7 @@ import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import Card from "react-bootstrap/Card"
 import Button from "react-bootstrap/Button"
+import Form from "react-bootstrap/Form"
 
 import axios from "../../api/axios"
 import ErrMsg from "../ErrMsg"
@@ -81,9 +82,6 @@ const Register = () => {
 				}
 			)
 
-			console.log(response.data)
-            console.log(JSON.stringify(response))
-
             alert("Email with confirmation was sent to you!")
 
             navigate("/login", { replace: true})
@@ -111,77 +109,86 @@ const Register = () => {
 					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
 				    : null
 				}
-				<form onSubmit={handleSubmit}>
-					<label htmlFor="username">Username</label>
-					<input
-						type="text"
-						id="username"
-						className={validUsername && username
-						 	? "is-valid form-control" 
-						 	: !validUsername && username
-						 		? "is-invalid form-control"
-						 		: "form-control"
-						}
-						onChange={(e) => setUsername(e.target.value)}
-						value={username}
-						autoComplete="off"
-						required
-					/>
-					<label htmlFor="email">Email</label>
-					<input 
-						type="email" 
-						id="email" 
-						className={validEmail && email
-						 	? "is-valid form-control" 
-						 	: !validEmail && email
-						 		? "is-invalid form-control"
-						 		: "form-control"
-						}
+				<Form onSubmit={handleSubmit}>
+					<Form.Group className="mb-1">
+						<Form.Label htmlFor="username">Username</Form.Label>
+						<Form.Control 
+							type="text"
+							id="username"
+							className={validUsername && username
+							 	? "is-valid" 
+							 	: !validUsername && username
+							 		? "is-invalid"
+							 		: ""
+							}
+							onChange={(e) => setUsername(e.target.value)}
+							value={username}
+							autoComplete="off"
+							required
+						/>
+					</Form.Group> 
+					<Form.Group className="mb-1">
+						<Form.Label htmlFor="email">Email</Form.Label>
+						<Form.Control 
+							type="email" 
+							id="email" 
+							className={validEmail && email
+						 		? "is-valid" 
+						 		: !validEmail && email
+						 			? "is-invalid"
+						 			: ""
+							}
 						onChange={(e) => setEmail(e.target.value)}
 						value={email}
 						autoComplete="off"
 						required
-					/>
-					<label htmlFor="password">Password</label>
-	                <input
-	                    type="password"
-	                    id="password" 
-	                    className={validPass && pass
-						 	? "is-valid form-control" 
-						 	: !validPass && pass
-						 		? "is-invalid form-control"
-						 		: "form-control"
-						}
-	                    onChange={(e) => setPass(e.target.value)}
-	                    value={pass}
-	                    required
-	                />
-	                <label htmlFor="confirmPassword">Confirm Password</label>
-	                <input
-	                	type="password"
-	                	id="confirmPassword"
-	                	className={validConfPass && confPass
-						 	? "is-valid form-control" 
-						 	: !validConfPass && confPass
-						 		? "is-invalid form-control"
-						 		: "form-control"
-						}
-	                	onChange={(e) => setConfPass(e.target.value)}
-	                	value={confPass}
-	                	required
-	                />
-	                <label htmlFor="photo">Photo</label>
-					<input 
-						type="text" 
-						id="photo" 
-						className="form-control"
-						onChange={(e) => setPhoto(e.target.value)}
-						value={photo}
-						autoComplete="off"
-						required
-					/>
-	                <Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Sign up" />
-				</form>
+						/>
+					</Form.Group>
+					<Form.Group className="mb-1">
+						<Form.Label htmlFor="password">Password</Form.Label>
+						<Form.Control 
+		                    type="password"
+	                    	id="password" 
+	                    	className={validPass && pass
+						 		? "is-valid" 
+						 		: !validPass && pass
+						 			? "is-invalid"
+						 			: ""
+							}
+	                    	onChange={(e) => setPass(e.target.value)}
+	                    	value={pass}
+	                    	required
+						/> 
+					</Form.Group>
+					<Form.Group className="mb-1">
+						<Form.Label htmlFor="confPassword">Confirm Password</Form.Label>
+						<Form.Control 
+		                    type="password"
+	                    	id="confPassword" 
+	                    	className={validConfPass && confPass
+						 		? "is-valid" 
+						 		: !validConfPass && confPass
+						 			? "is-invalid"
+						 			: ""
+							}
+	                    	onChange={(e) => setConfPass(e.target.value)}
+	                    	value={confPass}
+	                    	required
+						/> 
+					</Form.Group>
+					<Form.Group className="mb-1">
+						<Form.Label htmlFor="photo">Photo</Form.Label>
+						<Form.Control 
+							type="text" 
+							id="photo" 
+							onChange={(e) => setPhoto(e.target.value)}
+							value={photo}
+							autoComplete="off"
+							required
+						/>
+					</Form.Group>
+					<Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Sign up" />
+				</Form>
 			</Col>
 
 			<Col xs={12} lg={4}>

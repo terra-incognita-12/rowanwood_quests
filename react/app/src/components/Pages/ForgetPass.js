@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import Button from "react-bootstrap/Button"
-import Alert from "react-bootstrap/Alert"
+import Form from "react-bootstrap/Form"
 
 import axios from "../../api/axios"
 import ErrMsg from "../ErrMsg"
@@ -25,7 +25,7 @@ const ForgetPass = () => {
 		e.preventDefault()
 
 		try {
-			const response = await axios.post("auth/forget_password", JSON.stringify({ "email": email }),
+			await axios.post("auth/forget_password", JSON.stringify({ "email": email }),
 				{
 					headers: {"Content-Type": "application/json"},
 					withCredentials: true
@@ -59,20 +59,23 @@ const ForgetPass = () => {
 					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
 				    : null
 				}
-				<form onSubmit={handleSubmit}>
-					<label htmlFor="email">Recovery email</label>
-					<input 
-						type="email" 
-						id="email"
-						className="form-control"
-						onChange={(e) => setEmail(e.target.value)}
-						value={email}
-						autoComplete="off"
-						required 
-					/>
+				<Form onSubmit={handleSubmit}>
+					<Form.Group className="mb-1">
+						<Form.Label htmlFor="email">Recover Email</Form.Label>
+						<Form.Control 
+							type="email"
+							id="email"
+							onChange={(e) => setEmail(e.target.value)}
+							value={email}
+							autoComplete="off"
+							required
+						/>
+					</Form.Group>
 					<Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Send recovery link" />
-				</form>
-				<Link to="/login" className="text-decoration-none">Back to login</Link>
+				</Form>
+				<div className="text-center mt-1">
+					<Link to="/login" className="text-decoration-none">Back to login</Link>
+				</div>
 			</Col>
 		</Row>
 	)
