@@ -220,5 +220,5 @@ def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Dep
 	response.set_cookie('access_token', access_token, ACCESS_X*60, ACCESS_X*60, '/', None, False, True, 'lax')
 	response.set_cookie('logged_in', 'True', ACCESS_X*60, ACCESS_X*60, '/', None, False, False, 'lax')
 
-	return {'access_token': access_token}
+	return {'email': user.email, 'role': user.role, 'access_token': access_token}
 
