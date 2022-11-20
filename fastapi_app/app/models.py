@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import TIMESTAMP, Column, String, Boolean, text
+from sqlalchemy import TIMESTAMP, Column, String, Boolean, text, TEXT
 from sqlalchemy.dialects.postgresql import UUID
 
 from database import Base
@@ -16,4 +16,15 @@ class User(Base):
 	password_token = Column(String, nullable=True, unique=True)
 	role = Column(String, default='user')
 	created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
-	updated_at = Column(TIMESTAMP(timezone=True), server_default=text("now()"))
+	updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+
+class Quest(Base):
+	__tablename__ = 'quests'
+
+	id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
+	name = Column(String, unique=True)
+	brief_description = Column(String)
+	full_description = Column(TEXT)
+	photo = Column(String, nullable=True)
+	created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+	updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
