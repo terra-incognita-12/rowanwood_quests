@@ -6,8 +6,8 @@ import Col from "react-bootstrap/Col"
 import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
 
-import axios from "../../api/axios"
-import ErrMsg from "../ErrMsg"
+import axios from "../../../api/axios"
+import ErrMsg from "../../ErrMsg"
 
 const ForgetPass = () => {
 	const navigate = useNavigate()

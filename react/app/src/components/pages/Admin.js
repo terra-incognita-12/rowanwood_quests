@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import axios from "../../api/axios"
 
-const AdminPanel = () => {
+const Admin = () => {
 	const [user, setUser] = useState()
     const axiosPrivate = useAxiosPrivate()
     const navigate = useNavigate()  
@@ -54,4 +54,4 @@ const AdminPanel = () => {
 	)
 }
 
-export default AdminPanel
+export default Admin

@@ -14,20 +14,21 @@ const Sitenavbar = () => {
 			<Container>
 				<Navbar.Brand>Rowan Wood</Navbar.Brand>
 				<Nav className="me-auto">
+					<NavLink to="/" className="nav-link">Home</NavLink>
+					<NavLink to="/library" className="nav-link">Library</NavLink>
+					<NavLink to="/about" className="nav-link">About</NavLink> 
 					{ auth?.user 
 						?
 						<>
-							<NavLink to="/" className="nav-link">Home</NavLink> 
+							<NavLink to="/profile" className="nav-link">Profile</NavLink>
 							{ auth?.role === 'admin' 
-								? <NavLink to="/admin" className="nav-link">Admin Panel</NavLink>	
-								: null
+								? <NavLink to="/admin" className="nav-link">Admin</NavLink>	
+								: auth?.role === 'editor'
+									? <NavLink to="/admin" className="nav-link">Editor</NavLink>
+									: null 
 							}
 						</>
-						: 
-						<>
-							<NavLink to="/login" className="nav-link">Login</NavLink>
-							<NavLink to="/register" className="nav-link">Register</NavLink>
-						</>
+						: null
 					}	
 				</Nav>
 				{ auth?.user
@@ -35,7 +36,10 @@ const Sitenavbar = () => {
 					<Nav>
 						<NavLink to="/logout" className="nav-link">Log Out</NavLink>
 					</Nav>
-					: null
+					: 
+					<Nav>
+						<NavLink to="/login" className="nav-link">Sign in</NavLink>
+					</Nav>
 				}
 			</Container>
 		</Navbar>

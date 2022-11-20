@@ -7,8 +7,8 @@ import Card from "react-bootstrap/Card"
 import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
 
-import axios from "../../api/axios"
-import ErrMsg from "../ErrMsg"
+import axios from "../../../api/axios"
+import ErrMsg from "../../ErrMsg"
 
 const PASS_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/
 

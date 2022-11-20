@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import Alert from "react-bootstrap/Alert"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
@@ -109,6 +109,7 @@ const Register = () => {
 					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
 				    : null
 				}
+				<Link to="/login" className="btn btn-primary mb-3">Back to login</Link>
 				<Form onSubmit={handleSubmit}>
 					<Form.Group className="mb-1">
 						<Form.Label htmlFor="username">Username</Form.Label>

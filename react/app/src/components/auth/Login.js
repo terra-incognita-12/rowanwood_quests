@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
@@ -19,7 +19,7 @@ const Login = () => {
 	const location = useLocation()
 	const from = location.state?.from?.pathname || "/"
 
-	const { setAuth, persist, setPersist } = useAuth()
+	const { setAuth } = useAuth()
 
 	const handleShowErr = (e) => {
 		setShowErrMsg(e)
@@ -94,8 +94,11 @@ const Login = () => {
 					</Form.Group>
 					<Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Sign in" />
 				</Form>
+				<div className="text-center mt-2">
+					<span>Don't have an account yet? </span><Link to="/register" className="text-decoration-none">Sign up!</Link>
+				</div>
 				<div className="text-center mt-1">
-					<Link to="/forgetpass" className="text-decoration-none">Forget Password?</Link>
+					<span>Forgot Password? </span><Link to="/forgetpass" className="text-decoration-none">Let's recover it!</Link>
 				</div>
 			</Col>
 		</Row>
