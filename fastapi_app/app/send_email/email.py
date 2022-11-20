@@ -3,8 +3,8 @@ from typing import List
 from pydantic import EmailStr, BaseModel
 from jinja2 import Environment, select_autoescape, FileSystemLoader
 
-from config import settings
-from models import User
+from ..config import settings
+from ..models import User
 
 env = Environment(
 	loader=FileSystemLoader('send_email/'),

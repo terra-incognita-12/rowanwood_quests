@@ -5,9 +5,9 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException, status
 
-from config import settings
-from database import get_db
-from models import User
+from .config import settings
+from .database import get_db
+from .models import User
 
 class Settings(BaseModel):
 	authjwt_algorithm: str = settings.JWT_ALGORITHM

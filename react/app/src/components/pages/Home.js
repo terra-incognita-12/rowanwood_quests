@@ -2,10 +2,10 @@ import { useState, useEffect } from "react"
 import Modal from "react-bootstrap/Modal"
 import Button from "react-bootstrap/Button"
 
+import QuestsList from "../pageComponents/QuestsList"
 import WelcomeModal from "../modals/WelcomeModal"
 
 const Home = () => {
-
 	const [show, setShow] = useState(false);
 
   	const handleClose = () => setShow(false);
@@ -21,6 +21,7 @@ const Home = () => {
 				<h1>SALVE FATIGO VIATOR</h1>
 			</div>
 			<WelcomeModal show={show} handleClose={handleClose}/>
+            <QuestsList />
 		</>
 	)
 }

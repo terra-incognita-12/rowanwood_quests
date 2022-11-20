@@ -13,15 +13,15 @@ from sqlalchemy.orm import Session
 from pydantic import EmailStr
 from fastapi.responses import RedirectResponse
 
-from send_email.email import Email
-from oauth2 import AuthJWT, require_user
-from schemes import user_scheme
-from models import User
-from hasher import Hasher
-from email_token import EmailToken
-from password_token import PasswordToken
-from database import get_db
-from config import settings
+from ..send_email.email import Email
+from ..oauth2 import AuthJWT, require_user
+from ..schemes import user_scheme
+from ..models import User
+from ..hasher import Hasher
+from ..email_token import EmailToken
+from ..password_token import PasswordToken
+from ..database import get_db
+from ..config import settings
 
 router = APIRouter()
 
