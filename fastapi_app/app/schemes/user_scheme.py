@@ -36,3 +36,6 @@ class UserResponse(UserBaseScheme):
 	role: str
 	created_at: datetime
 	updated_at: datetime
+
+class ForeignKeyUserResponse(UserBaseScheme):
+	id: uuid.UUID

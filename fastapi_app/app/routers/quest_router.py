@@ -6,7 +6,7 @@ from fastapi import (
 from sqlalchemy.orm import Session
 from typing import List
 from ..database import get_db
-from ..models import Quest
+from ..models import Quest, Comment
 from ..schemes import quest_scheme
 
 router = APIRouter()
@@ -20,10 +20,19 @@ def create_quest(payload: quest_scheme.CreateQuestScheme, db: Session = Depends(
 
     return {'status': 'success', 'message': 'Quest created succesfully'}
 
-@router.get('/all', response_model=List[quest_scheme.QuestResponse])
+@router.get('/all', response_model=List[quest_scheme.QuestResponseScheme])
 def get_all_quests(db: Session = Depends(get_db)):
     quests = db.query(Quest).all()
     return quests
+
+@router.get('/{url}', response_model=quest_scheme.QuestResponseScheme)
+def get_quest(url: str, db: Session = Depends(get_db)):
+    quest = db.query(Quest).filter(Quest.url == url).first()
+
+    if not quest:
+        raise HTTPException(status_code=404, detail="Quest doesn't exist")
+
+    return quest
 
 # @router.get('/me', response_model=user_scheme.UserResponse)
 # def get_me(db: Session = Depends(get_db), user_id: str = Depends(require_user)):

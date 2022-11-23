@@ -3,6 +3,7 @@ import Modal from "react-bootstrap/Modal"
 import Button from "react-bootstrap/Button"
 
 import QuestsList from "../pageComponents/QuestsList"
+
 import WelcomeModal from "../modals/WelcomeModal"
 
 const Home = () => {
@@ -17,11 +18,11 @@ const Home = () => {
 
 	return (
 		<>	
+			<WelcomeModal show={show} handleClose={handleClose}/>
 			<div className="text-center mt-5">
 				<h1>SALVE FATIGO VIATOR</h1>
 			</div>
-			<WelcomeModal show={show} handleClose={handleClose}/>
-            <QuestsList />
+			<QuestsList />
 		</>
 	)
 }

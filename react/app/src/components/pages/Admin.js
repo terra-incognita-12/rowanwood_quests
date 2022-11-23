@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
-import axios from "../../api/axios"
 
 const Admin = () => {
 	const [user, setUser] = useState()

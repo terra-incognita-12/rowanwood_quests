@@ -1,4 +1,10 @@
 import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
+import Row from "react-bootstrap/Row"
+import Col from "react-bootstrap/Col"
+import Button from "react-bootstrap/Button"
+import Card from "react-bootstrap/Card"
+
 import axios from "../../api/axios"
 
 const QuestsList = () => {
@@ -29,17 +35,22 @@ const QuestsList = () => {
     }, [])
 
     return (
-        <>
+        <Row>
             {quests?.length
-                ? (
-                    <ul>
-                        {quests.map((quest, i) => 
-                            <li key={i}>{quest.name}</li> 
-                        )}
-                    </ul>
+                ?
+                quests.map((quest, i) => 
+                    <Col xs={12} md="auto" className="mt-3" key={i}>
+                        <Card>
+                            <Card.Body>
+                                <Card.Title>{quest.name}</Card.Title>
+                                <Card.Text>{quest.brief_description}</Card.Text>
+                                <Link to={`quest/${quest.url}`} className="btn btn-primary">Quest info</Link>
+                            </Card.Body>
+                        </Card>
+                    </Col>
                 ) : null
             }
-        </>
+        </Row>
     )
 }
 

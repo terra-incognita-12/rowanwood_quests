@@ -12,6 +12,7 @@ import PersistLogin from "./components/auth/PersistLogin"
 import Home from "./components/pages/Home"
 import Library from "./components/pages/Library"
 import About from "./components/pages/About"
+import QuestDetails from "./components/pages/QuestDetails"
 import Profile from "./components/pages/Profile"
 import Admin from "./components/pages/Admin"
 
@@ -32,6 +33,8 @@ function App() {
           <Route path="" element={<Home />} />
           <Route path="library" element={<Library />} />
           <Route path="about" element={<About />} />
+
+          <Route exact path="quest/:url" element={<QuestDetails />} />
 
           <Route path="login" element={<Login />} />
           <Route exact path="changepass/:token" element={<ChangePass />} />

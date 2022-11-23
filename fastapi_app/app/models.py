@@ -1,5 +1,6 @@
 import uuid
-from sqlalchemy import TIMESTAMP, Column, String, Boolean, text, TEXT
+from sqlalchemy import TIMESTAMP, Column, String, ForeignKey, Boolean, text, TEXT
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 
 from .database import Base
@@ -18,13 +19,32 @@ class User(Base):
 	created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
 	updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
 
+	user_comments = relationship('Comment', back_populates='user')
+
 class Quest(Base):
 	__tablename__ = 'quests'
 
 	id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
-	name = Column(String, unique=True)
+	name = Column(String)
+	url = Column(String, unique=True)
+	telegram_url = Column(String, unique=True)
 	brief_description = Column(String)
 	full_description = Column(TEXT)
 	photo = Column(String, nullable=True)
 	created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
 	updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+
+	quest_comments = relationship('Comment', back_populates='quest')
+
+class Comment(Base):
+	__tablename__ = 'comments'
+
+	id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
+	text_comment = Column(TEXT)
+	created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+	updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+	user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+	quest_id = Column(UUID(as_uuid=True), ForeignKey('quests.id', ondelete='CASCADE'), nullable=False)
+
+	user = relationship('User', back_populates='user_comments')
+	quest = relationship('Quest', back_populates='quest_comments')
