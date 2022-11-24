@@ -3,17 +3,18 @@ import Modal from "react-bootstrap/Modal"
 import Button from "react-bootstrap/Button"
 
 import QuestsList from "../pageComponents/QuestsList"
-
 import WelcomeModal from "../modals/WelcomeModal"
+import useAuth from "../../hooks/useAuth"
 
 const Home = () => {
 	const [show, setShow] = useState(false);
+	const { auth } = useAuth()
 
   	const handleClose = () => setShow(false);
   	const handleShow = () => setShow(true);
 
   	useEffect(() => {
-  		handleShow()
+  		!auth?.user && handleShow()
   	}, [])
 
 	return (

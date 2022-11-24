@@ -1,13 +1,16 @@
 import { useState, useRef, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 
+import useAuth from "../../hooks/useAuth"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
+import useRedirectLogin from "../../hooks/useRedirectLogin"
 
 const Admin = () => {
 	const [user, setUser] = useState()
-    const axiosPrivate = useAxiosPrivate()
-    const navigate = useNavigate()  
+
+    const axiosPrivate = useAxiosPrivate()  
     const location = useLocation()
+    const redirectLogin = useRedirectLogin(location)
 
     // Prevent dobule run react strict mode
     const oneTimeRun = useRef(false)
@@ -23,7 +26,7 @@ const Admin = () => {
     			})
     			isMounted && setUser(response.data)
     		} catch (err) {
-    			navigate('/login', { state: { from: location }, replace: true })
+    			redirectLogin()
     		}
     	}
 

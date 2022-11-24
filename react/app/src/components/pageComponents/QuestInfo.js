@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useNavigate, useLocation, Link } from "react-router-dom"
+import { useLocation, Link } from "react-router-dom"
 import Card from "react-bootstrap/Card"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
@@ -10,14 +10,15 @@ import axios from "../../api/axios"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import CommentForm from "../forms/CommentForm"
 import useAuth from "../../hooks/useAuth"
+import useRedirectLogin from "../../hooks/useRedirectLogin"
 
 const QuestInfo = ({ url }) => {
 	const [quest, setQuest] = useState("")
 	const [commentChanged, setCommentChanged] = useState(false)
 	const { auth } = useAuth()
-	const axiosPrivate = useAxiosPrivate()
-	const navigate = useNavigate()  
+	const axiosPrivate = useAxiosPrivate()  
     const location = useLocation()
+    const redirectLogin = useRedirectLogin(location)
 
 	const handleCommentChanged = () => setCommentChanged(true)
  
@@ -26,7 +27,7 @@ const QuestInfo = ({ url }) => {
 			await axiosPrivate.post("/comment/delete", JSON.stringify({id}))
 			setCommentChanged(true)
 		} catch (err) {
-			navigate('/login', { state: { from: location }, replace: true })
+			redirectLogin()
 		}
 	}
 
@@ -77,7 +78,8 @@ const QuestInfo = ({ url }) => {
 								<Card>
 									<Card.Header className="d-flex justify-content-between">
 										<div>
-											<b>{comment.user.username}</b> on {moment(new Date(comment.created_at)).format('MM/DD/YY HH:mm:ss')}
+											<Card.Title>{comment.user.username}</Card.Title>
+											<Card.Subtitle className="text-muted">{moment(new Date(comment.created_at)).format('MM/DD/YY HH:mm:ss')}</Card.Subtitle>
 										</div>
 										<div>
 											{auth?.role === 'admin'

@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react"
-import { useNavigate, useLocation, Link } from "react-router-dom"
+import { useLocation, Link } from "react-router-dom"
 import Form from "react-bootstrap/Form"
 import FloatingLabel from "react-bootstrap/FloatingLabel"
 import Button from "react-bootstrap/Button"
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
+import useRedirectLogin from "../../hooks/useRedirectLogin"
 
 const CommentForm = ({ url, handleCommentChanged }) => {
 	const [comment, setComment] = useState("")
-	const axiosPrivate = useAxiosPrivate()
-	const navigate = useNavigate()  
     const location = useLocation()
+	const axiosPrivate = useAxiosPrivate()  
+    const redirectLogin = useRedirectLogin(location)
 
 	const handleSubmit = async (e) => {
 		e.preventDefault()
@@ -20,7 +21,7 @@ const CommentForm = ({ url, handleCommentChanged }) => {
 			setComment("")
 			handleCommentChanged()
 		} catch (err) {
-			navigate('/login', { state: { from: location }, replace: true })
+			redirectLogin()
 		}
 	}
 	return (
