@@ -30,17 +30,16 @@ function App() {
           <Route path="register" element={<Register />} />
           <Route path="forgetpass" element={<ForgetPass />} />
 
-          <Route path="" element={<Home />} />
-          <Route path="library" element={<Library />} />
-          <Route path="about" element={<About />} />
-
-          <Route exact path="quest/:url" element={<QuestDetails />} />
-
           <Route path="login" element={<Login />} />
           <Route exact path="changepass/:token" element={<ChangePass />} />
           <Route path="unauthorized" element={<Unauthorized />} />
           
           <Route element={<PersistLogin />}>
+            <Route path="" element={<Home />} />
+            <Route path="library" element={<Library />} />
+            <Route path="about" element={<About />} />
+
+            <Route exact path="quest/:url" element={<QuestDetails />} />
             <Route element={<RequireAuth allowedRoles={['user', 'admin']} />}>
               <Route path="profile" element={<Profile />} />
               <Route path="logout" element={<Logout />} />

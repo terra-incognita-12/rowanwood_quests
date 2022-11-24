@@ -1,36 +1,37 @@
 import { useState, useEffect } from "react"
+import { useNavigate, useLocation, Link } from "react-router-dom"
 import Form from "react-bootstrap/Form"
 import FloatingLabel from "react-bootstrap/FloatingLabel"
 import Button from "react-bootstrap/Button"
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 
-const CommentForm = ({ url }) => {
-	const axiosPrivate = useAxiosPrivate()
+const CommentForm = ({ url, handleCommentChanged }) => {
 	const [comment, setComment] = useState("")
+	const axiosPrivate = useAxiosPrivate()
+	const navigate = useNavigate()  
+    const location = useLocation()
 
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 		try {
-			const response = await axiosPrivate.post("/comment/create", JSON.stringify({"text_comment": comment, "quest_url": url}))
+			await axiosPrivate.post("/comment/create", JSON.stringify({"text_comment": comment, "quest_url": url}))
 
 			setComment("")
-			return
+			handleCommentChanged()
 		} catch (err) {
-			console.log(err)
+			navigate('/login', { state: { from: location }, replace: true })
 		}
 	}
 	return (
 		<>
 			<Form onSubmit={handleSubmit}>
-				<FloatingLabel controlId="floatingTextarea" label="Your comment">
-        			<Form.Control 
-        				as="textarea" 
-        				placeholder="Leave a comment here"
-        				onChange={(e) => setComment(e.target.value)}
-        				value={comment} 
-        			/>
-      			</FloatingLabel>
+    			<Form.Control 
+    				as="textarea" 
+    				placeholder="Leave a comment here"
+    				onChange={(e) => setComment(e.target.value)}
+    				value={comment} 
+    			/>
       			<Button variant="success" className="mt-2" as="input" type="submit" value="Leave comment" />
 			</Form>	
 		</>

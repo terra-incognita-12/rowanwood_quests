@@ -16,6 +16,9 @@ class CreateCommentScheme(CommentsBaseScheme):
 	user_id: Union[uuid.UUID, None] = None
 	quest_url: str
 
+class DeleteCommentScheme(BaseModel):
+	id: uuid.UUID
+
 class CommentResponseScheme(CommentsBaseScheme):
 	id: uuid.UUID
 	created_at: datetime

@@ -18,8 +18,6 @@ router = APIRouter()
 def create_comment(payload: comment_scheme.CreateCommentScheme, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
     payload.user_id = uuid.UUID(user_id)
 
-    print(payload)
-
     quest = db.query(Quest).filter(Quest.url == payload.quest_url).first()
     if not quest:
         raise HTTPException(status_code=404, detail="Quest doesn't exist")
@@ -36,14 +34,14 @@ def create_comment(payload: comment_scheme.CreateCommentScheme, db: Session = De
 
     return {'status': 'success', 'message': 'Comment created succesfully'}
 
-# @router.get('/all', response_model=List[comment_scheme.CommentResponseScheme])
-# def get_all_comments(db: Session = Depends(get_db)):
-#    comments = db.query(Comment).all()
-#    return comments
+@router.post('/delete', status_code=status.HTTP_200_OK)
+def delete_comment(payload: comment_scheme.DeleteCommentScheme, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
+    comment = db.query(Comment).filter(Comment.id == payload.id).first()
 
-# @router.get('/{url}', response_model=quest_scheme.QuestResponseScheme)
-# def get_quest(url: str, db: Session = Depends(get_db)):
-#    quest = db.query(Quest).filter(Quest.url == url).first()
-#    if not quest:
-#        raise HTTPException(status_code=404, detail="Quest doesn't exist")
-#    return quest
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment doesn't exist")
+
+    db.delete(comment)
+    db.commit()
+
+    return {'status', 'ok'}
