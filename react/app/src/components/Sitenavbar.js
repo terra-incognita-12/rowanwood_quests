@@ -22,9 +22,13 @@ const Sitenavbar = () => {
 						<>
 							<NavLink to="/profile" className="nav-link">Profile</NavLink>
 							{ auth?.role === 'admin' 
-								? <NavLink to="/admin" className="nav-link">Admin</NavLink>	
+								? 
+								<>
+									<NavLink to="/editor" className="nav-link">Editor</NavLink>
+									<NavLink to="/admin" className="nav-link">Admin</NavLink>
+								</>	
 								: auth?.role === 'editor'
-									? <NavLink to="/admin" className="nav-link">Editor</NavLink>
+									? <NavLink to="/editor" className="nav-link">Editor</NavLink>
 									: null 
 							}
 						</>

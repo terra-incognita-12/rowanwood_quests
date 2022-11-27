@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { useLocation, Link } from "react-router-dom"
 import Form from "react-bootstrap/Form"
-import FloatingLabel from "react-bootstrap/FloatingLabel"
 import Button from "react-bootstrap/Button"
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
