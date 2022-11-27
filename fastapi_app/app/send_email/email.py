@@ -7,7 +7,7 @@ from ..config import settings
 from ..models import User
 
 env = Environment(
-	loader=FileSystemLoader('send_email/'),
+	loader=FileSystemLoader('app/send_email/'),
 	autoescape=select_autoescape(['html', 'xml'])
 )
 
