@@ -37,11 +37,39 @@ def get_quest(url: str, db: Session = Depends(get_db)):
     quest = db.query(Quest).filter(Quest.url == url).first()
 
     if not quest:
-        raise HTTPException(status_code=404, detail="Quest doesn't exist")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
 
     return quest
 
-# @router.get('/me', response_model=user_scheme.UserResponse)
-# def get_me(db: Session = Depends(get_db), user_id: str = Depends(require_user)):
-# 	user = db.query(User).filter(User.id == user_id).first()
-# 	return user
+@router.patch('/update/{id}')
+def update_quest(id: str, payload:quest_scheme.QuestBaseScheme, db: Session = Depends(get_db)):
+    quest_query = db.query(Quest).filter(Quest.id == id)
+    check_quest = quest_query.first()
+
+    if not check_quest:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+
+    check_quest_url = db.query(Quest).filter(Quest.url == payload.url).first()
+
+    if check_quest_url and str(check_quest_url.id) != id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Quest with this url already exists')
+
+    update_data = payload.dict(exclude_unset=True)
+    quest_query.update(update_data, synchronize_session=False)
+
+    db.commit()
+    db.refresh(check_quest)
+
+    return {'status': 'success', 'url': check_quest.url}    
+
+@router.delete('/delete/{url}')
+def delete_quest(url: str, db: Session = Depends(get_db)):
+    quest_query = db.query(Quest).filter(Quest.url == url)
+    check_quest = quest_query.first()
+
+    if not check_quest:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+
+    quest_query.delete(synchronize_session=False)
+    db.commit()
+    return {'success': 'OK'}

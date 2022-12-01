@@ -18,7 +18,9 @@ import Admin from "./components/pages/Admin"
 
 import Editor from "./components/pages/editor/Editor"
 import CreateQuest from "./components/pages/editor/CreateQuest"
+import EditQuestsList from "./components/pages/editor/EditQuestsList"
 import EditQuest from "./components/pages/editor/EditQuest"
+import DeleteQuest from "./components/pages/editor/DeleteQuest"
 
 import ForgetPass from "./components/pages/recoverPass/ForgetPass"
 import ChangePass from "./components/pages/recoverPass/ChangePass"
@@ -52,8 +54,10 @@ function App() {
 
             <Route element={<RequireAuth allowedRoles={['admin', 'editor']} />}>
               <Route path="editor" element={<Editor />} />
-              <Route exact path="editor/create" element={<CreateQuest />} />
-              <Route exact path="editor/edit" element={<EditQuest />} />
+              <Route exact path="editor/quest/create" element={<CreateQuest />} />
+              <Route exact path="editor/quest/edit" element={<EditQuestsList />} />
+              <Route exact path="editor/quest/edit/:url" element={<EditQuest />} />
+              <Route exact path="editor/quest/delete/:url" element={<DeleteQuest />} />
             </Route>
 
             <Route element={<RequireAuth allowedRoles={['admin']} />}>
