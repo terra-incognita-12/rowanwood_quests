@@ -25,7 +25,7 @@ const Editor = () => {
 				<Col xs={12} md={3}>
 					<Card>
 	                    <Card.Body className="text-center">
-	                        <Link to='/editor' className="btn btn-success w-100">Create Library Record</Link>
+	                        <Link to="/editor/library/create" className="btn btn-success w-100">Create Library Record</Link>
 	                    </Card.Body>
 	                </Card>
 				</Col>

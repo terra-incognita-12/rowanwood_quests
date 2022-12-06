@@ -2,8 +2,8 @@ import { useEffect } from "react"
 import { useParams } from "react-router"
 import { useNavigate } from "react-router-dom"
 
-import useAxiosPrivate from "../../../hooks/useAxiosPrivate"
-import useRedirectLogin from "../../../hooks/useRedirectLogin"
+import useAxiosPrivate from "../../../../hooks/useAxiosPrivate"
+import useRedirectLogin from "../../../../hooks/useRedirectLogin"
 
 const DeleteQuest = () => {
 	const { url } = useParams()

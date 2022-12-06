@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button"
 import Card from "react-bootstrap/Card"
 import ListGroup from "react-bootstrap/ListGroup"
 
-import axios from "../../../api/axios"
+import axios from "../../../../api/axios"
 
 const EditQuestList = () => {
 	const [quests, setQuests] = useState("")

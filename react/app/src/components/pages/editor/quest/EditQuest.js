@@ -2,8 +2,8 @@ import { useState, useEffect } from "react"
 import { useParams } from "react-router"
 import { Link } from "react-router-dom"
 
-import axios from "../../../api/axios"
-import EditQuestForm from "../../forms/EditQuestForm"
+import axios from "../../../../api/axios"
+import EditQuestForm from "../../../forms/EditQuestForm"
 
 const EditQuest = () => {
 	const { url } = useParams()

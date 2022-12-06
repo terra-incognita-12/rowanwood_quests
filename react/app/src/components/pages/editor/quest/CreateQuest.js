@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 
-import CreateQuestForm from "../../forms/CreateQuestForm"
+import CreateQuestForm from "../../../forms/CreateQuestForm"
 
 const CreateQuest = () => {
 	return (
