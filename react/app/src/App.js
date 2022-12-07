@@ -13,6 +13,7 @@ import Home from "./components/pages/Home"
 import Library from "./components/pages/Library"
 import About from "./components/pages/About"
 import QuestDetails from "./components/pages/QuestDetails"
+import LibraryDetails from "./components/pages/LibraryDetails"
 import Profile from "./components/pages/Profile"
 import Admin from "./components/pages/Admin"
 
@@ -49,6 +50,7 @@ function App() {
             <Route path="about" element={<About />} />
 
             <Route exact path="quest/:url" element={<QuestDetails />} />
+            <Route exact path="library/:url" element={<LibraryDetails />} />
             
             <Route element={<RequireAuth allowedRoles={['user', 'admin', 'editor']} />}>
               <Route path="profile" element={<Profile />} />

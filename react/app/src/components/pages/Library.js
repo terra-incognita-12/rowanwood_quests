@@ -1,8 +1,10 @@
+import LibraryList from "../pageComponents/LibraryList"
+
 const Library = () => {
 
 	return (
 		<>	
-			<h1>Library</h1>
+			<LibraryList />
 		</>
 	)
 }

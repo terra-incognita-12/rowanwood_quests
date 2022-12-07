@@ -15,7 +15,7 @@ router = APIRouter()
 
 @router.get("/records/all", response_model=List[library_scheme.LibraryRecordResponseScheme])
 def get_records(db: Session = Depends(get_db)):
-    records = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).all()
+    records = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).order_by(LibraryRecord.name).all()
     return records
 
 @router.get("/records/{url}", response_model=library_scheme.LibraryRecordResponseScheme)
