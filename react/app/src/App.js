@@ -25,6 +25,7 @@ import EditQuest from "./components/pages/editor/quest/EditQuest"
 import DeleteQuest from "./components/pages/editor/quest/DeleteQuest"
 
 import CreateLibraryRecord from "./components/pages/editor/library/CreateLibraryRecord"
+import EditLibraryRecordsList from "./components/pages/editor/library/EditLibraryRecordsList"
 
 import ForgetPass from "./components/pages/recoverPass/ForgetPass"
 import ChangePass from "./components/pages/recoverPass/ChangePass"
@@ -63,7 +64,9 @@ function App() {
               <Route exact path="editor/quest/edit" element={<EditQuestsList />} />
               <Route exact path="editor/quest/edit/:url" element={<EditQuest />} />
               <Route exact path="editor/quest/delete/:url" element={<DeleteQuest />} />
+              
               <Route exact path="editor/library/create" element={<CreateLibraryRecord />} />
+              <Route exact path="editor/library/edit" element={<EditLibraryRecordsList />} />
             </Route>
 
             <Route element={<RequireAuth allowedRoles={['admin']} />}>
