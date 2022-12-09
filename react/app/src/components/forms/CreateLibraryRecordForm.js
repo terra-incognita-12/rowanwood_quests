@@ -10,7 +10,9 @@ import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
-import Input from '@mui/material/Input';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
 
 import ErrMsg from "../ErrMsg"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
@@ -19,13 +21,7 @@ import useRedirectLogin from "../../hooks/useRedirectLogin"
 // Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _
 const URL_REGEX = /^[a-z][a-z0-9-_]{3,23}$/
 
-const someAr = [
-    {name: "string"},
-    {name: "r2"},
-    {name: "r4"},
-];
-
-const CreateQuestForm = () => {
+const CreateLibraryRecordForm = () => {
 	const navigate = useNavigate()
 	const location = useLocation()
 	const axiosPrivate = useAxiosPrivate()  
@@ -81,6 +77,8 @@ const CreateQuestForm = () => {
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 
+        !tags && setTags([])
+
 		if (!URL_REGEX.test(url)) {
 			setErrMsg("Invaid quest url. Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _")
 			handleShowErr(true)
@@ -112,91 +110,96 @@ const CreateQuestForm = () => {
 				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
 			    : null
 			}
-			<Form onSubmit={handleSubmit}>
-				<Row className="mt-3 mb-2">
-					<Col xs={12} lg={6}>
-                        <FormControl fullWidth>
-                            <InputLabel htmlFor="component-outlined">Name</InputLabel>
-                            <OutlinedInput
-                                id="name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                label="Name"
-                                required
-                            />
-                        </FormControl>
-					</Col>
-				</Row>
-				<Row className="mb-2">
-					<Col xs={12} lg={6}>
-                        <FormControl fullWidth>
-                            <InputLabel htmlFor="url">URL (Unique Name)</InputLabel>
-                            <OutlinedInput
-                                id="url"
-                                value={url}
-                                onChange={(e) => setUrl(e.target.value)}
-                                label="URL (Unique Name)"
-                                required
-                            />
-                        </FormControl>
-					</Col>
-				</Row>
-				<Row className="mb-2">
-					<Col xs={12} lg={6}>
-                        <FormControl fullWidth>
-                            <InputLabel htmlFor="photo">Photo</InputLabel>
-                            <OutlinedInput
-                                id="photo"
-                                value={photo}
-                                onChange={(e) => setPhoto(e.target.value)}
-                                label="Photo"
-                                required
-                            />
-                        </FormControl>
-					</Col>
-				</Row>
-				<Row className="mb-2">
-                    <Col xs={12} lg={6}>
-                        <Autocomplete
-                            multiple
-                            onChange={(e, newValue) => {
-						    	setTags(newValue)
-						    }}
-						    onInputChange={(e, newInputValue) => {
-						    	setInputTags(newInputValue)
-						    }}
-                            options={readyTags}
-                            getOptionLabel={(option) => option.name}
-                            renderInput={(params) => (
-                                <TextField {...params}
-                                    label="Tags" 
-                                    placeholder="Input tags" 
-                                    id="tags"
+            <Card className="mt-3">
+                <CardContent>
+                    <Typography gutterBottom variant="h3" component="div">Create Record</Typography>
+                    <Form onSubmit={handleSubmit}>
+                        <Row className="mt-3 mb-2">
+                            <Col xs={12} lg={6}>
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="component-outlined">Name</InputLabel>
+                                    <OutlinedInput
+                                        id="name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        label="Name"
+                                        required
+                                    />
+                                </FormControl>
+                            </Col>
+                        </Row>
+                        <Row className="mb-2">
+                            <Col xs={12} lg={6}>
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="url">URL (Unique Name)</InputLabel>
+                                    <OutlinedInput
+                                        id="url"
+                                        value={url}
+                                        onChange={(e) => setUrl(e.target.value)}
+                                        label="URL (Unique Name)"
+                                        required
+                                    />
+                                </FormControl>
+                            </Col>
+                        </Row>
+                        <Row className="mb-2">
+                            <Col xs={12} lg={6}>
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="photo">Photo</InputLabel>
+                                    <OutlinedInput
+                                        id="photo"
+                                        value={photo}
+                                        onChange={(e) => setPhoto(e.target.value)}
+                                        label="Photo"
+                                        required
+                                    />
+                                </FormControl>
+                            </Col>
+                        </Row>
+                        <Row className="mb-2">
+                            <Col xs={12} lg={6}>
+                                <Autocomplete
+                                    multiple
+                                    onChange={(e, newValue) => {
+                                        setTags(newValue)
+                                    }}
+                                    onInputChange={(e, newInputValue) => {
+                                        setInputTags(newInputValue)
+                                    }}
+                                    options={readyTags}
+                                    getOptionLabel={(option) => option.name}
+                                    renderInput={(params) => (
+                                        <TextField {...params}
+                                            label="Tags" 
+                                            placeholder="Input tags" 
+                                            id="tags"
+                                        />
+                                    )}
                                 />
-                            )}
-                        />
-                    </Col>
-				</Row>
-				<Row className="mb-2">
-					<Col xs={12}>
-                        <FormControl fullWidth>
-                            <InputLabel htmlFor="description">Description</InputLabel>
-                            <OutlinedInput
-                                id="description"
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                label="Description"
-                                required
-                            />
-                        </FormControl>
-					</Col>
-				</Row>
-				<div className="mt-3">
-		      		<Button variant="contained" color="success" type="submit">Create Record</Button>
-				</div>
-			</Form>
+                            </Col>
+                        </Row>
+                        <Row className="mb-2">
+                            <Col xs={12}>
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="description">Description</InputLabel>
+                                    <OutlinedInput
+                                        id="description"
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        label="Description"
+                                        required
+                                    />
+                                </FormControl>
+                            </Col>
+                        </Row>
+                        <div className="mt-3">
+                            <Button variant="contained" color="success" type="submit">Create Record</Button>
+                        </div>
+                    </Form>
+                </CardContent>
+            </Card>
 		</>
 	)
 }
 
-export default CreateQuestForm
+export default CreateLibraryRecordForm

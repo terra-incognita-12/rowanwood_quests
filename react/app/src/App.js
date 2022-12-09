@@ -1,4 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css"
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
 import { Routes, Route } from "react-router-dom"
 
 import Layout from "./components/Layout"
@@ -31,10 +34,17 @@ import ForgetPass from "./components/pages/recoverPass/ForgetPass"
 import ChangePass from "./components/pages/recoverPass/ChangePass"
 
 import Unauthorized from "./components/pages/Unauthorized"
- 
+
+const darkTheme = createTheme({
+    palette: {
+      mode: 'dark',
+    },
+  });
+
 function App() {
   return (
-    <>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
       <Routes>
         <Route path="/" element={<Layout />}>
             
@@ -75,7 +85,7 @@ function App() {
           </Route>
         </Route>
       </Routes>
-    </>
+    </ThemeProvider>
   );
 }
 
