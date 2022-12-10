@@ -54,16 +54,16 @@ def create_record(payload: library_scheme.LibraryRecordResponseScheme, db: Sessi
 
     return {'status': 'success', 'message': 'OK'}
 
-@router.patch('/records/update/{url}')
-def update_record(url: str, payload: library_scheme.LibraryRecordResponseScheme, db: Session = Depends(get_db)):
-    record_query = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).filter(LibraryRecord.url == url)
+@router.patch('/records/update/{id}')
+def update_record(id: str, payload: library_scheme.LibraryRecordUpdateScheme, db: Session = Depends(get_db)):
+    record_query = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).filter(LibraryRecord.id == id)
     check_record = record_query.first()
     if not check_record:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
 
     check_record_url = db.query(LibraryRecord).filter(LibraryRecord.url == payload.url).first()
 
-    if check_record_url and check_record_url.id != check_record.id:
+    if check_record_url and str(check_record_url.id) != id:
          raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Record with this url already exists')
 
     tags = db.query(LibraryTag).all()

@@ -13,6 +13,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import FormHelperText from '@mui/material/FormHelperText';
 
 import ErrMsg from "../ErrMsg"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
@@ -85,6 +86,8 @@ const CreateLibraryRecordForm = () => {
 			return
 		}
 
+        setPhoto("some_photo")
+
 		try {
 			const response = await axiosPrivate.post("/library/records/create", JSON.stringify({"name": name, "url": url, "description": description, "photo": photo, "library_tags": tags}))
 
@@ -125,10 +128,10 @@ const CreateLibraryRecordForm = () => {
                                         label="Name"
                                         required
                                     />
+                                    <FormHelperText>Name visible for user
+                                    </FormHelperText>
                                 </FormControl>
                             </Col>
-                        </Row>
-                        <Row className="mb-2">
                             <Col xs={12} lg={6}>
                                 <FormControl fullWidth>
                                     <InputLabel htmlFor="url">URL (Unique Name)</InputLabel>
@@ -139,20 +142,8 @@ const CreateLibraryRecordForm = () => {
                                         label="URL (Unique Name)"
                                         required
                                     />
-                                </FormControl>
-                            </Col>
-                        </Row>
-                        <Row className="mb-2">
-                            <Col xs={12} lg={6}>
-                                <FormControl fullWidth>
-                                    <InputLabel htmlFor="photo">Photo</InputLabel>
-                                    <OutlinedInput
-                                        id="photo"
-                                        value={photo}
-                                        onChange={(e) => setPhoto(e.target.value)}
-                                        label="Photo"
-                                        required
-                                    />
+                                    <FormHelperText>Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _
+                                    </FormHelperText>
                                 </FormControl>
                             </Col>
                         </Row>
@@ -192,6 +183,12 @@ const CreateLibraryRecordForm = () => {
                                 </FormControl>
                             </Col>
                         </Row>
+                        <div className="mt-3">
+                            <Button variant="contained" component="label">
+                                Upload photo
+                                <input hidden accept="image/*" multiple type="file" />
+                            </Button>
+                        </div>
                         <div className="mt-3">
                             <Button variant="contained" color="success" type="submit">Create Record</Button>
                         </div>

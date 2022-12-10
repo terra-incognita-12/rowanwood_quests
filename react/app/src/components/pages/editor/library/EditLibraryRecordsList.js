@@ -22,6 +22,7 @@ const EditLibraryRecordsList = () => {
 
     const [records, setRecords] = useState([])
     const [record, setRecord] = useState("")
+    const [dbRecord, setDbRecord] = useState("")
     const [showForm, setShowForm] = useState(false)
 
     useEffect(() => {
@@ -36,7 +37,7 @@ const EditLibraryRecordsList = () => {
                 
                 let data = []
                 for (let i = 0; i < response.data.length; i++) {
-                	let data_dict = {"name": response.data[i].name}
+                	let data_dict = {"name": response.data[i].name, "url": response.data[i].url}
                 	data.push(data_dict)
                 }
     			isMounted && setRecords(data)
@@ -59,10 +60,10 @@ const EditLibraryRecordsList = () => {
         const controller = new AbortController()
 
         try {
-            const response = await axiosPrivate.get(`/library/records/${record}`, {
+            const response = await axiosPrivate.get(`/library/records/${record.url}`, {
                 signal: controller.signal
             })
-            isMounted && setRecord(response.data)
+            isMounted && setDbRecord(response.data)
         } catch (err) {
             console.log(err)
         }
@@ -85,6 +86,9 @@ const EditLibraryRecordsList = () => {
                         disablePortal
                         id="combo-box-demo"
                         options={records}
+                        onChange={(e, newValue) => {
+                            setRecord(newValue)
+                        }}
                         getOptionLabel={(option) => option.name}
                         renderInput={(params) => <TextField fullWidth {...params} label="Records" />}
                     />
@@ -94,8 +98,8 @@ const EditLibraryRecordsList = () => {
                 </Col>
             </Row>
             
-            {showForm 
-                ? <EditLibraryRecordForm /> 
+            {showForm
+                ? <EditLibraryRecordForm record={dbRecord} /> 
                 : null
             }
 		</div>

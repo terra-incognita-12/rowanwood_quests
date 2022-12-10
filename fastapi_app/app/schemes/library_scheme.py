@@ -17,8 +17,11 @@ class LibraryTagBaseScheme(BaseModel):
 	class Config:
 		orm_mode = True
 
-class LibraryRecordResponseScheme(LibraryRecordBaseScheme):
+class LibraryRecordUpdateScheme(LibraryRecordBaseScheme):
 	library_tags: List[LibraryTagBaseScheme]
+
+class LibraryRecordResponseScheme(LibraryRecordUpdateScheme):
+	id: uuid.UUID
 
 class LibraryTagResponseScheme(LibraryTagBaseScheme):
 	library_records: List[LibraryRecordBaseScheme]
