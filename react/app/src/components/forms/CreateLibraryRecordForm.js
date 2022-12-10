@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 
 import Button from '@mui/material/Button';
-import Autocomplete from '@mui/material/Autocomplete';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -27,6 +27,7 @@ const CreateLibraryRecordForm = () => {
 	const location = useLocation()
 	const axiosPrivate = useAxiosPrivate()  
     const redirectLogin = useRedirectLogin(location)
+    const filter = createFilterOptions()
 
 	const [name, setName] = useState("")
 	const [description, setDescription] = useState("")
@@ -76,6 +77,7 @@ const CreateLibraryRecordForm = () => {
 	}
 
 	const handleSubmit = async (e) => {
+        setPhoto("some_photo")
 		e.preventDefault()
 
         !tags && setTags([])
@@ -86,7 +88,6 @@ const CreateLibraryRecordForm = () => {
 			return
 		}
 
-        setPhoto("some_photo")
 
 		try {
 			const response = await axiosPrivate.post("/library/records/create", JSON.stringify({"name": name, "url": url, "description": description, "photo": photo, "library_tags": tags}))
@@ -152,10 +153,38 @@ const CreateLibraryRecordForm = () => {
                                 <Autocomplete
                                     multiple
                                     onChange={(e, newValue) => {
-                                        setTags(newValue)
+                                        // setTags(newValue)
+
+                                        if (typeof newValue === 'string') {
+                                            setTags({
+                                                name: newValue,
+                                            });
+                                        } else if (newValue && newValue.inputValue) {
+                                          // Create a new value from the user input
+                                            setTags({
+                                                name: newValue.inputValue,
+                                            });
+                                        } else {
+                                          setTags(newValue);
+                                        }
                                     }}
                                     onInputChange={(e, newInputValue) => {
                                         setInputTags(newInputValue)
+                                    }}
+                                    filterOptions={(options, params) => {
+                                        const filtered = filter(options, params);
+
+                                        const { inputValue } = params;
+                                        // Suggest the creation of a new value
+                                        const isExisting = options.some((option) => inputValue === option.name);
+                                        if (inputValue !== '' && !isExisting) {
+                                          filtered.push({
+                                            inputValue,
+                                            name: inputValue,
+                                          });
+                                        }
+
+                                        return filtered;
                                     }}
                                     options={readyTags}
                                     getOptionLabel={(option) => option.name}

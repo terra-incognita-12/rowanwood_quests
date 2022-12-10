@@ -6,7 +6,7 @@ import Col from "react-bootstrap/Col"
 import { Link } from "react-router-dom"
 
 import Button from '@mui/material/Button';
-import Autocomplete from '@mui/material/Autocomplete';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -27,6 +27,7 @@ const EditLibraryRecordForm = ({ record }) => {
 	const location = useLocation()
 	const axiosPrivate = useAxiosPrivate()  
     const redirectLogin = useRedirectLogin(location)
+    const filter = createFilterOptions()
 
     const recordId = record?.id
     const recordName = record?.name
@@ -164,10 +165,38 @@ const EditLibraryRecordForm = ({ record }) => {
                                 <Autocomplete
                                     multiple
                                     onChange={(e, newValue) => {
-                                        setTags(newValue)
+                                        // setTags(newValue)
+
+                                        if (typeof newValue === 'string') {
+                                            setTags({
+                                                name: newValue,
+                                            });
+                                        } else if (newValue && newValue.inputValue) {
+                                          // Create a new value from the user input
+                                            setTags({
+                                                name: newValue.inputValue,
+                                            });
+                                        } else {
+                                          setTags(newValue);
+                                        }
                                     }}
                                     onInputChange={(e, newInputValue) => {
                                         setInputTags(newInputValue)
+                                    }}
+                                    filterOptions={(options, params) => {
+                                        const filtered = filter(options, params);
+
+                                        const { inputValue } = params;
+                                        // Suggest the creation of a new value
+                                        const isExisting = options.some((option) => inputValue === option.name);
+                                        if (inputValue !== '' && !isExisting) {
+                                          filtered.push({
+                                            inputValue,
+                                            name: inputValue,
+                                          });
+                                        }
+
+                                        return filtered;
                                     }}
                                     options={readyTags}
                                     getOptionLabel={(option) => option.name}

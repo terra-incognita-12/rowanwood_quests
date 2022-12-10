@@ -27,7 +27,7 @@ def get_record(url: str, db: Session = Depends(get_db)):
     return record
 
 @router.post('/records/create')
-def create_record(payload: library_scheme.LibraryRecordResponseScheme, db: Session = Depends(get_db)):
+def create_record(payload: library_scheme.LibraryRecordUpdateScheme, db: Session = Depends(get_db)):
 
     check_record = db.query(LibraryRecord).filter(LibraryRecord.url == payload.url).first()
     if check_record:
