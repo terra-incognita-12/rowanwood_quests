@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom"
+import Button from '@mui/material/Button';
 
 import CreateQuestForm from "../../../forms/CreateQuestForm"
 
 const CreateQuest = () => {
 	return (
-		<>
-			<Link to="/editor" className="btn btn-primary mt-3">Back to Editor Menu</Link>
+		<div className="mt-3">	
+			<Button component={Link} to="/editor" variant="text" size="large">&lt;&lt; Back</Button>
 			<CreateQuestForm />
-		</>
+		</div>
 	)
 }
 

@@ -1,43 +1,26 @@
 import { Link } from "react-router-dom"
-import Row from "react-bootstrap/Row"
-import Col from "react-bootstrap/Col"
-import Button from "react-bootstrap/Button"
-import Card from "react-bootstrap/Card"
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Stack from '@mui/material/Stack';
 
 const Editor = () => {
 	return (
-		<>	
-			<Row className="mt-5">
-				<Col xs={12} md={3}>
-					<Card>
-	                    <Card.Body className="text-center">
-	                        <Link to='/editor/quest/create' className="btn btn-success w-100">Create Quest</Link>
-	                    </Card.Body>
-	                </Card>
-				</Col>
-				<Col xs={12} md={3}>
-					<Card>
-	                    <Card.Body className="text-center">
-	                        <Link to='/editor/quest/edit' className="btn btn-success w-100">Edit Quest</Link>
-	                    </Card.Body>
-	                </Card>
-				</Col>
-				<Col xs={12} md={3}>
-					<Card>
-	                    <Card.Body className="text-center">
-	                        <Link to="/editor/library/create" className="btn btn-success w-100">Create Library Record</Link>
-	                    </Card.Body>
-	                </Card>
-				</Col>
-				<Col xs={12} md={3}>
-					<Card>
-	                    <Card.Body className="text-center">
-	                        <Link to='/editor/library/edit' className="btn btn-success w-100">Edit Library Record</Link>
-	                    </Card.Body>
-	                </Card>
-				</Col>
-			</Row>
-		</>
+		<Card className="mt-3">
+            <CardContent>	
+				<Typography variant="h4" gutterBottom>What do we doing today?</Typography>
+			</CardContent>
+			<CardActions>
+				<Stack spacing={2} direction="row">
+					<Button component={Link} to="/editor/quest/create">Create Quest</Button>
+					<Button component={Link} to="/editor/quest/edit">Edit Quest</Button>
+					<Button component={Link} to="/editor/library/create">Create Library Record</Button>
+					<Button component={Link} to="/editor/library/edit">Edit Library Record</Button>
+				</Stack>
+  			</CardActions>
+		</Card>
 	)
 }
 

@@ -1,8 +1,8 @@
-import { useLocation, useNavigate } from "react-router-dom"
-import { useState, useEffect } from "react"
-import Form from "react-bootstrap/Form"
-import Row from "react-bootstrap/Row"
-import Col from "react-bootstrap/Col"
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import Form from 'react-bootstrap/Form'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 
 import Button from '@mui/material/Button';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
@@ -15,9 +15,9 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import FormHelperText from '@mui/material/FormHelperText';
 
-import ErrMsg from "../ErrMsg"
-import useAxiosPrivate from "../../hooks/useAxiosPrivate"
-import useRedirectLogin from "../../hooks/useRedirectLogin"
+import ErrMsg from '../ErrMsg'
+import useAxiosPrivate from '../../hooks/useAxiosPrivate'
+import useRedirectLogin from '../../hooks/useRedirectLogin'
 
 // Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _
 const URL_REGEX = /^[a-z][a-z0-9-_]{3,23}$/
@@ -34,7 +34,7 @@ const CreateLibraryRecordForm = () => {
 	const [url, setUrl] = useState("")
 	const [photo, setPhoto] = useState("")
 	
-	const [tags, setTags] = useState("")
+	const [tags, setTags] = useState([])
 	const [inputTags, setInputTags] = useState("")
 
 	const [errMsg, setErrMsg] = useState("")
@@ -78,16 +78,14 @@ const CreateLibraryRecordForm = () => {
 
 	const handleSubmit = async (e) => {
         setPhoto("some_photo")
-		e.preventDefault()
 
-        !tags && setTags([])
+		e.preventDefault()
 
 		if (!URL_REGEX.test(url)) {
 			setErrMsg("Invaid quest url. Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _")
 			handleShowErr(true)
 			return
 		}
-
 
 		try {
 			const response = await axiosPrivate.post("/library/records/create", JSON.stringify({"name": name, "url": url, "description": description, "photo": photo, "library_tags": tags}))
@@ -153,14 +151,11 @@ const CreateLibraryRecordForm = () => {
                                 <Autocomplete
                                     multiple
                                     onChange={(e, newValue) => {
-                                        // setTags(newValue)
-
                                         if (typeof newValue === 'string') {
                                             setTags({
                                                 name: newValue,
                                             });
                                         } else if (newValue && newValue.inputValue) {
-                                          // Create a new value from the user input
                                             setTags({
                                                 name: newValue.inputValue,
                                             });
@@ -175,12 +170,11 @@ const CreateLibraryRecordForm = () => {
                                         const filtered = filter(options, params);
 
                                         const { inputValue } = params;
-                                        // Suggest the creation of a new value
                                         const isExisting = options.some((option) => inputValue === option.name);
                                         if (inputValue !== '' && !isExisting) {
                                           filtered.push({
                                             inputValue,
-                                            name: inputValue,
+                                            name: inputValue.toLowerCase().replaceAll(" ", "_"),
                                           });
                                         }
 
@@ -189,7 +183,8 @@ const CreateLibraryRecordForm = () => {
                                     options={readyTags}
                                     getOptionLabel={(option) => option.name}
                                     renderInput={(params) => (
-                                        <TextField {...params}
+                                        <TextField 
+                                            {...params}
                                             label="Tags" 
                                             placeholder="Input tags" 
                                             id="tags"

@@ -15,12 +15,6 @@ class QuestBaseScheme(BaseModel):
     class Config:
         orm_mode = True
 
-class CreateQuestScheme(QuestBaseScheme):
-    pass
-
 class QuestResponseScheme(QuestBaseScheme):
     id: uuid.UUID
     quest_comments: List[CommentResponseScheme] = []
-    
-# class ForeignKeyQuestResponse(QuestBaseScheme):
-#     id: uuid.UUID

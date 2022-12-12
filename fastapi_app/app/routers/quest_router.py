@@ -15,7 +15,7 @@ from ..oauth2 import require_user
 router = APIRouter()
 
 @router.post('/create', status_code=status.HTTP_201_CREATED)
-def create_quest(payload: quest_scheme.CreateQuestScheme, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
+def create_quest(payload: quest_scheme.QuestBaseScheme, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
     check_quest = db.query(Quest).filter(Quest.url == payload.url).first()
     if check_quest:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Quest with this url already exists')
@@ -25,7 +25,7 @@ def create_quest(payload: quest_scheme.CreateQuestScheme, db: Session = Depends(
     db.commit()
     db.refresh(new_quest)
 
-    return {'status': 'success', 'message': 'Quest created succesfully'}
+    return {'status': 'success', 'message': 'OK'}
 
 @router.get('/all', response_model=List[quest_scheme.QuestResponseScheme])
 def get_all_quests(db: Session = Depends(get_db)):
@@ -60,7 +60,7 @@ def update_quest(id: str, payload:quest_scheme.QuestBaseScheme, db: Session = De
     db.commit()
     db.refresh(check_quest)
 
-    return {'status': 'success', 'url': check_quest.url}    
+    return {'status': 'success', 'message': 'OK'}    
 
 @router.delete('/delete/{url}')
 def delete_quest(url: str, db: Session = Depends(get_db)):
@@ -72,4 +72,5 @@ def delete_quest(url: str, db: Session = Depends(get_db)):
 
     quest_query.delete(synchronize_session=False)
     db.commit()
-    return {'success': 'OK'}
+    
+    return {'status': 'success', 'message': 'OK'}

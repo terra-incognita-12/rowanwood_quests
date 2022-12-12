@@ -1,14 +1,14 @@
 import { useLocation } from "react-router-dom"
 import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 
+import Row from "react-bootstrap/Row"
+import Col from "react-bootstrap/Col"
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import Row from "react-bootstrap/Row"
-import Col from "react-bootstrap/Col"
-import { Link } from "react-router-dom"
 
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate"
 import useRedirectLogin from "../../../../hooks/useRedirectLogin"
@@ -20,8 +20,9 @@ const EditLibraryRecordsList = () => {
 	const axiosPrivate = useAxiosPrivate()  
     const redirectLogin = useRedirectLogin(location)
 
-    const [records, setRecords] = useState([])
-    const [record, setRecord] = useState("")
+    const [dropDownRecords, setDropDownRecords] = useState([])
+    const [allRecords, setAllRecords] = useState([])
+    const [pickedRecord, setPickedRecord] = useState("")
     const [dbRecord, setDbRecord] = useState("")
     const [showForm, setShowForm] = useState(false)
 
@@ -40,7 +41,10 @@ const EditLibraryRecordsList = () => {
                 	let data_dict = {"name": response.data[i].name, "url": response.data[i].url}
                 	data.push(data_dict)
                 }
-    			isMounted && setRecords(data)
+    			if (isMounted) {
+                    setDropDownRecords(data)
+                    setAllRecords(response.data)
+                }
             } catch (err) {
                 console.log(err)
             } 
@@ -55,25 +59,10 @@ const EditLibraryRecordsList = () => {
 
 	}, [])
 
-    const getRecord = async () => {
-        let isMounted = true
-        const controller = new AbortController()
-
-        try {
-            const response = await axiosPrivate.get(`/library/records/${record.url}`, {
-                signal: controller.signal
-            })
-            isMounted && setDbRecord(response.data)
-        } catch (err) {
-            console.log(err)
-        }
-
+    const getRecord = () => {
+        const record = allRecords.find(elem => elem.url === pickedRecord.url)
+        setDbRecord(record)
         setShowForm(true)
-
-        return () => {
-            isMounted = false
-            controller.abort()
-        }
     }
 
 	return (
@@ -85,9 +74,9 @@ const EditLibraryRecordsList = () => {
                     <Autocomplete
                         disablePortal
                         id="combo-box-demo"
-                        options={records}
+                        options={dropDownRecords}
                         onChange={(e, newValue) => {
-                            setRecord(newValue)
+                            setPickedRecord(newValue)
                         }}
                         getOptionLabel={(option) => option.name}
                         renderInput={(params) => <TextField fullWidth {...params} label="Records" />}

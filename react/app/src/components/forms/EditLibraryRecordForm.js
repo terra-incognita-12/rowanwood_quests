@@ -122,6 +122,18 @@ const EditLibraryRecordForm = ({ record }) => {
 		}
 	}
 
+    const handleDelete = async () => {
+        const answer = window.confirm("Are you sure to delete this record?")
+        if (!answer) { return }
+
+        try {
+            await axiosPrivate.delete(`/library/records/delete/${url}`, JSON.stringify({"url": recordUrl}))
+            window.location.reload(false);
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
 	return (
 		<>
 			{showErrMsg 
@@ -132,10 +144,10 @@ const EditLibraryRecordForm = ({ record }) => {
             <Card className="mt-3">
                 <CardContent>
                     <Typography gutterBottom variant="h3" component="div">{recordName}</Typography>
-                    <Button component={Link} to={`/editor/library/delete/${url}`} variant="contained" color="error">Delete Record</Button>
+                    <Button variant="contained" color="error" onClick={handleDelete}>Delete Record</Button>
                     <Form onSubmit={handleSubmit}>
                         <Row className="mt-3 mb-2">
-                            <Col xs={12} lg={6}>
+                            <Col xs={12} lg={6} className="mb-2">
                                 <FormControl fullWidth>
                                     <InputLabel htmlFor="component-outlined">Name</InputLabel>
                                     <OutlinedInput
@@ -165,14 +177,11 @@ const EditLibraryRecordForm = ({ record }) => {
                                 <Autocomplete
                                     multiple
                                     onChange={(e, newValue) => {
-                                        // setTags(newValue)
-
                                         if (typeof newValue === 'string') {
                                             setTags({
                                                 name: newValue,
                                             });
                                         } else if (newValue && newValue.inputValue) {
-                                          // Create a new value from the user input
                                             setTags({
                                                 name: newValue.inputValue,
                                             });
@@ -187,12 +196,11 @@ const EditLibraryRecordForm = ({ record }) => {
                                         const filtered = filter(options, params);
 
                                         const { inputValue } = params;
-                                        // Suggest the creation of a new value
                                         const isExisting = options.some((option) => inputValue === option.name);
                                         if (inputValue !== '' && !isExisting) {
                                           filtered.push({
                                             inputValue,
-                                            name: inputValue,
+                                            name: inputValue.toLowerCase().replaceAll(" ", "_"),
                                           });
                                         }
 
@@ -233,7 +241,7 @@ const EditLibraryRecordForm = ({ record }) => {
                             </Button>
                         </div>
                         <div className="mt-3">
-                            <Button variant="contained" color="success" type="submit">Create Record</Button>
+                            <Button variant="contained" color="success" type="submit">Update Record</Button>
                         </div>
                     </Form>
                 </CardContent>

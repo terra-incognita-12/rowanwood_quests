@@ -1,12 +1,21 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { useState, useEffect } from "react"
-import Form from "react-bootstrap/Form"
-import Button from "react-bootstrap/Button"
-import Row from "react-bootstrap/Row"
-import Col from "react-bootstrap/Col"
+import { useState, useEffect } from 'react'
+import Form from 'react-bootstrap/Form'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+
+import Button from '@mui/material/Button';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import FormControl from '@mui/material/FormControl';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
 
 import ErrMsg from "../ErrMsg"
-import axios from "../../api/axios"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
 
@@ -62,7 +71,7 @@ const EditQuestForm = ({ quest }) => {
 		try {
 			const response = await axiosPrivate.patch(`/quest/update/${questId}`, JSON.stringify({"name": name, "url": url, "telegram_url": telegramUrl, "brief_description": briefDesc, "full_description": fullDesc, "photo": photo}))
 
-			navigate(`/quest/${response.data.url}`, { replace: true })
+			navigate(`/quest/${url}`, { replace: true })
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg("No server respone")
@@ -79,6 +88,18 @@ const EditQuestForm = ({ quest }) => {
 		}
 	}
 
+	const handleDelete = async () => {
+        const answer = window.confirm("Are you sure to delete this quest?")
+        if (!answer) { return }
+
+        try {
+            await axiosPrivate.delete(`/quest/delete/${url}`, JSON.stringify({"url": questUrl}))
+            window.location.reload(false);
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
 	return (
 		<>
 			{showErrMsg 
@@ -86,82 +107,95 @@ const EditQuestForm = ({ quest }) => {
 				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
 			    : null
 			}
-			<Form onSubmit={handleSubmit}>
-				<Row className="mt-5">
-					<Col xs={12} lg={6}>
-						<Form.Group className="mb-1">
-							<Form.Label htmlFor="name">Quest Name</Form.Label>
-							<Form.Control 
-								type="text"
-								id="name"
-								onChange={(e) => setName(e.target.value)}
-								value={name || ""}
-								autoComplete="off"
-								required
-							/>
-						</Form.Group>
-						<Form.Group className="mb-1">
-							<Form.Label htmlFor="name">Photo</Form.Label>
-							<Form.Control 
-								type="text"
-								id="name"
-								onChange={(e) => setPhoto(e.target.value)}
-								value={photo || ""}
-								autoComplete="off"
-								required
-							/>
-						</Form.Group>
-					</Col>
-					<Col xs={12} lg={6}>
-		    			<Form.Group className="mb-1">
-							<Form.Label htmlFor="name">Unique Name (for URL)</Form.Label>
-							<Form.Control 
-								type="text"
-								id="name"
-								onChange={(e) => setUrl(e.target.value)}
-								value={url || ""}
-								autoComplete="off"
-								required
-							/>
-						</Form.Group>
-						<Form.Group className="mb-1">
-							<Form.Label htmlFor="name">Telegram Address Of Quest</Form.Label>
-							<Form.Control 
-								type="text"
-								id="name"
-								onChange={(e) => setTelegramUrl(e.target.value)}
-								value={telegramUrl || ""}
-								autoComplete="off"
-								required
-							/>
-						</Form.Group>
-					</Col>
-				</Row>
-				<Row>
-					<Form.Group className="mb-1">
-						<Form.Label htmlFor="shortDesc">Brief Description</Form.Label>
-						<Form.Control 
-							type="text"
-							id="name"
-							onChange={(e) => setBriefDesc(e.target.value)}
-							value={briefDesc || ""}
-							autoComplete="off"
-							required
-						/>
-					</Form.Group>
-				</Row>
-				<Row >
-					<Form.Group className="mb-1">
-						<Form.Label htmlFor="fullDesc">Full Description</Form.Label>
-						<Form.Control 
-		    				as="textarea" 
-		    				onChange={(e) => setFullDesc(e.target.value)}
-		    				value={fullDesc || ""} 
-	    				/>
-					</Form.Group>
-				</Row>
-		      	<Button variant="success" className="mt-2" as="input" type="submit" value="Update Quest" />
-			</Form>
+
+			<Card className="mt-3">
+                <CardContent>
+                    <Typography gutterBottom variant="h3" component="div">{questName}</Typography>
+                    <Stack spacing={2} direction="row">
+                    	<Button variant="contained" color="primary">Edit Quest Details</Button>
+                    	<Button variant="contained" color="error" onClick={handleDelete}>Delete Quest</Button>
+                    </Stack>
+                    <Form onSubmit={handleSubmit}>
+                        <Row className="mt-3 mb-2">
+                            <Col xs={12} lg={6}>
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="component-outlined">Name</InputLabel>
+                                    <OutlinedInput
+                                        id="name"
+                                        value={name || ""}
+                                        onChange={(e) => setName(e.target.value)}
+                                        label="Name"
+                                        required
+                                    />
+                                </FormControl>
+                            </Col>
+                        </Row>
+                        <Row className="mb-2">
+                            <Col xs={12} lg={6} className="mb-2">
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="url">URL (Unique Name)</InputLabel>
+                                    <OutlinedInput
+                                        id="url"
+                                        value={url || ""}
+                                        onChange={(e) => setUrl(e.target.value)}
+                                        label="URL (Unique Name)"
+                                        required
+                                    />
+                                </FormControl>
+                            </Col>
+                            <Col xs={12} lg={6}>
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="telegramUrl">Telegram URL</InputLabel>
+                                    <OutlinedInput
+                                        id="telegramUrl"
+                                        value={telegramUrl || ""}
+                                        onChange={(e) => setTelegramUrl(e.target.value)}
+                                        label="Telegram URL"
+                                        required
+                                    />
+                                </FormControl>
+                            </Col>
+                        </Row>
+                        <Row className="mb-2">
+                            <Col xs={12} lg={6}>
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="briefDesc">Brief Description</InputLabel>
+                                    <OutlinedInput
+                                        id="briefDesc"
+                                        value={briefDesc || ""}
+                                        onChange={(e) => setBriefDesc(e.target.value)}
+                                        label="Brief Description"
+                                        required
+                                    />
+                                </FormControl>
+                            </Col>
+                        </Row>
+                        <Row className="mb-2">
+                            <Col xs={12}>
+                                <FormControl fullWidth>
+                                    <InputLabel htmlFor="fullDesc">Full Description</InputLabel>
+                                    <OutlinedInput
+                                        id="fullDesc"
+                                        value={fullDesc || ""}
+                                        onChange={(e) => setFullDesc(e.target.value)}
+                                        label="Full Description"
+                                        required
+                                    />
+                                </FormControl>
+                            </Col>
+                        </Row>
+                        <div className="mt-3">
+                            <Button variant="contained" component="label">
+                                Upload photo
+                                <input hidden accept="image/*" multiple type="file" />
+                            </Button>
+                        </div>
+                        <div className="mt-3">
+                            <Button variant="contained" color="success" type="submit">Update Quest</Button>
+                        </div>
+                    </Form>
+                </CardContent>
+            </Card>
 		</>
 	)
 }

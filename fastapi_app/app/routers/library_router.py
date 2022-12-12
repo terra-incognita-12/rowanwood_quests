@@ -27,24 +27,13 @@ def get_record(url: str, db: Session = Depends(get_db)):
     return record
 
 @router.post('/records/create')
-def create_record(payload: library_scheme.LibraryRecordUpdateScheme, db: Session = Depends(get_db)):
+def create_record(payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db)):
 
     check_record = db.query(LibraryRecord).filter(LibraryRecord.url == payload.url).first()
     if check_record:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Record with this url already exists')
 
-    tags = db.query(LibraryTag).all()
-    tags_names = [x.name for x in tags]
-
-    payload_temp = []
-    for elem in payload.library_tags:
-        if elem.name not in tags_names:
-            payload_temp.append(LibraryTag(name=elem.name))
-        else:
-            tag = db.query(LibraryTag).filter(LibraryTag.name==elem.name).first()
-            payload_temp.append(tag)
-
-    payload.library_tags = payload_temp
+    payload.library_tags = prepare_library_tags(payload.library_tags, db)
 
     new_library_record = LibraryRecord(**payload.dict())
     
@@ -55,7 +44,7 @@ def create_record(payload: library_scheme.LibraryRecordUpdateScheme, db: Session
     return {'status': 'success', 'message': 'OK'}
 
 @router.patch('/records/update/{id}')
-def update_record(id: str, payload: library_scheme.LibraryRecordUpdateScheme, db: Session = Depends(get_db)):
+def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db)):
     record_query = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).filter(LibraryRecord.id == id)
     check_record = record_query.first()
     if not check_record:
@@ -66,17 +55,7 @@ def update_record(id: str, payload: library_scheme.LibraryRecordUpdateScheme, db
     if check_record_url and str(check_record_url.id) != id:
          raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Record with this url already exists')
 
-    tags = db.query(LibraryTag).all()
-    tags_names = [x.name for x in tags]
-
-    payload_temp = []
-    for elem in payload.library_tags:
-        if elem.name not in tags_names:
-            payload_temp.append(LibraryTag(name=elem.name))
-        else:
-            tag = db.query(LibraryTag).filter(LibraryTag.name==elem.name).first()
-            payload_temp.append(tag)
-
+    payload_temp = prepare_library_tags(payload.library_tags, db)
     del payload.library_tags
 
     update_data = payload.dict(exclude_unset=True)
@@ -101,9 +80,25 @@ def delete_quest(url: str, db: Session = Depends(get_db)):
         
     record_query.delete(synchronize_session=False)
     db.commit()
-    return {'success': 'OK'}
+    
+    return {'status': 'success', 'message': 'OK'}
 
 @router.get("/tags/all", response_model=List[library_scheme.LibraryTagResponseScheme])
 def get_tags(db: Session = Depends(get_db)):
     tags = db.query(LibraryTag).options(joinedload(LibraryTag.library_records)).all()
     return tags
+
+def prepare_library_tags(payload_tags: List, db: Session):
+    payload_temp = []
+
+    all_tags = db.query(LibraryTag.name).all()
+    all_tags_names = [x[0] for x in all_tags]
+    
+    for elem in payload_tags:
+        if elem.name not in all_tags_names:
+            payload_temp.append(LibraryTag(name=elem.name))
+        else:
+            tag = db.query(LibraryTag).filter(LibraryTag.name==elem.name).first()
+            payload_temp.append(tag)
+
+    return payload_temp
