@@ -20,8 +20,16 @@ class LibraryTagBaseScheme(BaseModel):
 class LibraryRecordSendScheme(LibraryRecordBaseScheme):
 	library_tags: List[LibraryTagBaseScheme]
 
-class LibraryRecordResponseScheme(LibraryRecordSendScheme):
+class LibraryRecordResponseScheme(LibraryRecordBaseScheme):
+	id: uuid.UUID
+	library_tags: List[LibraryTagBaseScheme]
+
+class LibraryRecordResponseWithoutTagsScheme(LibraryRecordBaseScheme):
 	id: uuid.UUID
 
+class LibraryTagSendScheme(LibraryTagBaseScheme):
+	pass
+
 class LibraryTagResponseScheme(LibraryTagBaseScheme):
-	library_records: List[LibraryRecordBaseScheme]
+	id: uuid.UUID
+	library_records: List[LibraryRecordResponseWithoutTagsScheme]

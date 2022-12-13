@@ -88,6 +88,41 @@ def get_tags(db: Session = Depends(get_db)):
     tags = db.query(LibraryTag).options(joinedload(LibraryTag.library_records)).all()
     return tags
 
+@router.patch('/tags/update/{id}')
+def update_tag(id: str, payload: library_scheme.LibraryTagSendScheme, db: Session = Depends(get_db)):
+    tag_query = db.query(LibraryTag).filter(LibraryTag.id == id)
+    check_tag = tag_query.first()
+    if not check_tag:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag doesn't exist")
+
+    check_tag_name = db.query(LibraryTag).filter(LibraryTag.name == payload.name).first()
+
+    if check_tag_name and str(check_tag_name.id) != id:
+         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Tag with this name already exists')
+
+    update_data = payload.dict(exclude_unset=True)
+
+    tag_query.update(update_data, synchronize_session=False)
+    db.commit()
+    db.refresh(check_tag)
+
+    return {'status': 'success', 'message': 'OK'}
+
+@router.delete('/tags/delete/{id}')
+def delete_tag(id: str, db: Session = Depends(get_db)):
+    tag_query = db.query(LibraryTag).options(joinedload(LibraryTag.library_records)).filter(LibraryTag.id == id)
+    check_tag = tag_query.first()
+    if not check_tag:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag doesn't exist")
+
+    check_tag.library_records = []
+    db.commit()
+        
+    tag_query.delete(synchronize_session=False)
+    db.commit()
+    
+    return {'status': 'success', 'message': 'OK'}
+
 def prepare_library_tags(payload_tags: List, db: Session):
     payload_temp = []
 
