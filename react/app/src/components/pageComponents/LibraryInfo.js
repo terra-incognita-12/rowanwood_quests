@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import Card from "react-bootstrap/Card"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
-import Button from "react-bootstrap/Button"
-import moment from 'moment'
+
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 
 import axios from "../../api/axios"
 
@@ -22,6 +24,7 @@ const LibraryInfo = ({ url }) => {
                 const response = await axios.get(`/library/records/${url}`, {
                     signal: controller.signal
                 })
+                response.data.name = response.data.name.toUpperCase()
                 isMounted && setRecord(response.data)
             } catch (err) {
                 console.log(err)
@@ -30,8 +33,6 @@ const LibraryInfo = ({ url }) => {
 
         getRecord()
 
-        console.log(record?.library_tags)
-        console.log(record?.name)
         return () => {
             isMounted = false
             controller.abort()
@@ -39,21 +40,22 @@ const LibraryInfo = ({ url }) => {
     }, [])
 
 	return (
-		<>
-			<div className="text-center mt-5">
-				<h1>{record?.name}</h1>
-			</div>
-			<div className="mt-3">
-				<p>{record?.description}</p>
-			</div>
-            {record?.library_tags
-                ?
-                record?.library_tags.map((tag, i) =>             
-                    <Link to={`/library?tag=${tag.name}`} key={i} className="text-decoration-none">#{tag.name} </Link>
-                )
-                : null
-            }
-		</>
+        <div className="mt-3">
+            <Button component={Link} to="/library" variant="text" size="large">&lt;&lt; Back</Button>
+            <Card className="mt-3">
+                <CardContent>
+                    <Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">{record.name}</Typography>
+                    <Typography gutterBottom variant="body1">{record.description}</Typography>
+                    {record.library_tags?.length
+                        ?
+                        record.library_tags.map((tag, i) =>             
+                            <Button component={Link} to={`/library?tag=${tag.name}`} key={i} variant="text">#{tag.name} </Button>
+                        )
+                        : null
+                    }
+                </CardContent>
+            </Card>
+        </div>
 	)
 
 }

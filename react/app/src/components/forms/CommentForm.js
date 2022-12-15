@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react"
 import { useLocation, Link } from "react-router-dom"
 import Form from "react-bootstrap/Form"
-import Button from "react-bootstrap/Button"
+// import Button from "react-bootstrap/Button"
+
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import FormControl from '@mui/material/FormControl';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
@@ -24,17 +30,23 @@ const CommentForm = ({ url, handleCommentChanged }) => {
 		}
 	}
 	return (
-		<>
-			<Form onSubmit={handleSubmit}>
-    			<Form.Control 
-    				as="textarea" 
-    				placeholder="Leave a comment here"
-    				onChange={(e) => setComment(e.target.value)}
-    				value={comment} 
-    			/>
-      			<Button variant="success" className="mt-2" as="input" type="submit" value="Leave comment" />
-			</Form>	
-		</>
+		<Form onSubmit={handleSubmit}>
+  			<FormControl fullWidth>
+                <InputLabel htmlFor="comment">Comment</InputLabel>
+                <OutlinedInput
+                    id="comment"
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    label="Comment"
+                    required
+                    multiline
+      				rows={6}
+                />
+            </FormControl>
+            <div className="mt-3">
+                <Button variant="contained" color="success" type="submit">Send Comment</Button>
+            </div>
+		</Form>	
 	)
 }
 

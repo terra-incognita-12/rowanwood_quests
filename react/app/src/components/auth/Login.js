@@ -2,8 +2,15 @@ import { useState } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
-import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
+
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
 
 import axios from "../../api/axios"
 import useAuth from "../../hooks/useAuth"
@@ -64,42 +71,43 @@ const Login = () => {
 
 	return (
 		<Row className="justify-content-center mt-5">
-			<Col xs={12} lg={4}>
+			<Col xs={12} lg={5}>
 				{showErrMsg 
 					?
 					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
 				    : null
 				}
-				<Form onSubmit={handleSubmit}>
-					<Form.Group className="mb-1">
-						<Form.Label htmlFor="email">Email</Form.Label>
-						<Form.Control 
-							type="email"
-							id="email"
-							onChange={(e) => setUser(e.target.value)}
-							value={user}
-							autoComplete="off"
-							required
-						/>
-					</Form.Group> 
-					<Form.Group className="mb-1">
-						<Form.Label htmlFor="password">Password</Form.Label>
-						<Form.Control 
-		                    type="password"
-		                    id="password" 
-		                    onChange={(e) => setPass(e.target.value)}
-		                    value={pass}
-		                    required
-						/> 
-					</Form.Group>
-					<Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Sign in" />
-				</Form>
-				<div className="text-center mt-2">
-					<span>Don't have an account yet? </span><Link to="/register" className="text-decoration-none">Sign up!</Link>
-				</div>
-				<div className="text-center mt-1">
-					<span>Forgot Password? </span><Link to="/forgetpass" className="text-decoration-none">Let's recover it!</Link>
-				</div>
+				<Card>
+                	<CardContent>
+						<Form onSubmit={handleSubmit} className="mb-2">
+							<FormControl fullWidth className="mb-3">
+		                        <InputLabel htmlFor="user">Email</InputLabel>
+		                        <OutlinedInput
+		                            id="user"
+		                            type="email"
+		                            value={user}
+		                            onChange={(e) => setUser(e.target.value)}
+		                            label="Email"
+		                            required
+		                        />
+		                    </FormControl>
+		                    <FormControl fullWidth className="mb-3">
+		                        <InputLabel htmlFor="password">Password</InputLabel>
+		                        <OutlinedInput
+		                            id="password"
+		                            type="password"
+		                            value={pass}
+		                            onChange={(e) => setPass(e.target.value)}
+		                            label="Password"
+		                            required
+		                        />
+		                    </FormControl>
+							<Button variant="contained" color="success" type="submit" fullWidth>Login</Button>
+						</Form>
+						<Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Don't have an account yet?<Button component={Link} to="/register">Sign up!</Button></Typography>
+						<Typography variant="body1" display="flex" justifyContent="center" alignItems="center">Forgot Password?<Button component={Link} to="/forgetpass">Let's recover it!</Button></Typography>
+                	</CardContent>
+				</Card>
 			</Col>
 		</Row>
 	)

@@ -120,13 +120,13 @@ const EditLibraryTagForm = ({ tag }) => {
                         <Col xs={12} lg={6}>
                             <Typography gutterBottom variant="h5" component="div">Tag used in:</Typography>
                             <Paper elevation={3}>
-                            <List sx={{ height: 200, position: 'relative', overflow: 'auto', maxHeight: 200}}>
-                                {records.map((record, i) => 
-                                    <ListItem key={i} component="div">
-                                        <ListItemText primary={`${record.name}`} />
-                                    </ListItem>
-                                )}
-                            </List>
+                                <List sx={{ height: 200, position: 'relative', overflow: 'auto', maxHeight: 200}}>
+                                    {records.map((record, i) => 
+                                        <ListItem key={i} component="div">
+                                            <ListItemText primary={`${record.name}`} />
+                                        </ListItem>
+                                    )}
+                                </List>
                             </Paper>
                         </Col>
                     </Row>

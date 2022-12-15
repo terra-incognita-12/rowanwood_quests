@@ -3,8 +3,16 @@ import { useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
-import Button from "react-bootstrap/Button"
+// import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
+
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
 
 import axios from "../../../api/axios"
 import ErrMsg from "../../ErrMsg"
@@ -53,29 +61,33 @@ const ForgetPass = () => {
 
 	return (
 		<Row className="justify-content-center mt-5">
-			<Col xs={12} lg={4}>
+			<Col xs={12} lg={5}>
 				{showErrMsg 
 					?
 					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
 				    : null
 				}
-				<Form onSubmit={handleSubmit}>
-					<Form.Group className="mb-1">
-						<Form.Label htmlFor="email">Recover Email</Form.Label>
-						<Form.Control 
-							type="email"
-							id="email"
-							onChange={(e) => setEmail(e.target.value)}
-							value={email}
-							autoComplete="off"
-							required
-						/>
-					</Form.Group>
-					<Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Send recovery link" />
-				</Form>
-				<div className="text-center mt-1">
-					<Link to="/login" className="text-decoration-none">Back to login</Link>
-				</div>
+				<Card>
+                	<CardContent>
+						<Form onSubmit={handleSubmit} className="mb-2">
+							<FormControl fullWidth className="mb-3">
+		                        <InputLabel htmlFor="user">Email</InputLabel>
+		                        <OutlinedInput
+		                            id="email"
+		                            type="email"
+		                            value={email}
+		                            onChange={(e) => setEmail(e.target.value)}
+		                            label="Email"
+		                            required
+		                        />
+		                    </FormControl>
+							<Button variant="contained" color="success" type="submit" fullWidth>Send Email</Button>
+						</Form>
+						<Typography display="flex" justifyContent="center" alignItems="center">
+							<Button component={Link} to="/login">Back to Login</Button>
+						</Typography>
+                	</CardContent>
+				</Card>
 			</Col>
 		</Row>
 	)
