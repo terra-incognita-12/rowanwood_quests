@@ -18,6 +18,16 @@ def get_records(db: Session = Depends(get_db)):
     records = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).order_by(LibraryRecord.name).all()
     return records
 
+@router.get("/records/tag/{tag}", response_model=List[library_scheme.LibraryRecordBaseScheme])
+def get_records_by_tag(tag: str, db: Session = Depends(get_db)):
+    tags = db.query(LibraryTag).options(joinedload(LibraryTag.library_records)).filter(LibraryTag.name == tag).all()
+    if not tags:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
+
+    records = [x.library_records for x in tags]
+
+    return records[0]
+
 @router.get("/records/{url}", response_model=library_scheme.LibraryRecordResponseScheme)
 def get_record(url: str, db: Session = Depends(get_db)):
     record = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).filter(LibraryRecord.url == url).first()
@@ -25,6 +35,7 @@ def get_record(url: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
     
     return record
+
 
 @router.post('/records/create')
 def create_record(payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db)):

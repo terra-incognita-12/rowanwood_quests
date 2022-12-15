@@ -30,6 +30,8 @@ const LibraryInfo = ({ url }) => {
 
         getRecord()
 
+        console.log(record?.library_tags)
+        console.log(record?.name)
         return () => {
             isMounted = false
             controller.abort()
@@ -44,7 +46,13 @@ const LibraryInfo = ({ url }) => {
 			<div className="mt-3">
 				<p>{record?.description}</p>
 			</div>
-			<Link to="/" className="text-decoration-none">#{record?.url}</Link>
+            {record?.library_tags
+                ?
+                record?.library_tags.map((tag, i) =>             
+                    <Link to={`/library?tag=${tag.name}`} key={i} className="text-decoration-none">#{tag.name} </Link>
+                )
+                : null
+            }
 		</>
 	)
 
