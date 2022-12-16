@@ -3,9 +3,18 @@ import { useParams } from "react-router"
 import { useNavigate } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
-import Card from "react-bootstrap/Card"
-import Button from "react-bootstrap/Button"
+// import Card from "react-bootstrap/Card"
+// import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
+
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import FormHelperText from '@mui/material/FormHelperText';
 
 import axios from "../../../api/axios"
 import ErrMsg from "../../ErrMsg"
@@ -94,57 +103,54 @@ const ChangePass = () => {
 
 	return (
 		<Row className="justify-content-center mt-5">
-			<Col xs={12} lg={4}>
+			<Col xs={12} lg={5}>
 				{showErrMsg 
 					?
 					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
 				    : null
 				}
-				<Form onSubmit={handleSubmit}>
-					<Form.Group className="mb-1">
-						<Form.Label htmlFor="password">New Password</Form.Label>
-						<Form.Control 
-		                    type="password"
-	                    	id="password" 
-	                    	className={validPass && pass
-						 		? "is-valid" 
-						 		: !validPass && pass
-						 			? "is-invalid"
-						 			: ""
-							}
-	                    	onChange={(e) => setPass(e.target.value)}
-	                    	value={pass}
-	                    	required
-						/> 
-					</Form.Group>
-					<Form.Group className="mb-1">
-						<Form.Label htmlFor="confPassword">Confirm Password</Form.Label>
-						<Form.Control 
-		                    type="password"
-	                    	id="confPassword" 
-	                    	className={validConfPass && confPass
-						 		? "is-valid" 
-						 		: !validConfPass && confPass
-						 			? "is-invalid"
-						 			: ""
-							}
-	                    	onChange={(e) => setConfPass(e.target.value)}
-	                    	value={confPass}
-	                    	required
-						/> 
-					</Form.Group>
-					<Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Submit" />
-				</Form>
-			</Col>
-
-			<Col xs={12} lg={4}>
 				<Card>
-					<Card.Body>
-						<ul>
-							<li><b>Password</b> must be at least one lowercase letter, one uppercase letter, one digit, and one special character and size is 8 to 24
-							</li>
-						</ul>
-					</Card.Body>
+                	<CardContent>
+						<Form onSubmit={handleSubmit} className="mb-2">
+		                    <FormControl fullWidth className="mb-3">
+		                        <InputLabel htmlFor="password">New Password</InputLabel>
+		                        <OutlinedInput
+		                        	error={!validPass && pass}
+		                            id="password"
+		                            type="password"
+		                            value={pass}
+		                            onChange={(e) => setPass(e.target.value)}
+		                            label="New Password"
+		                            required
+		                        />
+		                        {!validPass && pass
+		                        	?
+		                        	<FormHelperText sx={{ color: "#fc0303" }}>
+		                        		Password must be at least one lowercase letter, one uppercase letter, one digit, and one special character and size is 8 to 24
+                                	</FormHelperText>
+                                	: null
+		                        }
+		                    </FormControl>
+		                    <FormControl fullWidth className="mb-3">
+		                        <InputLabel htmlFor="confPass">Confirm New Password</InputLabel>
+		                        <OutlinedInput
+		                        	error={!validConfPass && confPass}
+		                            id="confPass"
+		                            type="password"
+		                            value={confPass}
+		                            onChange={(e) => setConfPass(e.target.value)}
+		                            label="Confirm New Password"
+		                            required
+		                        />
+		                        {!validConfPass && confPass
+		                        	?
+		                        	<FormHelperText sx={{ color: "#fc0303" }}>Passwords should be matching</FormHelperText>
+                                	: null
+		                        }
+		                    </FormControl>
+							<Button variant="contained" color="success" type="submit" fullWidth>Change Password</Button>
+						</Form>
+                	</CardContent>
 				</Card>
 			</Col>
 		</Row>

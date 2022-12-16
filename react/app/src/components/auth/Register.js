@@ -3,9 +3,18 @@ import { useNavigate, Link } from "react-router-dom"
 import Alert from "react-bootstrap/Alert"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
-import Card from "react-bootstrap/Card"
-import Button from "react-bootstrap/Button"
+// import Card from "react-bootstrap/Card"
+// import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
+
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import FormHelperText from '@mui/material/FormHelperText';
 
 import axios from "../../api/axios"
 import ErrMsg from "../ErrMsg"
@@ -103,7 +112,117 @@ const Register = () => {
 
 	return (
 		<Row className="justify-content-center mt-5">
-			<Col xs={12} lg={4}>
+
+			<Col xs={12} lg={5}>
+				{showErrMsg 
+					?
+					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
+				    : null
+				}
+				<Card>
+                	<CardContent>
+						<Form onSubmit={handleSubmit} className="mb-2">
+							<FormControl fullWidth className="mb-3">
+		                        <InputLabel htmlFor="username">Username</InputLabel>
+		                        <OutlinedInput
+		                        	error={!validUsername && username}
+		                            id="username"
+		                            type="text"
+		                            value={username}
+		                            onChange={(e) => setUsername(e.target.value)}
+		                            label="Username"
+		                            required
+		                        />
+		                        {!validUsername && username
+		                        	?
+		                        	<FormHelperText sx={{ color: "#fc0303" }}>
+		                        		Username must start with the lower or upper case letter and after must followed by 3 to 23 char that can be lowercase, upper, number, - and _
+                                	</FormHelperText>
+                                	: null
+		                        }
+		                    </FormControl>
+		                    <FormControl fullWidth className="mb-3">
+		                        <InputLabel htmlFor="email">Email</InputLabel>
+		                        <OutlinedInput
+		                        	error={!validEmail && email}
+		                            id="email"
+		                            type="email"
+		                            value={email}
+		                            onChange={(e) => setEmail(e.target.value)}
+		                            label="Email"
+		                            required
+		                        />
+		                        {!validEmail && email
+		                        	?
+		                        	<FormHelperText sx={{ color: "#fc0303" }}>Should be proper email format</FormHelperText>
+                                	: null
+		                        }
+		                    </FormControl>
+		                    <FormControl fullWidth className="mb-3">
+		                        <InputLabel htmlFor="password">Password</InputLabel>
+		                        <OutlinedInput
+		                        	error={!validPass && pass}
+		                            id="password"
+		                            type="password"
+		                            value={pass}
+		                            onChange={(e) => setPass(e.target.value)}
+		                            label="Password"
+		                            required
+		                        />
+		                        {!validPass && pass
+		                        	?
+		                        	<FormHelperText sx={{ color: "#fc0303" }}>
+		                        		Password must be at least one lowercase letter, one uppercase letter, one digit, and one special character and size is 8 to 24
+                                	</FormHelperText>
+                                	: null
+		                        }
+		                    </FormControl>
+		                    <FormControl fullWidth className="mb-3">
+		                        <InputLabel htmlFor="confPass">Confirm Password</InputLabel>
+		                        <OutlinedInput
+		                        	error={!validConfPass && confPass}
+		                            id="confPass"
+		                            type="password"
+		                            value={confPass}
+		                            onChange={(e) => setConfPass(e.target.value)}
+		                            label="Confirm Password"
+		                            required
+		                        />
+		                        {!validConfPass && confPass
+		                        	?
+		                        	<FormHelperText sx={{ color: "#fc0303" }}>Passwords should be matching</FormHelperText>
+                                	: null
+		                        }
+		                    </FormControl>
+		                    <div className="mb-3">
+	                            <Button variant="contained" component="label">
+	                                Upload photo
+	                                <input hidden accept="image/*" multiple type="file" />
+	                            </Button>
+                        	</div>
+							<Button variant="contained" color="success" type="submit" fullWidth>Create Account</Button>
+						</Form>
+						<Typography display="flex" justifyContent="center" alignItems="center"><Button component={Link} to="/login">Back to Login</Button></Typography>
+                	</CardContent>
+				</Card>
+			</Col>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			{/*<Col xs={12} lg={4}>
 				{showErrMsg 
 					?
 					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
@@ -190,9 +309,9 @@ const Register = () => {
 					</Form.Group>
 					<Button variant="success" className="w-100 mt-2" as="input" type="submit" value="Sign up" />
 				</Form>
-			</Col>
+			</Col>*/}
 
-			<Col xs={12} lg={4}>
+			{/*<Col xs={12} lg={4}>
 				<Card>
 					<Card.Body>
 						<ul>
@@ -203,7 +322,7 @@ const Register = () => {
 						</ul>
 					</Card.Body>
 				</Card>
-			</Col>
+			</Col>*/}
 		</Row>
 	)
 }
