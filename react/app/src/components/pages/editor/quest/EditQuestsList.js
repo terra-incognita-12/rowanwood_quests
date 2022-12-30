@@ -32,7 +32,7 @@ const EditQuestList = () => {
 
         const getQuests = async () => {
             try {
-                const response = await axiosPrivate.get("/quest/all", {
+                const response = await axiosPrivate.get("/quest/all/lines", {
                     signal: controller.signal
                 })
                 

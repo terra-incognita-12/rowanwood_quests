@@ -25,6 +25,8 @@ import Editor from "./components/pages/editor/Editor"
 import CreateQuest from "./components/pages/editor/quest/CreateQuest"
 import EditQuestsList from "./components/pages/editor/quest/EditQuestsList"
 
+import QuestLinesList from "./components/pages/editor/questDetails/QuestLinesList"
+
 import CreateLibraryRecord from "./components/pages/editor/library/CreateLibraryRecord"
 import EditLibraryRecordsList from "./components/pages/editor/library/EditLibraryRecordsList"
 import EditLibraryTagsList from "./components/pages/editor/library/EditLibraryTagsList"
@@ -72,9 +74,11 @@ function App() {
               <Route exact path="editor/quest/create" element={<CreateQuest />} />
               <Route exact path="editor/quest/edit" element={<EditQuestsList />} />
               
+              <Route exact path="editor/quest/edit/:url" element={<QuestLinesList />} />
+
               <Route exact path="editor/library/create" element={<CreateLibraryRecord />} />
               <Route exact path="editor/library/edit" element={<EditLibraryRecordsList />} />
-              <Route exact path="/editor/library/tags" element={<EditLibraryTagsList />} />
+              <Route exact path="editor/library/tags" element={<EditLibraryTagsList />} />
             </Route>
 
             <Route element={<RequireAuth allowedRoles={['admin']} />}>

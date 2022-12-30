@@ -4,15 +4,17 @@ from fastapi import (
     status,
     HTTPException
 )
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import asc
 from typing import List
 from ..database import get_db
-from ..models import Quest, Comment
+from ..models import Quest, Comment, QuestLine, QuestOption
 from ..schemes import quest_scheme
 from ..oauth2 import require_user
 
 router = APIRouter()
+
+# BASE QUEST
 
 @router.post('/create', status_code=status.HTTP_201_CREATED)
 def create_quest(payload: quest_scheme.QuestBaseScheme, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
@@ -27,12 +29,19 @@ def create_quest(payload: quest_scheme.QuestBaseScheme, db: Session = Depends(ge
 
     return {'status': 'success', 'message': 'OK'}
 
-@router.get('/all', response_model=List[quest_scheme.QuestResponseScheme])
-def get_all_quests(db: Session = Depends(get_db)):
+# Pull quests only with user comments
+@router.get('/all/comments', response_model=List[quest_scheme.QuestResponseSchemeWithComments])
+def get_all_quests_with_comments(db: Session = Depends(get_db)):
     quests = db.query(Quest).order_by(asc(Quest.name)).all()
     return quests
 
-@router.get('/{url}', response_model=quest_scheme.QuestResponseScheme)
+# Pull quests only with quest lines
+@router.get('/all/lines', response_model=List[quest_scheme.QuestResponseSchemeWithLines])
+def get_all_quests_with_lines(db: Session = Depends(get_db)):
+    quests = db.query(Quest).order_by(asc(Quest.name)).all()
+    return quests
+
+@router.get('/{url}', response_model=quest_scheme.QuestResponseSchemeWithComments)
 def get_quest(url: str, db: Session = Depends(get_db)):
     quest = db.query(Quest).filter(Quest.url == url).first()
 
@@ -73,4 +82,46 @@ def delete_quest(url: str, db: Session = Depends(get_db)):
     quest_query.delete(synchronize_session=False)
     db.commit()
     
+    return {'status': 'success', 'message': 'OK'}
+
+# LINES
+
+@router.post('/lines/create', status_code=status.HTTP_201_CREATED)
+def create_quest_line(payload: quest_scheme.QuestLineSendScheme, db: Session = Depends(get_db)):
+    check_quest = db.query(Quest).filter(Quest.id == payload.quest_id).first()
+    if not check_quest:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+
+    new_quest_line = QuestLine(**payload.dict())
+    db.add(new_quest_line)
+    db.commit()
+    db.refresh(new_quest_line)
+
+    return {'status': 'success', 'message': 'OK'}
+
+@router.get('/lines/all/{url}', response_model=List[quest_scheme.QuestLineResponseScheme])
+def get_all_lines_for_quest(url: str, db: Session = Depends(get_db)):
+    check_quest = db.query(Quest).filter(Quest.url == url).first()
+    if not check_quest:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+
+    return check_quest.quest_lines
+
+# OPTIONS
+
+@router.post('/options/create', status_code=status.HTTP_201_CREATED)
+def create_quest_option(payload: quest_scheme.QuestOptionSendScheme, db: Session = Depends(get_db)):
+    quest_line_query = db.query(QuestLine).options(joinedload(QuestLine.quest_options)).filter(QuestLine.id == payload.quest_line_id)
+    check_quest_line = quest_line_query.first()
+    if not check_quest_line:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
+
+    check_quest_line.quest_options.append(QuestOption(
+        unique_name=payload.unique_name,
+        description=payload.description
+    ))
+
+    db.commit()
+    db.refresh(check_quest_line)
+
     return {'status': 'success', 'message': 'OK'}

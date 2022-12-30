@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate, Link } from "react-router-dom"
 import { useState, useEffect } from 'react'
 import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
@@ -112,7 +112,7 @@ const EditQuestForm = ({ quest }) => {
                 <CardContent>
                     <Typography gutterBottom variant="h3" component="div">{questName}</Typography>
                     <Stack spacing={2} direction="row">
-                    	<Button variant="contained" color="primary">Edit Quest Details</Button>
+                    	<Button component={Link} to={`${questUrl}`} variant="contained" color="primary">Edit Quest Details</Button>
                     	<Button variant="contained" color="error" onClick={handleDelete}>Delete Quest</Button>
                     </Stack>
                     <Form onSubmit={handleSubmit}>

@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import TIMESTAMP, Column, String, ForeignKey, Boolean, text, TEXT, Table
+from sqlalchemy import TIMESTAMP, Column, String, ForeignKey, Boolean, text, TEXT, Table, Integer
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -35,6 +35,7 @@ class Quest(Base):
 	updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
 
 	quest_comments = relationship('Comment', back_populates='quest')
+	quest_lines = relationship('QuestLine', back_populates='quest')
 
 class Comment(Base):
 	__tablename__ = 'comments'
@@ -71,4 +72,36 @@ class LibraryTag(Base):
 library_records_tags = Table('library_records_tags', Base.metadata, 
 	Column('library_record_id', ForeignKey('library_record.id'), primary_key=True),
 	Column('library_tag_id', ForeignKey('library_tag.id'), primary_key=True),
+)
+
+class QuestLine(Base):
+	__tablename__ = 'quest_line'
+
+	id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
+	name = Column(String)
+	unique_number = Column(Integer)
+	photo = Column(String, nullable=True)
+	description = Column(String)
+	quest_id = Column(UUID(as_uuid=True), ForeignKey('quests.id', ondelete='CASCADE'), nullable=False)
+
+	quest_options = relationship('QuestOption', secondary='quest_lines_options', back_populates='quest_lines')
+
+	quest_next_options = relationship('QuestOption', back_populates='quest_next_line')
+	quest = relationship('Quest', back_populates='quest_lines')
+
+class QuestOption(Base):
+	__tablename__ = 'quest_option'
+
+	id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
+	unique_name = Column(String, unique=True)
+	description = Column(String)
+	quest_next_line_id = Column(UUID(as_uuid=True), ForeignKey('quest_line.id', ondelete='SET NULL'), nullable=True)
+
+	quest_lines = relationship('QuestLine', secondary='quest_lines_options', back_populates='quest_options')
+	
+	quest_next_line = relationship('QuestLine', back_populates='quest_next_options')
+
+quest_lines_options = Table('quest_lines_options', Base.metadata,
+	Column('quest_line_id', ForeignKey('quest_line.id'), primary_key=True),
+	Column('quest_option_id', ForeignKey('quest_option.id'), primary_key=True),
 )

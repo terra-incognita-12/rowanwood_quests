@@ -23,7 +23,7 @@ const QuestsList = () => {
         const getQuests = async () => {
             
             try {
-                const response = await axios.get("/quest/all", {
+                const response = await axios.get("/quest/all/comments", {
                     signal: controller.signal
                 })
                 isMounted && setQuests(response.data)
