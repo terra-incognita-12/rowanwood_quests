@@ -50,6 +50,8 @@ const QuestLinesList = () => {
 	const axiosPrivate = useAxiosPrivate()
 
 	const [rows, setRows] = useState([])
+	const [questsLinesList, setQuestsLinesList] = useState([])
+	
 	const [newLineModalOpen, setNewLineModalOpen] = useState(false)
 
 	const handleNewLineModalOpen = () => {
@@ -70,13 +72,18 @@ const QuestLinesList = () => {
                     signal: controller.signal
                 })
 
-                let data = []
+                let dataRows = []
+                let dataQuestLines = [] 
                 for (let i = 0; i < response.data.length; i++) {
-                    let data_dict = {"id": response.data[i].unique_number, "name": response.data[i].name}
-                    data.push(data_dict)
+                    let dataDict = {"id": response.data[i].unique_number, "name": response.data[i].name}
+                    dataRows.push(dataDict)
+                    dataDict = {"id": response.data[i].id, "name": response.data[i].name}
+                    dataQuestLines.push(dataDict)
+
                 }
                 if (isMounted) {
-                    setRows(data)
+                    setRows(dataRows)
+                    setQuestsLinesList(dataQuestLines)
                 }
             } catch (err) {
                 console.log(err)
@@ -126,12 +133,9 @@ const QuestLinesList = () => {
 			            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
 			            	Create New Line	
 			            </Typography>
-			            <Button autoFocus color="inherit" onClick={handleNewLineModalClose}>
-			             	Save
-			            </Button>
 		          	</Toolbar>
 		        </AppBar>
-		        <CreateQuestLineForm />
+		        <CreateQuestLineForm handleNewLineModalClose={handleNewLineModalClose} questLinesList={questsLinesList}/>
       		</Dialog>
        	</div>
 	)

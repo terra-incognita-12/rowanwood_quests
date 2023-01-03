@@ -93,8 +93,7 @@ class QuestOption(Base):
 	__tablename__ = 'quest_option'
 
 	id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
-	unique_name = Column(String, unique=True)
-	description = Column(String)
+	name = Column(String)
 	quest_next_line_id = Column(UUID(as_uuid=True), ForeignKey('quest_line.id', ondelete='SET NULL'), nullable=True)
 
 	quest_lines = relationship('QuestLine', secondary='quest_lines_options', back_populates='quest_options')
