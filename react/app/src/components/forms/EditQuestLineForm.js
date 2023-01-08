@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import Form from 'react-bootstrap/Form'
 import Row from 'react-bootstrap/Row'
@@ -20,11 +20,17 @@ import ErrMsg from "../ErrMsg"
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import useRedirectLogin from '../../hooks/useRedirectLogin'
 
-const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
+const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList, url }) => {
 	const navigate = useNavigate()
 	const location = useLocation()
 	const axiosPrivate = useAxiosPrivate()  
     const redirectLogin = useRedirectLogin(location)
+
+    const questLineId = questLine?.id
+    const questLineName = questLine?.name
+    const questLineUniqueNum = questLine?.unique_number
+    const questLineDesc = questLine?.description
+    const questLineOptions = questLine?.quest_options
 
 	const [name, setName] = useState("")
 	const [uniqueNum, setUniqueNum] = useState("")
@@ -34,6 +40,21 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 
 	const [errMsg, setErrMsg] = useState("")
 	const [showErrMsg, setShowErrMsg] = useState(false)
+
+	useEffect(() => {
+		setName(questLineName)
+		setUniqueNum(questLineUniqueNum)
+		setDescription(questLineDesc)
+
+		let newQuestOptions = []
+		for (let i = 0; i < questLineOptions.length; i++) {
+			let newOptionField = { name: questLineOptions[i].name, quest_next_line_id:questLineOptions[i].quest_next_line.id }
+			newQuestOptions.push(newOptionField)
+		}
+		console.log(newQuestOptions)
+		setQuestOptions(newQuestOptions)
+
+	}, [questLineName, questLineUniqueNum, questLineDesc, questLineOptions])
 
 	const handleShowErr = (e) => {
 		setShowErrMsg(e)
@@ -50,27 +71,40 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 	    setQuestOptions(optionField)
 	}
 
+	const getQuestNameById = (id) => {
+		console.log(id)
+		for (let i = 0; i < questLinesList.length; i++) {
+			if (questLinesList[i].id === id) {
+				return questLinesList[i].name
+			}
+		}
+
+		return "NaN"
+	}
+
 	const handleSubmit = async (e) => {
 		setPhoto("some_photo")
 
 		e.preventDefault()
 
-		try {
-			const response = await axiosPrivate.post(`/quest/lines/create/${url}`, JSON.stringify({"name": name, "unique_number": uniqueNum, "description": description, "photo": photo, "quest_options": questOptions}))
+		console.log(questOptions)
 
-			window.location.reload(false);
-		} catch (err) {
-			if (!err?.response) {
-				setErrMsg("No server respone")
-			} else if (err.response?.status === 400) {
-				redirectLogin()
-			} else if (err.response?.status === 403) {
-				setErrMsg("Quest line with this unique number already exists")
-			} else {
-                setErrMsg("Create Quest Line Failed")
-            }
-            handleShowErr(true)
-		}
+		// try {
+		// 	const response = await axiosPrivate.post(`/quest/lines/create/${url}`, JSON.stringify({"name": name, "unique_number": uniqueNum, "description": description, "photo": photo, "quest_options": questOptions}))
+
+		// 	window.location.reload(false);
+		// } catch (err) {
+		// 	if (!err?.response) {
+		// 		setErrMsg("No server respone")
+		// 	} else if (err.response?.status === 400) {
+		// 		redirectLogin()
+		// 	} else if (err.response?.status === 403) {
+		// 		setErrMsg("Quest line with this unique number already exists")
+		// 	} else {
+  //               setErrMsg("Create Quest Line Failed")
+  //           }
+  //           handleShowErr(true)
+		// }
 			
 	}
 
@@ -154,6 +188,13 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 						<Col xs={12} lg={6}>
 				            <FormControl fullWidth>
 				                <Autocomplete
+				                	defaultValue={
+				                		questLineOptions[i]
+				                			?	
+				                		{ name: getQuestNameById(questLineOptions[i].quest_next_line.id), quest_next_line_id:questLineOptions[i].quest_next_line.id }
+				                			:
+				                			null
+				                	}
 			                        disablePortal
 			                        id="combo-box-demo"
 			                        options={questLinesList}
@@ -183,4 +224,4 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 	)
 }
 
-export default CreateQuestLineForm
+export default EditQuestLineForm

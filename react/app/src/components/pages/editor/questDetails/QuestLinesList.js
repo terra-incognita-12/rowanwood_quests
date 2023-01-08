@@ -11,7 +11,6 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 
-
 import Dialog from '@mui/material/Dialog';
 import ListItemText from '@mui/material/ListItemText';
 import ListItem from '@mui/material/ListItem';
@@ -22,7 +21,6 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 // import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
-
 
 import CreateQuestLineForm from "../../../forms/CreateQuestLineForm"
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate"
@@ -36,7 +34,7 @@ const columns = [
 		minWidth: 130, 
 		flex: 1,
 		renderCell: (params) => 
-      		<Button component={Link} to={`/`} size="small">{params.row.name}</Button>, 
+      		<Button component={Link} to={`${params.row.id}`} size="small">{params.row.name}</Button>, 
 	},
 ];
 
@@ -52,14 +50,14 @@ const QuestLinesList = () => {
 	const [rows, setRows] = useState([])
 	const [questsLinesList, setQuestsLinesList] = useState([])
 	
-	const [newLineModalOpen, setNewLineModalOpen] = useState(false)
+	const [lineModalOpen, setLineModalOpen] = useState(false)
 
-	const handleNewLineModalOpen = () => {
-		setNewLineModalOpen(true)
+	const handleLineModalOpen = () => {
+		setLineModalOpen(true)
 	}
 
-	const handleNewLineModalClose = () => {
-		setNewLineModalOpen(false)
+	const handleLineModalClose = () => {
+		setLineModalOpen(false)
 	}
 	
 	useEffect(() => {
@@ -71,7 +69,6 @@ const QuestLinesList = () => {
                 const response = await axiosPrivate.get(`/quest/lines/all/${url}`, {
                     signal: controller.signal
                 })
-
                 let dataRows = []
                 let dataQuestLines = [] 
                 for (let i = 0; i < response.data.length; i++) {
@@ -79,7 +76,6 @@ const QuestLinesList = () => {
                     dataRows.push(dataDict)
                     dataDict = {"id": response.data[i].id, "name": response.data[i].name}
                     dataQuestLines.push(dataDict)
-
                 }
                 if (isMounted) {
                     setRows(dataRows)
@@ -105,7 +101,7 @@ const QuestLinesList = () => {
 			<Card className="mt-3">
 	            <CardContent style={{ height: 500, width: '100%' }}>
 	                <Typography gutterBottom variant="h3" component="div">Quest Lines</Typography>
-	                <Button variant="contained" color="primary" onClick={handleNewLineModalOpen}>Create New Line</Button>
+	                <Button variant="contained" color="primary" onClick={handleLineModalOpen}>Create New Line</Button>
 	                <DataGrid
 	                	className="mt-2"
 				        rows={rows}
@@ -116,8 +112,8 @@ const QuestLinesList = () => {
 
 	        <Dialog
 		        fullScreen
-		        open={newLineModalOpen}
-		        onClose={handleNewLineModalClose}
+		        open={lineModalOpen}
+		        onClose={handleLineModalClose}
 		        TransitionComponent={Transition}
 		    >
 		        <AppBar sx={{ position: 'relative' }}>
@@ -125,7 +121,7 @@ const QuestLinesList = () => {
 			            <IconButton
 			            	edge="start"
 			            	color="inherit"
-			            	onClick={handleNewLineModalClose}
+			            	onClick={handleLineModalClose}
 			            	aria-label="close"
 			            >
 			            	X
@@ -135,7 +131,7 @@ const QuestLinesList = () => {
 			            </Typography>
 		          	</Toolbar>
 		        </AppBar>
-		        <CreateQuestLineForm handleNewLineModalClose={handleNewLineModalClose} questLinesList={questsLinesList}/>
+		        <CreateQuestLineForm handleLineModalClose={handleLineModalClose} questLinesList={questsLinesList} url={url}/>
       		</Dialog>
        	</div>
 	)

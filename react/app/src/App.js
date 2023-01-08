@@ -26,6 +26,7 @@ import CreateQuest from "./components/pages/editor/quest/CreateQuest"
 import EditQuestsList from "./components/pages/editor/quest/EditQuestsList"
 
 import QuestLinesList from "./components/pages/editor/questDetails/QuestLinesList"
+import QuestLine from "./components/pages/editor/questDetails/QuestLine"
 
 import CreateLibraryRecord from "./components/pages/editor/library/CreateLibraryRecord"
 import EditLibraryRecordsList from "./components/pages/editor/library/EditLibraryRecordsList"
@@ -75,6 +76,7 @@ function App() {
               <Route exact path="editor/quest/edit" element={<EditQuestsList />} />
               
               <Route exact path="editor/quest/edit/:url" element={<QuestLinesList />} />
+              <Route exact path="editor/quest/edit/:url/:unique_number" element={<QuestLine />} />
 
               <Route exact path="editor/library/create" element={<CreateLibraryRecord />} />
               <Route exact path="editor/library/edit" element={<EditLibraryRecordsList />} />

@@ -86,13 +86,21 @@ def delete_quest(url: str, db: Session = Depends(get_db)):
 
 # LINES
 
-@router.post('/lines/create', status_code=status.HTTP_201_CREATED)
-def create_quest_line(payload: quest_scheme.QuestLineSendScheme, db: Session = Depends(get_db)):
-    check_quest = db.query(Quest).filter(Quest.id == payload.quest_id).first()
+@router.post('/lines/create/{url}', status_code=status.HTTP_201_CREATED)
+def create_quest_line(url: str, payload: quest_scheme.QuestLineSendScheme, db: Session = Depends(get_db)):
+    check_quest = db.query(Quest).filter(Quest.url == url).first()
     if not check_quest:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")     
+    check_unique_number = db.query(QuestLine).filter(QuestLine.quest_id == check_quest.id, QuestLine.unique_number == payload.unique_number).first()
+    if check_unique_number:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Quest line with this unique number already exists')
 
-    new_quest_line = QuestLine(**payload.dict())
+    payload_quest = []
+    for elem in payload.quest_options:
+        payload_quest.append(QuestOption(name=elem.name, quest_next_line_id=elem.quest_next_line_id))
+    payload.quest_options = payload_quest
+
+    new_quest_line = QuestLine(quest_id=check_quest.id, **payload.dict())
     db.add(new_quest_line)
     db.commit()
     db.refresh(new_quest_line)
@@ -106,6 +114,18 @@ def get_all_lines_for_quest(url: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
 
     return check_quest.quest_lines
+
+@router.get('/lines/{url}/{unique_number}', response_model=quest_scheme.QuestLineResponseScheme)
+def get_line_for_quest(url: str, unique_number: int, db: Session = Depends(get_db)):
+    check_quest = db.query(Quest).filter(Quest.url == url).first()
+    if not check_quest:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+
+    check_quest_line = db.query(QuestLine).filter(QuestLine.quest_id == check_quest.id, QuestLine.unique_number == unique_number).first()
+    if not check_quest_line:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
+
+    return check_quest_line
 
 # OPTIONS
 

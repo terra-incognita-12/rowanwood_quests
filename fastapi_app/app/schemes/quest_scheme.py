@@ -16,17 +16,13 @@ class QuestBaseScheme(BaseModel):
         orm_mode = True
 
 class QuestOptionBaseScheme(BaseModel):
-    unique_name: str
-    description: str
+    name: str
 
     class Config:
         orm_mode = True
 
 class QuestOptionSendScheme(QuestOptionBaseScheme):
-    quest_line_id: Union[uuid.UUID, None] = None
-
-class QuestOptionResponseScheme(QuestOptionBaseScheme):
-    id: uuid.UUID
+    quest_next_line_id: Union[uuid.UUID, None] = None
 
 class QuestLineBaseScheme(BaseModel):
     name: str
@@ -37,8 +33,21 @@ class QuestLineBaseScheme(BaseModel):
     class Config:
         orm_mode = True
 
+class QuestNextLineScheme(BaseModel):
+    id: Union[uuid.UUID, None] = None
+    name: str
+    unique_number: int
+
+    class Config:
+        orm_mode = True
+
+class QuestOptionResponseScheme(QuestOptionBaseScheme):
+    id: uuid.UUID
+    quest_next_line: QuestNextLineScheme = None
+
 class QuestLineSendScheme(QuestLineBaseScheme):
-    quest_id: Union[uuid.UUID, None] = None 
+    # quest_id: Union[uuid.UUID, None] = None
+    quest_options: List[QuestOptionSendScheme] = [] 
 
 class QuestLineResponseScheme(QuestLineBaseScheme):
     id: uuid.UUID
@@ -51,4 +60,6 @@ class QuestResponseSchemeWithComments(QuestBaseScheme):
 class QuestResponseSchemeWithLines(QuestBaseScheme):
     id: uuid.UUID
     quest_lines: List[QuestLineResponseScheme] = []
+
+
 
