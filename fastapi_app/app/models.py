@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import TIMESTAMP, Column, String, ForeignKey, Boolean, text, TEXT, Table, Integer
+from sqlalchemy import TIMESTAMP, Column, String, ForeignKey, Boolean, text, TEXT, Table, Integer, desc
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -34,8 +34,8 @@ class Quest(Base):
 	created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
 	updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
 
-	quest_comments = relationship('Comment', back_populates='quest')
-	quest_lines = relationship('QuestLine', back_populates='quest')
+	quest_comments = relationship('Comment', back_populates='quest', order_by='Comment.created_at')
+	quest_lines = relationship('QuestLine', back_populates='quest', order_by='QuestLine.unique_number')
 
 class Comment(Base):
 	__tablename__ = 'comments'

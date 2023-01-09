@@ -79,7 +79,7 @@ def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: 
     return {'status': 'success', 'message': 'OK'}
 
 @router.delete('/records/delete/{url}')
-def delete_quest(url: str, db: Session = Depends(get_db)):
+def delete_record(url: str, db: Session = Depends(get_db)):
     record_query = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).filter(LibraryRecord.url == url)
     check_record = record_query.first()
 

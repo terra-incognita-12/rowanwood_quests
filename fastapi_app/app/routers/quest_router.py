@@ -132,7 +132,7 @@ def update_quest_line(id: str, payload: quest_scheme.QuestLineSendScheme, db: Se
     quest_line_query = db.query(QuestLine).filter(QuestLine.id == id)
     check_quest_line = quest_line_query.first()
 
-    if not quest_line_query:
+    if not check_quest_line:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
 
     check_quest_line_unumber = db.query(QuestLine).filter(QuestLine.unique_number == payload.unique_number).first()
@@ -153,6 +153,15 @@ def update_quest_line(id: str, payload: quest_scheme.QuestLineSendScheme, db: Se
     db.refresh(check_quest_line)
 
     return {'status': 'success', 'message': 'OK'}  
+
+@router.delete('/lines/update/{id}')
+    quest_line_query = db.query(QuestLine).filter(QuestLine.id == id)
+    check_quest_line = quest_line_query.first()
+
+    if not check_quest_line:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
+
+    
 
 # OPTIONS
 
