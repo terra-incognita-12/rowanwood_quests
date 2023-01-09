@@ -89,22 +89,21 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 
 		console.log(questOptions)
 
-		// try {
-		// 	const response = await axiosPrivate.post(`/quest/lines/create/${url}`, JSON.stringify({"name": name, "unique_number": uniqueNum, "description": description, "photo": photo, "quest_options": questOptions}))
-
-		// 	window.location.reload(false);
-		// } catch (err) {
-		// 	if (!err?.response) {
-		// 		setErrMsg("No server respone")
-		// 	} else if (err.response?.status === 400) {
-		// 		redirectLogin()
-		// 	} else if (err.response?.status === 403) {
-		// 		setErrMsg("Quest line with this unique number already exists")
-		// 	} else {
-  //               setErrMsg("Create Quest Line Failed")
-  //           }
-  //           handleShowErr(true)
-		// }
+		try {
+			const response = await axiosPrivate.patch(`/quest/lines/update/${questLineId}`, JSON.stringify({"name": name, "unique_number": uniqueNum, "description": description, "photo": photo, "quest_options": questOptions}))
+			window.location.reload(false);
+		} catch (err) {
+			if (!err?.response) {
+				setErrMsg("No server respone")
+			} else if (err.response?.status === 400) {
+				redirectLogin()
+			} else if (err.response?.status === 403) {
+				setErrMsg("Quest line with this unique number already exists")
+			} else {
+                setErrMsg("Create Quest Line Failed")
+            }
+            handleShowErr(true)
+		}
 			
 	}
 
@@ -217,7 +216,7 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 	                </Button>
 	            </div>
 	            <div className="mt-3">
-	                <Button variant="contained" color="success" type="submit">Create Line</Button>
+	                <Button variant="contained" color="success" type="submit">Update Line</Button>
 	            </div>
 	        </Form>
 		</Container>

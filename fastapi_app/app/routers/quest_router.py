@@ -127,6 +127,33 @@ def get_line_for_quest(url: str, unique_number: int, db: Session = Depends(get_d
 
     return check_quest_line
 
+@router.patch('/lines/update/{id}')
+def update_quest_line(id: str, payload: quest_scheme.QuestLineSendScheme, db: Session = Depends(get_db)):
+    quest_line_query = db.query(QuestLine).filter(QuestLine.id == id)
+    check_quest_line = quest_line_query.first()
+
+    if not quest_line_query:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
+
+    check_quest_line_unumber = db.query(QuestLine).filter(QuestLine.unique_number == payload.unique_number).first()
+
+    if check_quest_line_unumber and str(check_quest_line_unumber.id) != id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Quest with this unique number already exists')
+
+    payload_quest = []
+    for elem in payload.quest_options:
+        payload_quest.append(QuestOption(name=elem.name, quest_next_line_id=elem.quest_next_line_id))
+    del payload.quest_options
+
+    update_data = payload.dict(exclude_unset=True)
+    check_quest_line.quest_options = payload_quest
+
+    quest_line_query.update(update_data, synchronize_session=False)
+    db.commit()
+    db.refresh(check_quest_line)
+
+    return {'status': 'success', 'message': 'OK'}  
+
 # OPTIONS
 
 @router.post('/options/create', status_code=status.HTTP_201_CREATED)

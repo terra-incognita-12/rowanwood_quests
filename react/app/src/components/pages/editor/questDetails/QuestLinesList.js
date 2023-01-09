@@ -99,7 +99,7 @@ const QuestLinesList = () => {
 		<div className="mt-3">
 			<Button component={Link} to="/editor/quest/edit" variant="text" size="large">&lt;&lt; Back</Button>
 			<Card className="mt-3">
-	            <CardContent style={{ height: 500, width: '100%' }}>
+	            <CardContent style={{ height: 700, width: '100%' }}>
 	                <Typography gutterBottom variant="h3" component="div">Quest Lines</Typography>
 	                <Button variant="contained" color="primary" onClick={handleLineModalOpen}>Create New Line</Button>
 	                <DataGrid
