@@ -56,7 +56,7 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 		e.preventDefault()
 
 		try {
-			const response = await axiosPrivate.post(`/quest/lines/create/${url}`, JSON.stringify({"name": name, "unique_number": uniqueNum, "description": description, "photo": photo, "quest_options": questOptions}))
+			const response = await axiosPrivate.post(`/quest/lines/create/${url}`, JSON.stringify({"name": name, "unique_number": uniqueNum, "description": description, "photo": photo, "quest_current_options": questOptions}))
 
 			window.location.reload(false);
 		} catch (err) {

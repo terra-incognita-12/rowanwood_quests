@@ -31,7 +31,7 @@ const QuestInfo = ({ url }) => {
 	const handleCommentDelete = async (id) => {
 		try {
 			await axiosPrivate.post("/comment/delete", JSON.stringify({id}))
-			setCommentChanged(true)
+
 		} catch (err) {
 			redirectLogin()
 		}

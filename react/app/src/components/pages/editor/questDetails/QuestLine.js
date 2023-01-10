@@ -1,5 +1,5 @@
 import { useState, useEffect, forwardRef } from "react"
-import { useLocation, Link } from "react-router-dom"
+import { useLocation, useNavigate, Link } from "react-router-dom"
 import { useParams } from "react-router"
 
 import Row from 'react-bootstrap/Row'
@@ -36,8 +36,9 @@ const QuestLine = () => {
     const [questsLinesList, setQuestsLinesList] = useState([])
 	const [questLine, setQuestLine] = useState("")
 
-	const axiosPrivate = useAxiosPrivate()  
+    const navigate = useNavigate()
     const location = useLocation()
+    const axiosPrivate = useAxiosPrivate()  
     const redirectLogin = useRedirectLogin(location)
 
     const handleLineModalOpen = () => {
@@ -46,6 +47,18 @@ const QuestLine = () => {
 
     const handleLineModalClose = () => {
         setLineModalOpen(false)
+    }
+
+    const handleLineDelete = async (id) => {
+        const answer = window.confirm("Are you sure to delete this line?")
+        if (!answer) { return }
+
+        try {
+            await axiosPrivate.delete(`/quest/lines/delete/${id}`, JSON.stringify({id}))
+            navigate(`/editor/quest/edit/${url}`, { replace: true})
+        } catch (err) {
+            console.log(err)
+        }
     }
 
 	useEffect(() => {
@@ -100,14 +113,14 @@ const QuestLine = () => {
                     <Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">{questLine.name}</Typography>
                     <Stack spacing={2} direction="row" className="mb-4">
                         <Button variant="contained" color="primary" onClick={handleLineModalOpen}>Edit Quest Line</Button>
-                        <Button variant="contained" color="error" >Delete Quest Line</Button>
+                        <Button variant="contained" color="error" onClick={() => handleLineDelete(questLine.id)}>Delete Quest Line</Button>
                     </Stack>
                     <Typography gutterBottom variant="body1">{questLine.description}</Typography>
                     <hr/>
                     <Typography gutterBottom variant="h6">Options:</Typography>
-                    {questLine.quest_options?.length
+                    {questLine.quest_current_options?.length
                         ?
-                        questLine.quest_options.map((option, i) => 
+                        questLine.quest_current_options.map((option, i) => 
                             <Stack direction="row" spacing={2} key={i}>
                                 <Button component={Link} to={`/editor/quest/edit/${url}/${option.quest_next_line.unique_number}`} variant="text">{i+1}) {option.name} (Goto #{option.quest_next_line.unique_number} "{option.quest_next_line.name}")</Button>
                             </Stack>            

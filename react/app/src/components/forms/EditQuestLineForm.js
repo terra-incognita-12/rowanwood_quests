@@ -30,7 +30,7 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
     const questLineName = questLine?.name
     const questLineUniqueNum = questLine?.unique_number
     const questLineDesc = questLine?.description
-    const questLineOptions = questLine?.quest_options
+    const questLineOptions = questLine?.quest_current_options
 
 	const [name, setName] = useState("")
 	const [uniqueNum, setUniqueNum] = useState("")
@@ -87,10 +87,8 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 
 		e.preventDefault()
 
-		console.log(questOptions)
-
 		try {
-			const response = await axiosPrivate.patch(`/quest/lines/update/${questLineId}`, JSON.stringify({"name": name, "unique_number": uniqueNum, "description": description, "photo": photo, "quest_options": questOptions}))
+			const response = await axiosPrivate.patch(`/quest/lines/update/${questLineId}`, JSON.stringify({"name": name, "unique_number": uniqueNum, "description": description, "photo": photo, "quest_current_options": questOptions}))
 			window.location.reload(false);
 		} catch (err) {
 			if (!err?.response) {

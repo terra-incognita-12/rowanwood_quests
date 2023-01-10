@@ -69,7 +69,7 @@ def update_quest(id: str, payload:quest_scheme.QuestBaseScheme, db: Session = De
     db.commit()
     db.refresh(check_quest)
 
-    return {'status': 'success', 'message': 'OK'}    
+    return {'status': 'success', 'message': 'OK'}   
 
 @router.delete('/delete/{url}')
 def delete_quest(url: str, db: Session = Depends(get_db)):
@@ -95,15 +95,19 @@ def create_quest_line(url: str, payload: quest_scheme.QuestLineSendScheme, db: S
     if check_unique_number:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Quest line with this unique number already exists')
 
-    payload_quest = []
-    for elem in payload.quest_options:
-        payload_quest.append(QuestOption(name=elem.name, quest_next_line_id=elem.quest_next_line_id))
-    payload.quest_options = payload_quest
+    payload_options = payload.quest_current_options
+    del payload.quest_current_options
 
     new_quest_line = QuestLine(quest_id=check_quest.id, **payload.dict())
     db.add(new_quest_line)
     db.commit()
     db.refresh(new_quest_line)
+
+    for elem in payload_options:
+        option = QuestOption(name=elem.name, quest_current_line_id=new_quest_line.id, quest_next_line_id=elem.quest_next_line_id)
+        db.add(option)
+        db.commit()
+        db.refresh(option)
 
     return {'status': 'success', 'message': 'OK'}
 
@@ -140,28 +144,36 @@ def update_quest_line(id: str, payload: quest_scheme.QuestLineSendScheme, db: Se
     if check_quest_line_unumber and str(check_quest_line_unumber.id) != id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Quest with this unique number already exists')
 
-    payload_quest = []
-    for elem in payload.quest_options:
-        payload_quest.append(QuestOption(name=elem.name, quest_next_line_id=elem.quest_next_line_id))
-    del payload.quest_options
+    payload_options = payload.quest_current_options
+    del payload.quest_current_options
 
     update_data = payload.dict(exclude_unset=True)
-    check_quest_line.quest_options = payload_quest
 
     quest_line_query.update(update_data, synchronize_session=False)
     db.commit()
     db.refresh(check_quest_line)
 
-    return {'status': 'success', 'message': 'OK'}  
+    db.query(QuestOption).filter(QuestOption.quest_current_line_id == id).delete()
+    db.commit()
 
-@router.delete('/lines/update/{id}')
-    quest_line_query = db.query(QuestLine).filter(QuestLine.id == id)
-    check_quest_line = quest_line_query.first()
+    for elem in payload_options:
+        option = QuestOption(name=elem.name, quest_current_line_id=id, quest_next_line_id=elem.quest_next_line_id)
+        db.add(option)
+        db.commit()
+        db.refresh(option)
 
+    return {'status': 'success', 'message': 'OK', 'unique_number': check_quest_line.unique_number}  
+@router.delete('/lines/delete/{id}')
+def delete_quest_line(id: str, db: Session = Depends(get_db)):
+    check_quest_line = db.query(QuestLine).filter(QuestLine.id == id).first()
+    
     if not check_quest_line:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
 
-    
+    db.delete(check_quest_line)
+    db.commit()
+
+    return {'status': 'success', 'message': 'OK'}
 
 # OPTIONS
 

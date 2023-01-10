@@ -47,11 +47,11 @@ class QuestOptionResponseScheme(QuestOptionBaseScheme):
 
 class QuestLineSendScheme(QuestLineBaseScheme):
     # quest_id: Union[uuid.UUID, None] = None
-    quest_options: List[QuestOptionSendScheme] = [] 
+    quest_current_options: List[QuestOptionSendScheme] = [] 
 
 class QuestLineResponseScheme(QuestLineBaseScheme):
     id: uuid.UUID
-    quest_options: List[QuestOptionResponseScheme] = []
+    quest_current_options: List[QuestOptionResponseScheme] = []
 
 class QuestResponseSchemeWithComments(QuestBaseScheme):
     id: uuid.UUID
