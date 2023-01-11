@@ -82,7 +82,7 @@ async def login(payload: user_scheme.LoginUserScheme, request: Request, response
 	response.set_cookie('refresh_token', refresh_token, REFRESH_X*60, REFRESH_X*60, '/', None, False, True, 'lax')
 	response.set_cookie('logged_in', 'True', ACCESS_X*60, ACCESS_X*60, '/', None, False, False, 'lax')
 
-	return {'status': 'success', 'role': user.role, 'access_token': access_token}
+	return {'username': user.username, 'status': 'success', 'role': user.role, 'access_token': access_token}
 
 @router.get('/logout')
 def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = Depends(require_user)):
@@ -220,5 +220,17 @@ def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Dep
 	response.set_cookie('access_token', access_token, ACCESS_X*60, ACCESS_X*60, '/', None, False, True, 'lax')
 	response.set_cookie('logged_in', 'True', ACCESS_X*60, ACCESS_X*60, '/', None, False, False, 'lax')
 
-	return {'email': user.email, 'role': user.role, 'access_token': access_token}
+	return {'username': user.username, 'email': user.email, 'role': user.role, 'access_token': access_token}
 
+@router.post('/change_username')
+def change_username(payload: user_scheme.ChangeUsernameScheme, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
+	user_query = db.query(User).filter(User.email == EmailStr(payload.email.lower()))
+	check_user = user_query.first()
+
+	if not check_user or not Hasher.verify_password(payload.password, check_user.password):
+		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User with this email don't exsist or wrong password")
+
+	user_query.update({'username': payload.username}, synchronize_session=False)
+	db.commit()
+
+	return {'success': 'OK'}

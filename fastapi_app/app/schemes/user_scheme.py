@@ -39,3 +39,6 @@ class UserResponse(UserBaseScheme):
 
 class ForeignKeyUserResponse(UserBaseScheme):
 	id: uuid.UUID
+
+class ChangeUsernameScheme(LoginUserScheme):
+	username: str
