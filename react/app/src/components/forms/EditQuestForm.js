@@ -157,7 +157,7 @@ const EditQuestForm = ({ quest }) => {
                             </Col>
                         </Row>
                         <Row className="mb-2">
-                            <Col xs={12} lg={6}>
+                            <Col xs={12}>
                                 <FormControl fullWidth>
                                     <InputLabel htmlFor="briefDesc">Brief Description</InputLabel>
                                     <OutlinedInput
@@ -165,6 +165,8 @@ const EditQuestForm = ({ quest }) => {
                                         value={briefDesc || ""}
                                         onChange={(e) => setBriefDesc(e.target.value)}
                                         label="Brief Description"
+                                        multiline
+                                        rows={2}
                                         required
                                     />
                                 </FormControl>
@@ -179,6 +181,8 @@ const EditQuestForm = ({ quest }) => {
                                         value={fullDesc || ""}
                                         onChange={(e) => setFullDesc(e.target.value)}
                                         label="Full Description"
+                                        multiline
+                                        rows={12}
                                         required
                                     />
                                 </FormControl>

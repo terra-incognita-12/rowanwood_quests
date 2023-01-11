@@ -9,6 +9,7 @@ import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
+import Stack from '@mui/material/Stack';
 
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate"
 import useRedirectLogin from "../../../../hooks/useRedirectLogin"
@@ -70,18 +71,18 @@ const EditQuestList = () => {
             <Button component={Link} to="/editor" variant="text" size="large">&lt;&lt; Back</Button>
             <Row className="mt-3">
                 <Col xs={12} md={6}>
-                    <Autocomplete
-                        disablePortal
-                        options={dropDownQuests}
-                        onChange={(e, newValue) => {
-                            setPickedQuest(newValue)
-                        }}
-                        getOptionLabel={(option) => option.name}
-                        renderInput={(params) => <TextField fullWidth {...params} label="Quests" />}
-                    />
-                </Col>
-                <Col xs={12} md={6}>
-                    <Button variant="contained" color="primary" size="large" onClick={getQuest}>Search</Button>
+                    <Stack spacing={2} direction="row">
+                        <Autocomplete fullWidth
+                            disablePortal
+                            options={dropDownQuests}
+                            onChange={(e, newValue) => {
+                                setPickedQuest(newValue)
+                            }}
+                            getOptionLabel={(option) => option.name}
+                            renderInput={(params) => <TextField fullWidth {...params} label="Quests" />}
+                        />
+                        <Button variant="contained" color="primary" size="large" onClick={getQuest}>Search</Button>
+                    </Stack>
                 </Col>
             </Row>
             

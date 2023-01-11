@@ -99,7 +99,7 @@ const CreateQuestForm = () => {
                             </Col>
                         </Row>
                         <Row className="mb-2">
-                            <Col xs={12} lg={6}>
+                            <Col xs={12} lg={6} className="mb-2">
                                 <FormControl fullWidth>
                                     <InputLabel htmlFor="url">URL (Unique Name)</InputLabel>
                                     <OutlinedInput
@@ -127,7 +127,7 @@ const CreateQuestForm = () => {
                             </Col>
                         </Row>
                         <Row className="mb-2">
-                            <Col xs={12} lg={6}>
+                            <Col xs={12}>
                                 <FormControl fullWidth>
                                     <InputLabel htmlFor="briefDesc">Brief Description</InputLabel>
                                     <OutlinedInput
@@ -135,6 +135,8 @@ const CreateQuestForm = () => {
                                         value={briefDesc}
                                         onChange={(e) => setBriefDesc(e.target.value)}
                                         label="Brief Description"
+                                        multiline
+                                        rows={2}
                                         required
                                     />
                                 </FormControl>
@@ -149,6 +151,8 @@ const CreateQuestForm = () => {
                                         value={fullDesc}
                                         onChange={(e) => setFullDesc(e.target.value)}
                                         label="Full Description"
+                                        multiline
+                                        rows={12}
                                         required
                                     />
                                 </FormControl>

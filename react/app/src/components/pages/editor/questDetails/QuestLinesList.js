@@ -19,7 +19,7 @@ import Divider from '@mui/material/Divider';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-// import CloseIcon from '@mui/icons-material/Close';
+import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 
 import CreateQuestLineForm from "../../../forms/CreateQuestLineForm"
@@ -124,7 +124,7 @@ const QuestLinesList = () => {
 			            	onClick={handleLineModalClose}
 			            	aria-label="close"
 			            >
-			            	X
+			            	<CloseIcon />
 			            </IconButton>
 			            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
 			            	Create New Line	

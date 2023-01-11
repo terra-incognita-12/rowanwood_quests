@@ -15,6 +15,9 @@ import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 import FormHelperText from '@mui/material/FormHelperText';
 import Container from '@mui/material/Container';
+import IconButton from '@mui/material/IconButton';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import Toolbar from '@mui/material/Toolbar';
 
 import ErrMsg from "../ErrMsg"
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
@@ -51,7 +54,6 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 			let newOptionField = { name: questLineOptions[i].name, quest_next_line_id:questLineOptions[i].quest_next_line.id }
 			newQuestOptions.push(newOptionField)
 		}
-		console.log(newQuestOptions)
 		setQuestOptions(newQuestOptions)
 
 	}, [questLineName, questLineUniqueNum, questLineDesc, questLineOptions])
@@ -72,7 +74,6 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 	}
 
 	const getQuestNameById = (id) => {
-		console.log(id)
 		for (let i = 0; i < questLinesList.length; i++) {
 			if (questLinesList[i].id === id) {
 				return questLinesList[i].name
@@ -151,6 +152,8 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 			                    value={description}
 			                    onChange={(e) => setDescription(e.target.value)}
 			                    label="Description"
+			                    multiline
+			                    rows={7}
 			                    required
 			                />
 			            </FormControl>
@@ -162,10 +165,12 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 			    </div>
 			    {questOptions.map((elem, i) => (
 				    <Row key={i} className="mt-1">
-				    	<Stack direction="row" spacing={2} className="mb-2">
-				    		<Typography variant="h6">Option #{i+1}</Typography>
-			    			<Button variant="contained" color="error" size="small" onClick={() => removeOptionField(i)}>Delete</Button>
-					    </Stack>
+				    	<Toolbar>
+			    			<IconButton edge="start" color="error" onClick={() => removeOptionField(i)}>
+                            	<RemoveCircleOutlineIcon />
+                            </IconButton>
+				    		<Typography sx={{ ml: 2, flex: 1 }} variant="h6">Option #{i+1}</Typography>
+					    </Toolbar>
 			    		<Col xs={12} lg={6} className="mb-2">
 				            <FormControl fullWidth>
 				                <InputLabel htmlFor="url">Quest Option Name</InputLabel>
