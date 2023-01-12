@@ -74,14 +74,14 @@ const EditQuestForm = ({ quest }) => {
 			navigate(`/quest/${url}`, { replace: true })
 		} catch (err) {
 			if (!err?.response) {
-				setErrMsg("No server respone")
-			} else if (err.response?.status === 400) {
-				redirectLogin()
-			} else if (err.response?.status === 403) {
-				setErrMsg("Quest with this url already exists")
-			} else if (err.response?.status === 404) {
-				setErrMsg("Quest doesn't exist")
-			} else {
+                setErrMsg("No server respone")
+            } else if (err.response?.status === 400) {
+                redirectLogin()
+            } else if (err.response?.status === 403) {
+                setErrMsg("Quest with this url already exists")
+            } else if (err.response?.status === 404) {
+                setErrMsg("Quest doesn't exist")
+            } else {
                 setErrMsg("Create Quest Failed")
             }
             handleShowErr(true)

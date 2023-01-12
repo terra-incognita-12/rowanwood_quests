@@ -11,6 +11,8 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Avatar from '@mui/material/Avatar';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import IconButton from '@mui/material/IconButton';
 
 import axios from "../../api/axios"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
@@ -31,7 +33,7 @@ const QuestInfo = ({ url }) => {
 	const handleCommentDelete = async (id) => {
 		try {
 			await axiosPrivate.post("/comment/delete", JSON.stringify({id}))
-
+			handleCommentChanged()
 		} catch (err) {
 			redirectLogin()
 		}
@@ -78,7 +80,7 @@ const QuestInfo = ({ url }) => {
 						quest.quest_comments.map((comment, i) =>
 							<Row key={i} className="mb-3">
 								<Col xs={12} md={8}>
-									<Paper elevation={3}>
+									<Paper elevation={3} sx={{ ml: 2, pl: 2, pt: 1, pb: 1 }}>
 										<div className="d-flex justify-content-between">
 											<Stack direction="row" spacing={2}>
 												<div>
@@ -92,7 +94,9 @@ const QuestInfo = ({ url }) => {
 											{auth?.role === 'admin'
 												?
 												<div>
-													<Button variant="contained" color="error" size="small" onClick={() => handleCommentDelete(comment.id)}>Delete Comment</Button>
+													<IconButton edge="start" color="error" onClick={() => handleCommentDelete(comment.id)}>
+                            							<DeleteForeverIcon />
+                            						</IconButton>	
 												</div>
 												: null
 											}
@@ -114,54 +118,6 @@ const QuestInfo = ({ url }) => {
                 </CardContent>
             </Card>
         </div>
-		// <>
-		// 	<div className="text-center mt-5">
-		// 		<h1>{quest?.name}</h1>
-		// 	</div>
-		// 	<div className="">
-		// 		<h4><i>Telegram link:</i> <b>@{quest?.url}</b></h4> 
-		// 	</div>
-		// 	<div className="mt-3">
-		// 		<p>{quest?.full_description}</p>
-		// 	</div>
-		// 	<Link to="/" className="text-decoration-none">#{quest?.url}</Link>
-		// 	<hr/>
-		// 	<div className="mt-3">
-		// 		{quest?.quest_comments?.length
-		// 			?
-		// 			quest.quest_comments.map((comment, i) =>
-		// 				<Row key={i}>
-		// 					<Col xs={12} md={8}>
-		// 						<Card>
-		// 							<Card.Header className="d-flex justify-content-between">
-		// 								<div>
-		// 									<Card.Title>{comment.user.username}</Card.Title>
-		// 									<Card.Subtitle className="text-muted">{moment(new Date(comment.created_at)).format('MM/DD/YY HH:mm:ss')}</Card.Subtitle>
-		// 								</div>
-		// 								<div>
-		// 									{auth?.role === 'admin'
-		// 										?
-		// 										<Button variant="danger" size="sm" onClick={() => handleCommentDelete(comment.id)}>Delete</Button>
-		// 										: null
-		// 									}
-		// 								</div>
-		// 							</Card.Header>
-		// 							<p>{comment.text_comment}</p>
-		// 						</Card>	
-		// 					</Col>
-		// 				</Row>
-		// 			) : <p>No comments yet!</p>
-		// 		}
-		// 		<Row className="mt-3">
-		// 			<Col xs={12} md={8}>
-		// 				{auth?.user
-		// 					? <CommentForm url={url} handleCommentChanged={handleCommentChanged} />
-		// 					: <h4>Sign in to leave comments</h4>
-		// 				}
-		// 			</Col>
-		// 		</Row>
-		// 	</div>
-		// </>
 	)
 }
 
