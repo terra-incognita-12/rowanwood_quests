@@ -18,7 +18,7 @@ from telegram.ext import (
 )
 
 BACKEND_URL = 'http://127.0.0.1:8000'
-QUEST_URL = 'training'
+QUEST_URL = 'bad_day'
 TOKEN='5962491186:AAERx0YPEL2kbOsKhYywIeP-7J9xCRpjcL4'
 
 NEXT_STEP = 1
@@ -28,6 +28,16 @@ logging.basicConfig(
 	level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+
+def get_quest_info():
+	try:
+		response = requests.get(f'{BACKEND_URL}/quest/{QUEST_URL}')
+		data = response.json()
+		return data
+	except requests.exceptions.RequestException as e:
+		print(e)
+	
+	return "error"
 
 # Get line API
 def get_line(unique_number: int):
@@ -46,9 +56,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	
 	logger.info(f'User {user.first_name} started the conversation.')
 	
+	quest_info = get_quest_info()
 	first_line = get_line(1)
 
 	await update.message.reply_text(f'Hello {user.first_name}! Welcome to the Arena by Rowan Wood')
+
+	await update.message.reply_text(f"QUEST INFO \n\n {quest_info['full_description']} \n\n")
 
 	keyboard = []
 	for elem in first_line['quest_current_options']:

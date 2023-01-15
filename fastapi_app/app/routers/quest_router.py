@@ -139,7 +139,7 @@ def update_quest_line(id: str, payload: quest_scheme.QuestLineSendScheme, db: Se
     if not check_quest_line:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
 
-    check_quest_line_unumber = db.query(QuestLine).filter(QuestLine.unique_number == payload.unique_number).first()
+    check_quest_line_unumber = db.query(QuestLine).filter(QuestLine.unique_number == payload.unique_number, QuestLine.quest_id == check_quest_line.quest_id).first()
 
     if check_quest_line_unumber and str(check_quest_line_unumber.id) != id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Quest with this unique number already exists')
