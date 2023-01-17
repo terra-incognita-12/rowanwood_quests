@@ -1,8 +1,11 @@
+from ..s3 import bucket
 from fastapi import (
     APIRouter, 
     Depends,
     status,
-    HTTPException
+    HTTPException,
+    UploadFile,
+    Form
 )
 from sqlalchemy.orm import Session, joinedload
 from typing import List
@@ -54,6 +57,12 @@ def create_record(payload: library_scheme.LibraryRecordSendScheme, db: Session =
 
     return {'status': 'success', 'message': 'OK'}
 
+@router.patch('/records/update/photo/{id}')
+def update_record_photo(id: str, photo: UploadFile):
+    bucket.upload_fileobj(photo.file, photo.filename, ExtraArgs={"ACL": "public-read"})
+
+    return {'status': 'success', 'message': 'OK'}
+
 @router.patch('/records/update/{id}')
 def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db)):
     record_query = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).filter(LibraryRecord.id == id)
@@ -68,6 +77,8 @@ def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: 
 
     payload_temp = prepare_library_tags(payload.library_tags, db)
     del payload.library_tags
+
+    payload.photo = f"https://rowan-wood-test-bucket.s3.amazonaws.com/{payload.photo}"
 
     update_data = payload.dict(exclude_unset=True)
     check_record.library_tags = payload_temp

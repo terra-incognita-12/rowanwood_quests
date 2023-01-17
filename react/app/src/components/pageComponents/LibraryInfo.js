@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 
+import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -45,6 +46,21 @@ const LibraryInfo = ({ url }) => {
             <Card className="mt-3">
                 <CardContent>
                     <Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">{record.name}</Typography>
+                    <Box display="flex" justifyContent="center" alignItems="center">
+                        <Box
+                            component="img"
+                            sx={{
+                                height: 600,
+                                width: 600,
+                                maxHeight: { xs: 400, md: 600 },
+                                maxWidth: { xs: 400, md: 600 },
+                                borderRadius: '16px',
+                            }}
+                            alt="Photo"
+                            src={record.photo}
+                        />
+                    </Box>
+                    
                     <Typography gutterBottom variant="body1">{record.description}</Typography>
                     {record.library_tags?.length
                         ?
