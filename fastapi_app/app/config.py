@@ -18,4 +18,8 @@ class Settings:
 	EMAIL_PASS = config('EMAIL_PASS')
 	EMAIL_FROM = config('EMAIL_FROM')
 	EMAIL_TOKEN_EXPIRES_SECONDS = config('EMAIL_TOKEN_EXPIRES_SECONDS')
+
+	S3_BUCKET_NAME = config('S3_BUCKET_NAME')
+	S3_FULL_URL = config('S3_FULL_URL')
+	
 settings = Settings()

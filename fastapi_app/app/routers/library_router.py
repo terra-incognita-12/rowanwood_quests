@@ -1,5 +1,7 @@
-from ..s3 import bucket, s3
-from botocore.exceptions import ClientError
+# from ..s3 import bucket, s3
+# import boto3
+# from botocore.exceptions import ClientError
+
 from fastapi import (
     APIRouter, 
     Depends,
@@ -10,12 +12,16 @@ from fastapi import (
 )
 from sqlalchemy.orm import Session, joinedload
 from typing import List
+from ..s3 import s3
 from ..database import get_db
+from ..config import settings
 from ..models import LibraryRecord, LibraryTag
 from ..schemes import library_scheme
 from ..oauth2 import require_user
 
 router = APIRouter()
+
+FOLDER = 'record/'
 
 @router.get("/records/all", response_model=List[library_scheme.LibraryRecordResponseScheme])
 def get_records(db: Session = Depends(get_db)):
@@ -65,14 +71,15 @@ def update_record_photo(id: str, photo: UploadFile, db: Session = Depends(get_db
     if not check_record:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
 
-    try:
-        bucket.upload_fileobj(photo.file, photo.filename, ExtraArgs={"ACL": "public-read"})
-    except ClientError as e:
-        print(e)
-    
-    photo_url = {'photo': f'https://rowan-wood-test-bucket.s3.amazonaws.com/{photo.filename}'}
+    key = FOLDER + id + photo.filename
 
-    record_query.update(photo_url, synchronize_session=False)
+    if check_record.photo:
+        old_key = check_record.photo.replace(settings.S3_FULL_URL,'')
+        s3.delete_photo(old_key)
+    
+    s3.add_new_photo(photo.file, key)
+
+    record_query.update({'photo': f'{settings.S3_FULL_URL + key}'}, synchronize_session=False)
     db.commit()
     db.refresh(check_record)
 
@@ -85,20 +92,12 @@ def delete_record_photo(id: str, db: Session = Depends(get_db)):
     if not check_record:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
 
-    # i1 = check_record.photo.find("/")
-    # i2 = check_record.photo.find(".jpg")
+    key = check_record.photo.replace(settings.S3_FULL_URL,'')
+    s3.delete_photo(key)
 
-    # try:
-    #     # bucket.upload_fileobj(photo.file, photo.filename, ExtraArgs={"ACL": "public-read"})
-    #     s3.delete_object(Bucket='rowan-wood-test-bucket', Key=payload.photo)
-    # except ClientError as e:
-    #     print(e)
-
-    # photo_url = {'photo': ''}
-
-    # record_query.update(photo_url, synchronize_session=False)
-    # db.commit()
-    # db.refresh(check_record)
+    record_query.update({'photo': ''}, synchronize_session=False)
+    db.commit()
+    db.refresh(check_record)
 
     return {'status': 'success', 'message': 'OK'}
 
@@ -117,8 +116,6 @@ def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: 
     payload_temp = prepare_library_tags(payload.library_tags, db)
     del payload.library_tags
 
-    payload.photo = f"https://rowan-wood-test-bucket.s3.amazonaws.com/{payload.photo}"
-
     update_data = payload.dict(exclude_unset=True)
     check_record.library_tags = payload_temp
 
@@ -135,6 +132,10 @@ def delete_record(url: str, db: Session = Depends(get_db)):
 
     if not check_record:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
+
+    if check_record.photo:
+        key = check_record.photo.replace(settings.S3_FULL_URL,'')
+        s3.delete_photo(key)
 
     check_record.library_tags = []
     db.commit()
@@ -184,6 +185,8 @@ def delete_tag(id: str, db: Session = Depends(get_db)):
     
     return {'status': 'success', 'message': 'OK'}
 
+# MISC
+
 def prepare_library_tags(payload_tags: List, db: Session):
     payload_temp = []
 
@@ -198,3 +201,6 @@ def prepare_library_tags(payload_tags: List, db: Session):
             payload_temp.append(tag)
 
     return payload_temp
+
+# def add_new_photo()
+

@@ -19,7 +19,6 @@ const LibraryInfo = ({ url }) => {
 	const [record, setRecord] = useState("")
 
     const isSmallScreen = useMediaQuery(theme => theme.breakpoints.down("sm"));
-    // const isSmallScreen = /xs|sm/.test(width)
 
 	useEffect(() => {
         let isMounted = true
@@ -52,20 +51,25 @@ const LibraryInfo = ({ url }) => {
             <Card className="mt-3">
                 <CardContent>
                     <Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">{record.name}</Typography>
-                    <Box display="flex" justifyContent="center" alignItems="center" className="mb-3">
-                        <Box
-                            component="img"
-                            sx={{
-                                height: 600,
-                                width: 600,
-                                maxHeight: { xs: 400, md: 600 },
-                                maxWidth: { xs: 400, md: 600 },
-                                borderRadius: '16px',
-                            }}
-                            alt="Photo"
-                            src={record.photo}
-                        />
-                    </Box>
+                    {record.photo
+                        ? (
+                            <Box display="flex" justifyContent="center" alignItems="center" className="mb-3">
+                                <Box
+                                    component="img"
+                                    sx={{
+                                        height: 600,
+                                        width: 600,
+                                        maxHeight: { xs: 400, md: 600 },
+                                        maxWidth: { xs: 400, md: 600 },
+                                        borderRadius: '16px',
+                                    }}
+                                    alt="Photo"
+                                    src={record.photo}
+                                />
+                            </Box>
+                        )
+                        : null
+                    }
                     
                     <Typography 
                         gutterBottom 

@@ -7,7 +7,6 @@ class LibraryRecordBaseScheme(BaseModel):
 	name: str
 	url: str
 	description: str
-	photo: str
 
 	class Config:
 		orm_mode = True
@@ -21,15 +20,14 @@ class LibraryTagBaseScheme(BaseModel):
 class LibraryRecordSendScheme(LibraryRecordBaseScheme):
 	library_tags: List[LibraryTagBaseScheme]
 
-class LibraryDeletePhotoScheme(BaseModel):
-    photo: str
-
 class LibraryRecordResponseScheme(LibraryRecordBaseScheme):
 	id: uuid.UUID
+	photo: str
 	library_tags: List[LibraryTagBaseScheme]
 
 class LibraryRecordResponseWithoutTagsScheme(LibraryRecordBaseScheme):
 	id: uuid.UUID
+	photo: str
 
 class LibraryTagSendScheme(LibraryTagBaseScheme):
 	pass

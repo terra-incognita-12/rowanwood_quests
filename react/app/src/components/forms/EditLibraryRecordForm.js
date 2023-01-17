@@ -5,6 +5,7 @@ import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 import { Link } from "react-router-dom"
 
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
@@ -118,20 +119,10 @@ const EditLibraryRecordForm = ({ record }) => {
         let photo_data = new FormData();
         photo_data.append("photo", photo)
 
-        try {
-            await axios.patch(`/library/records/update/photo/${recordId}`, photo_data, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            })
-        } catch (err) {
-            console.log(err)
-            return
-        }
-
 		try {
 			const response = await axiosPrivate.patch(`/library/records/update/${recordId}`, JSON.stringify({"name": name, "url": url, "description": description, "photo": photo.name, "library_tags": tags}))
-			navigate(`/library/${url}`, { replace: true})
+			// navigate(`/library/${url}`, { replace: true})
+            
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg("No server respone")
@@ -144,6 +135,18 @@ const EditLibraryRecordForm = ({ record }) => {
             }
             handleShowErr(true)
 		}
+
+        try {
+            await axios.patch(`/library/records/update/photo/${recordId}`, photo_data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            window.location.reload(false);
+        } catch (err) {
+            console.log(err)
+            return
+        }
 	}
 
     const handleDelete = async () => {
@@ -152,6 +155,18 @@ const EditLibraryRecordForm = ({ record }) => {
 
         try {
             await axiosPrivate.delete(`/library/records/delete/${url}`, JSON.stringify({"url": recordUrl}))
+            window.location.reload(false);
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    const handleDeletePhoto = async () => {
+        const answer = window.confirm("Are you sure to delete this photo?")
+        if (!answer) { return }
+
+        try {
+            await axiosPrivate.delete(`/library/records/delete/photo/${recordId}`)
             window.location.reload(false);
         } catch (err) {
             console.log(err)
@@ -167,8 +182,28 @@ const EditLibraryRecordForm = ({ record }) => {
 			}
             <Card className="mt-3">
                 <CardContent>
-                    <Typography gutterBottom variant="h3" component="div">{recordName}</Typography>
-                    <Button variant="contained" color="error" onClick={handleDelete}>Delete Record</Button>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Box>
+                            <Typography gutterBottom variant="h3" component="div">{recordName}</Typography>
+                            <Button variant="contained" color="error" onClick={handleDelete}>Delete Record</Button>
+                        </Box>
+                        {record.photo
+                            ? (
+                                <Box
+                                    component="img"
+                                    sx={{
+                                        height: 150,
+                                        width: 150,
+                                        borderRadius: '8px',
+                                    }}
+                                    alt="Photo"
+                                    src={record.photo}
+                                />
+                            )
+                            : null
+                        }
+                        
+                    </Box>
                     <Form onSubmit={handleSubmit}>
                         <Row className="mt-3 mb-2">
                             <Col xs={12} lg={6} className="mb-2">
@@ -253,14 +288,19 @@ const EditLibraryRecordForm = ({ record }) => {
                                         value={description || ""}
                                         onChange={(e) => setDescription(e.target.value)}
                                         label="Description"
+                                        multiline
+                                        rows={12}
                                         required
                                     />
                                 </FormControl>
                             </Col>
                         </Row>
-                        <Stack spacing={3} direction="row">
+                        <Stack spacing={2} direction="row">
+                            <Button variant="contained" component="label" color="error" onClick={handleDeletePhoto}>
+                                Delete Photo
+                            </Button>
                             <Button variant="contained" component="label">
-                                Upload photo
+                                Upload new photo
                                 <input hidden accept="image/*" type="file" onChange={handlePhotoUploaded} />
                             </Button>
                             {isPhotoUploaded && photo.name
