@@ -3,6 +3,9 @@ import { Link } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 
+// import { useMediaQuery } from "@material-ui/core";
+// import useMediaQuery from "@material-ui/core/useMediaQuery";
+import useMediaQuery from '@mui/material/useMediaQuery';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -14,6 +17,9 @@ import axios from "../../api/axios"
 const LibraryInfo = ({ url }) => {
 
 	const [record, setRecord] = useState("")
+
+    const isSmallScreen = useMediaQuery(theme => theme.breakpoints.down("sm"));
+    // const isSmallScreen = /xs|sm/.test(width)
 
 	useEffect(() => {
         let isMounted = true
@@ -46,7 +52,7 @@ const LibraryInfo = ({ url }) => {
             <Card className="mt-3">
                 <CardContent>
                     <Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">{record.name}</Typography>
-                    <Box display="flex" justifyContent="center" alignItems="center">
+                    <Box display="flex" justifyContent="center" alignItems="center" className="mb-3">
                         <Box
                             component="img"
                             sx={{
@@ -61,7 +67,16 @@ const LibraryInfo = ({ url }) => {
                         />
                     </Box>
                     
-                    <Typography gutterBottom variant="body1">{record.description}</Typography>
+                    <Typography 
+                        gutterBottom 
+                        variant="body1"
+                        sx={isSmallScreen
+                            ? { p: 3 }
+                            : { p: 1 }
+                        }
+                    >
+                        {record.description}
+                    </Typography>
                     {record.library_tags?.length
                         ?
                         record.library_tags.map((tag, i) =>             
