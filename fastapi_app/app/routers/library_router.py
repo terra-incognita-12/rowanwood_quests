@@ -1,4 +1,5 @@
-from ..s3 import bucket
+from ..s3 import bucket, s3
+from botocore.exceptions import ClientError
 from fastapi import (
     APIRouter, 
     Depends,
@@ -58,8 +59,46 @@ def create_record(payload: library_scheme.LibraryRecordSendScheme, db: Session =
     return {'status': 'success', 'message': 'OK'}
 
 @router.patch('/records/update/photo/{id}')
-def update_record_photo(id: str, photo: UploadFile):
-    bucket.upload_fileobj(photo.file, photo.filename, ExtraArgs={"ACL": "public-read"})
+def update_record_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):
+    record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)
+    check_record = record_query.first()
+    if not check_record:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
+
+    try:
+        bucket.upload_fileobj(photo.file, photo.filename, ExtraArgs={"ACL": "public-read"})
+    except ClientError as e:
+        print(e)
+    
+    photo_url = {'photo': f'https://rowan-wood-test-bucket.s3.amazonaws.com/{photo.filename}'}
+
+    record_query.update(photo_url, synchronize_session=False)
+    db.commit()
+    db.refresh(check_record)
+
+    return {'status': 'success', 'message': 'OK'}
+
+@router.delete('/records/delete/photo/{id}')
+def delete_record_photo(id: str, db: Session = Depends(get_db)):
+    record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)
+    check_record = record_query.first()
+    if not check_record:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
+
+    # i1 = check_record.photo.find("/")
+    # i2 = check_record.photo.find(".jpg")
+
+    # try:
+    #     # bucket.upload_fileobj(photo.file, photo.filename, ExtraArgs={"ACL": "public-read"})
+    #     s3.delete_object(Bucket='rowan-wood-test-bucket', Key=payload.photo)
+    # except ClientError as e:
+    #     print(e)
+
+    # photo_url = {'photo': ''}
+
+    # record_query.update(photo_url, synchronize_session=False)
+    # db.commit()
+    # db.refresh(check_record)
 
     return {'status': 'success', 'message': 'OK'}
 

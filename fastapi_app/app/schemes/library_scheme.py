@@ -21,6 +21,9 @@ class LibraryTagBaseScheme(BaseModel):
 class LibraryRecordSendScheme(LibraryRecordBaseScheme):
 	library_tags: List[LibraryTagBaseScheme]
 
+class LibraryDeletePhotoScheme(BaseModel):
+    photo: str
+
 class LibraryRecordResponseScheme(LibraryRecordBaseScheme):
 	id: uuid.UUID
 	library_tags: List[LibraryTagBaseScheme]
