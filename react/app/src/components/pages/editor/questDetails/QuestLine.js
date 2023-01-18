@@ -113,7 +113,7 @@ const QuestLine = () => {
             <Card className="mt-3">
                 <CardContent>
 
-                    <Stack spacing={2} direction="row" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Stack spacing={2} direction="row" sx={{ display: 'flex', justifyContent: 'space-between' }} className="mb-3">
                         <Box>
                             <Typography gutterBottom variant="h4">{questLine.name}</Typography>
                             <Stack spacing={1} direction="row">

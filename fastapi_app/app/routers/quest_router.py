@@ -85,6 +85,15 @@ def delete_quest(url: str, db: Session = Depends(get_db)):
     if not check_quest:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
 
+    if check_quest.photo:
+        key = check_quest.photo.replace(settings.S3_FULL_URL,'')
+        s3.delete_photo(key)
+
+    for elem in check_quest.quest_lines:
+        if elem.photo:
+            key = elem.photo.replace(settings.S3_FULL_URL,'')
+            s3.delete_photo(key)
+
     quest_query.delete(synchronize_session=False)
     db.commit()
     
@@ -175,6 +184,10 @@ def delete_quest_line(id: str, db: Session = Depends(get_db)):
     
     if not check_quest_line:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
+
+    if check_quest_line.photo:
+        key = check_quest_line.photo.replace(settings.S3_FULL_URL,'')
+        s3.delete_photo(key)
 
     db.delete(check_quest_line)
     db.commit()

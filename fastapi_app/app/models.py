@@ -85,14 +85,7 @@ class QuestLine(Base):
 	quest_id = Column(UUID(as_uuid=True), ForeignKey('quests.id', ondelete='CASCADE'), nullable=False)
 
 	quest = relationship('Quest', back_populates='quest_lines')
-	# quest_current_options = relationship('QuestOption', back_populates='quest_current_line')
-	# quest_next = relationship('QuestOption', back_populates='quest_next_line')
-
-
-	# quest_current_options = relationship('QuestOption', secondary='quest_lines_options', back_populates='quest_lines')
-	# quest_next_options = relationship('QuestOption', back_populates='quest_next_line')
 	
-
 class QuestOption(Base):
 	__tablename__ = 'quest_option'
 
@@ -101,17 +94,5 @@ class QuestOption(Base):
 	quest_current_line_id = Column(UUID(as_uuid=True), ForeignKey('quest_line.id', ondelete='CASCADE'), nullable=False)
 	quest_next_line_id = Column(UUID(as_uuid=True), ForeignKey('quest_line.id', ondelete='CASCADE'), nullable=False)
 
-	# quest_current_line = relationship('QuestLine', backref='quest_current_options', back_populates='quest_current_options')
-	# quest_next_line = relationship('QuestLine', backref='quest_next', back_populates='quest_next')
-
 	quest_current_line = relationship('QuestLine', backref=backref('quest_current_options', cascade="all,delete"), foreign_keys=[quest_current_line_id])
 	quest_next_line = relationship('QuestLine', backref=backref('quest_next',cascade="all,delete"), foreign_keys=[quest_next_line_id])
-
-	# quest_lines = relationship('QuestLine', secondary='quest_lines_options', back_populates='quest_options')
-	
-	# quest_next_line = relationship('QuestLine', back_populates='quest_next_options')
-
-# quest_lines_options = Table('quest_lines_options', Base.metadata,
-# 	Column('quest_line_id', ForeignKey('quest_line.id'), primary_key=True),
-# 	Column('quest_option_id', ForeignKey('quest_option.id'), primary_key=True),
-# )
