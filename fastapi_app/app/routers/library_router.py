@@ -1,7 +1,3 @@
-# from ..s3 import bucket, s3
-# import boto3
-# from botocore.exceptions import ClientError
-
 from fastapi import (
     APIRouter, 
     Depends,
@@ -62,7 +58,7 @@ def create_record(payload: library_scheme.LibraryRecordSendScheme, db: Session =
     db.commit()
     db.refresh(new_library_record)
 
-    return {'status': 'success', 'message': 'OK'}
+    return {'status': 'success', 'message': 'OK', 'id': new_library_record.id}
 
 @router.patch('/records/update/photo/{id}')
 def update_record_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):

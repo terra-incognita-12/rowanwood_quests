@@ -3,8 +3,6 @@ import { Link } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
 
-// import { useMediaQuery } from "@material-ui/core";
-// import useMediaQuery from "@material-ui/core/useMediaQuery";
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';

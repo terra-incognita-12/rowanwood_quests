@@ -16,8 +16,8 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import Icon from '@mui/material/Icon';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 
 import ErrMsg from "../ErrMsg"
 import axios from "../../api/axios"
@@ -105,6 +105,15 @@ const EditLibraryRecordForm = ({ record }) => {
         }   
     }
 
+    const handleCleanPhotoUpload = (e) => {
+        e.target.value = ""
+    }
+
+    const handleRemovePhotoBeforeUpload = (e) => {
+        setIsPhotoUploaded(false)
+        setPhoto("")
+    }
+
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 
@@ -115,14 +124,9 @@ const EditLibraryRecordForm = ({ record }) => {
 			handleShowErr(true)
 			return
 		}
-        
-        let photo_data = new FormData();
-        photo_data.append("photo", photo)
 
 		try {
-			const response = await axiosPrivate.patch(`/library/records/update/${recordId}`, JSON.stringify({"name": name, "url": url, "description": description, "photo": photo.name, "library_tags": tags}))
-			// navigate(`/library/${url}`, { replace: true})
-            
+			const response = await axiosPrivate.patch(`/library/records/update/${recordId}`, JSON.stringify({"name": name, "url": url, "description": description, "library_tags": tags}))
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg("No server respone")
@@ -136,17 +140,25 @@ const EditLibraryRecordForm = ({ record }) => {
             handleShowErr(true)
 		}
 
-        try {
-            await axios.patch(`/library/records/update/photo/${recordId}`, photo_data, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            })
-            window.location.reload(false);
-        } catch (err) {
-            console.log(err)
-            return
+        if (!photo) {
+            navigate(`/library/${url}`, { replace: true})
+        } else {
+            let photo_data = new FormData();
+            photo_data.append("photo", photo)
+
+            try {
+                await axios.patch(`/library/records/update/photo/${recordId}`, photo_data, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+                navigate(`/library/${url}`, { replace: true})
+            } catch (err) {
+                console.log(err)
+                alert("Main info on record updated successfully, but it was issue with update photo, please try again")
+            }
         }
+
 	}
 
     const handleDelete = async () => {
@@ -295,16 +307,23 @@ const EditLibraryRecordForm = ({ record }) => {
                                 </FormControl>
                             </Col>
                         </Row>
-                        <Stack spacing={2} direction="row">
+                        <Stack spacing={1} direction="row">
                             <Button variant="contained" component="label" color="error" onClick={handleDeletePhoto}>
                                 Delete Photo
                             </Button>
                             <Button variant="contained" component="label">
                                 Upload new photo
-                                <input hidden accept="image/*" type="file" onChange={handlePhotoUploaded} />
+                                <input hidden accept="image/*" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload}/>
                             </Button>
                             {isPhotoUploaded && photo.name
-                                ? <Typography gutterBottom variant="body2" component="div">{photo.name}</Typography>
+                                ? (
+                                    <Stack spacing={1} direction="row">
+                                        <Typography gutterBottom variant="overline" component="div">{photo.name}</Typography>
+                                        <IconButton edge="end" color="error" onClick={handleRemovePhotoBeforeUpload}>
+                                            <CloseIcon />
+                                        </IconButton>
+                                    </Stack>
+                                )
                                 : null
                             }   
                         </Stack>

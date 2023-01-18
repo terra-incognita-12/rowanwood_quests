@@ -5,6 +5,7 @@ import { useParams } from "react-router"
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -111,10 +112,30 @@ const QuestLine = () => {
             <Button component={Link} to={`/editor/quest/edit/${url}`} variant="text" size="large">&lt;&lt; Back to quest lines</Button>
             <Card className="mt-3">
                 <CardContent>
-                    <Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">{questLine.name}</Typography>
-                    <Stack spacing={2} direction="row" className="mb-4">
-                        <Button variant="contained" color="primary" onClick={handleLineModalOpen}>Edit Quest Line</Button>
-                        <Button variant="contained" color="error" onClick={() => handleLineDelete(questLine.id)}>Delete Quest Line</Button>
+
+                    <Stack spacing={2} direction="row" sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Box>
+                            <Typography gutterBottom variant="h4">{questLine.name}</Typography>
+                            <Stack spacing={1} direction="row">
+                                <Button variant="contained" color="primary" onClick={handleLineModalOpen}>Edit Quest Line</Button>
+                                <Button variant="contained" color="error" onClick={() => handleLineDelete(questLine.id)}>Delete Quest Line</Button>
+                            </Stack>
+                        </Box>
+                        {questLine.photo
+                            ? (
+                                <Box
+                                    component="img"
+                                    sx={{
+                                        height: 150,
+                                        width: 150,
+                                        borderRadius: '8px',
+                                    }}
+                                    alt="Photo"
+                                    src={questLine.photo}
+                                />
+                            )
+                            : null
+                        }
                     </Stack>
                     <Typography gutterBottom variant="body1">{questLine.description}</Typography>
                     <hr/>

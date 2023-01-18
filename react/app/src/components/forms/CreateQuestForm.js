@@ -14,8 +14,12 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import FormHelperText from '@mui/material/FormHelperText';
+import Stack from '@mui/material/Stack';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 
 import ErrMsg from "../ErrMsg"
+import axios from "../../api/axios"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
 
@@ -33,7 +37,9 @@ const CreateQuestForm = () => {
 	const [fullDesc, setFullDesc] = useState("")
 	const [url, setUrl] = useState("")
 	const [telegramUrl, setTelegramUrl] = useState("")
+
 	const [photo, setPhoto] = useState("")
+    const [isPhotoUploaded, setIsPhotoUploaded] = useState(false)
 
 	const [errMsg, setErrMsg] = useState("")
 	const [showErrMsg, setShowErrMsg] = useState(false)
@@ -42,8 +48,27 @@ const CreateQuestForm = () => {
 		setShowErrMsg(e)
 	}
 
+    const handlePhotoUploaded = (e) => {
+        if (!e.target.files[0]) {
+            setIsPhotoUploaded(false)
+            setPhoto("")
+        } else {
+            setIsPhotoUploaded(true)
+            setPhoto(e.target.files[0])
+        }   
+    }
+
+    const handleCleanPhotoUpload = (e) => {
+        e.target.value = ""
+    }
+
+    const handleRemovePhotoBeforeUpload = (e) => {
+        setIsPhotoUploaded(false)
+        setPhoto("")
+    }
+
 	const handleSubmit = async (e) => {
-		setPhoto("some_photo")
+        let questId = ""
 
 		e.preventDefault()
 
@@ -54,9 +79,9 @@ const CreateQuestForm = () => {
 		}
 
 		try {
-			const response = await axiosPrivate.post("/quest/create", JSON.stringify({"name": name, "url": url, "telegram_url": telegramUrl, "brief_description": briefDesc, "full_description": fullDesc, "photo": photo}))
+			const response = await axiosPrivate.post("/quest/create", JSON.stringify({"name": name, "url": url, "telegram_url": telegramUrl, "brief_description": briefDesc, "full_description": fullDesc}))
 
-			navigate("/editor/quest/edit", { replace: true})
+            questId = response.data.id
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg("No server respone")
@@ -69,6 +94,25 @@ const CreateQuestForm = () => {
             }
             handleShowErr(true)
 		}
+
+        if (!photo) {
+            navigate(`/quest/${url}`, { replace: true})
+        } else {
+            let photo_data = new FormData();
+            photo_data.append("photo", photo)
+
+            try {
+                await axios.patch(`/quest/update/photo/${questId}`, photo_data, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+                navigate(`/quest/${url}`, { replace: true})
+            } catch (err) {
+                console.log(err)
+                alert("Main info on record created successfully, but it was issue with update photo, please try again")
+            }
+        }
 	}
 
 	return (
@@ -158,12 +202,23 @@ const CreateQuestForm = () => {
                                 </FormControl>
                             </Col>
                         </Row>
-                        <div className="mt-3">
+                        <Stack spacing={2} direction="row">
                             <Button variant="contained" component="label">
-                                Upload photo
-                                <input hidden accept="image/*" multiple type="file" />
+                                Upload Photo
+                                <input hidden accept="image/*" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload} />
                             </Button>
-                        </div>
+                            {isPhotoUploaded && photo.name
+                                ? (
+                                    <Stack spacing={1} direction="row">
+                                        <Typography gutterBottom variant="overline" component="div">{photo.name}</Typography>
+                                        <IconButton edge="end" color="error" onClick={handleRemovePhotoBeforeUpload}>
+                                            <CloseIcon />
+                                        </IconButton>
+                                    </Stack>
+                                )
+                                : null
+                            }   
+                        </Stack>
                         <div className="mt-3">
                             <Button variant="contained" color="success" type="submit">Create Quest</Button>
                         </div>

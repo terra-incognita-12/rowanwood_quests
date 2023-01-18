@@ -10,10 +10,12 @@ class QuestBaseScheme(BaseModel):
     telegram_url: str
     brief_description: str
     full_description: str
-    photo: str
 
     class Config:
         orm_mode = True
+
+class QuestSendScheme(QuestBaseScheme):
+    pass
 
 class QuestOptionBaseScheme(BaseModel):
     name: str
@@ -27,7 +29,6 @@ class QuestOptionSendScheme(QuestOptionBaseScheme):
 class QuestLineBaseScheme(BaseModel):
     name: str
     unique_number: int
-    photo: str
     description: str
 
     class Config:
@@ -51,14 +52,17 @@ class QuestLineSendScheme(QuestLineBaseScheme):
 
 class QuestLineResponseScheme(QuestLineBaseScheme):
     id: uuid.UUID
+    photo: Union[str, None] = None
     quest_current_options: List[QuestOptionResponseScheme] = []
 
 class QuestResponseSchemeWithComments(QuestBaseScheme):
     id: uuid.UUID
+    photo: Union[str, None] = None
     quest_comments: List[CommentResponseScheme] = []
 
 class QuestResponseSchemeWithLines(QuestBaseScheme):
     id: uuid.UUID
+    photo: Union[str, None] = None
     quest_lines: List[QuestLineResponseScheme] = []
 
 

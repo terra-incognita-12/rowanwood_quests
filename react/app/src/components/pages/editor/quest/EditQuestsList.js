@@ -72,7 +72,8 @@ const EditQuestList = () => {
             <Row className="mt-3">
                 <Col xs={12} md={6}>
                     <Stack spacing={2} direction="row">
-                        <Autocomplete fullWidth
+                        <Autocomplete 
+                            fullWidth
                             disablePortal
                             options={dropDownQuests}
                             onChange={(e, newValue) => {

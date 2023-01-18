@@ -1,7 +1,7 @@
 import uuid
 from fastapi import UploadFile
 from pydantic import BaseModel
-from typing import List
+from typing import List, Union
 
 class LibraryRecordBaseScheme(BaseModel):
 	name: str
@@ -22,12 +22,12 @@ class LibraryRecordSendScheme(LibraryRecordBaseScheme):
 
 class LibraryRecordResponseScheme(LibraryRecordBaseScheme):
 	id: uuid.UUID
-	photo: str
+	photo: Union[str, None] = None
 	library_tags: List[LibraryTagBaseScheme]
 
 class LibraryRecordResponseWithoutTagsScheme(LibraryRecordBaseScheme):
 	id: uuid.UUID
-	photo: str
+	photo: Union[str, None] = None
 
 class LibraryTagSendScheme(LibraryTagBaseScheme):
 	pass

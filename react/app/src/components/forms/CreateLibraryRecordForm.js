@@ -14,8 +14,12 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import FormHelperText from '@mui/material/FormHelperText';
+import Stack from '@mui/material/Stack';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 
 import ErrMsg from '../ErrMsg'
+import axios from "../../api/axios"
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import useRedirectLogin from '../../hooks/useRedirectLogin'
 
@@ -32,8 +36,10 @@ const CreateLibraryRecordForm = () => {
 	const [name, setName] = useState("")
 	const [description, setDescription] = useState("")
 	const [url, setUrl] = useState("")
+
 	const [photo, setPhoto] = useState("")
-	
+	const [isPhotoUploaded, setIsPhotoUploaded] = useState(false)
+
 	const [tags, setTags] = useState([])
 	const [inputTags, setInputTags] = useState("")
 
@@ -76,8 +82,27 @@ const CreateLibraryRecordForm = () => {
 		setShowErrMsg(e)
 	}
 
+    const handlePhotoUploaded = (e) => {
+        if (!e.target.files[0]) {
+            setIsPhotoUploaded(false)
+            setPhoto("")
+        } else {
+            setIsPhotoUploaded(true)
+            setPhoto(e.target.files[0])
+        }   
+    }
+
+    const handleCleanPhotoUpload = (e) => {
+        e.target.value = ""
+    }
+
+    const handleRemovePhotoBeforeUpload = (e) => {
+        setIsPhotoUploaded(false)
+        setPhoto("")
+    }
+
 	const handleSubmit = async (e) => {
-        setPhoto("some_photo")
+        let recordId = ""
 
 		e.preventDefault()
 
@@ -88,9 +113,8 @@ const CreateLibraryRecordForm = () => {
 		}
 
 		try {
-			const response = await axiosPrivate.post("/library/records/create", JSON.stringify({"name": name, "url": url, "description": description, "photo": photo, "library_tags": tags}))
-
-			navigate(`/library/${url}`, { replace: true})
+			const response = await axiosPrivate.post("/library/records/create", JSON.stringify({"name": name, "url": url, "description": description, "library_tags": tags}))
+            recordId = response.data.id
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg("No server respone")
@@ -103,6 +127,25 @@ const CreateLibraryRecordForm = () => {
             }
             handleShowErr(true)
 		}
+
+        if (!photo) {
+            window.location.reload(false);
+        } else {
+            let photo_data = new FormData();
+            photo_data.append("photo", photo)
+
+            try {
+                await axios.patch(`/library/records/update/photo/${recordId}`, photo_data, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+                navigate(`/library/${url}`, { replace: true})
+            } catch (err) {
+                console.log(err)
+                alert("Main info on record created successfully, but it was issue with update photo, please try again")
+            }
+        }
 	}
 
 	return (
@@ -202,17 +245,30 @@ const CreateLibraryRecordForm = () => {
                                         value={description}
                                         onChange={(e) => setDescription(e.target.value)}
                                         label="Description"
+                                        multiline
+                                        rows={12}
                                         required
                                     />
                                 </FormControl>
                             </Col>
                         </Row>
-                        <div className="mt-3">
+                        <Stack spacing={2} direction="row">
                             <Button variant="contained" component="label">
-                                Upload photo
-                                <input hidden accept="image/*" multiple type="file" />
+                                Upload Photo
+                                <input hidden accept="image/*" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload} />
                             </Button>
-                        </div>
+                            {isPhotoUploaded && photo.name
+                                ? (
+                                    <Stack spacing={1} direction="row">
+                                        <Typography gutterBottom variant="overline" component="div">{photo.name}</Typography>
+                                        <IconButton edge="end" color="error" onClick={handleRemovePhotoBeforeUpload}>
+                                            <CloseIcon />
+                                        </IconButton>
+                                    </Stack>
+                                )
+                                : null
+                            }   
+                        </Stack>
                         <div className="mt-3">
                             <Button variant="contained" color="success" type="submit">Create Record</Button>
                         </div>

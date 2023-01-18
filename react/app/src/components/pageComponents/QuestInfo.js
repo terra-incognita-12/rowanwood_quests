@@ -13,6 +13,8 @@ import Stack from '@mui/material/Stack';
 import Avatar from '@mui/material/Avatar';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import IconButton from '@mui/material/IconButton';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import Box from '@mui/material/Box';
 
 import axios from "../../api/axios"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
@@ -70,6 +72,25 @@ const QuestInfo = ({ url }) => {
             <Card className="mt-3">
                 <CardContent>
                     <Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">{quest.name}</Typography>
+                    {quest.photo
+                        ? (
+                            <Box display="flex" justifyContent="center" alignItems="center" className="mb-3">
+                                <Box
+                                    component="img"
+                                    sx={{
+                                        height: 600,
+                                        width: 600,
+                                        maxHeight: { xs: 400, md: 600 },
+                                        maxWidth: { xs: 400, md: 600 },
+                                        borderRadius: '16px',
+                                    }}
+                                    alt="Photo"
+                                    src={quest.photo}
+                                />
+                            </Box>
+                        )
+                        : null
+                    }
                     <Typography gutterBottom variant="h6">Telegram address: <i>@{quest.telegram_url}</i></Typography>
                     <hr/>
                     <Typography gutterBottom variant="body1">{quest.full_description}</Typography>

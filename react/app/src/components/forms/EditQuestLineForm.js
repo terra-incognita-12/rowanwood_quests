@@ -17,9 +17,11 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import CloseIcon from '@mui/icons-material/Close';
 import Toolbar from '@mui/material/Toolbar';
 
 import ErrMsg from "../ErrMsg"
+import axios from "../../api/axios"
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import useRedirectLogin from '../../hooks/useRedirectLogin'
 
@@ -38,7 +40,10 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 	const [name, setName] = useState("")
 	const [uniqueNum, setUniqueNum] = useState("")
 	const [description, setDescription] = useState("")
+
 	const [photo, setPhoto] = useState("")
+	const [isPhotoUploaded, setIsPhotoUploaded] = useState(false)
+
 	const [questOptions, setQuestOptions] = useState([{ name: "", quest_next_line_id: "" }])
 
 	const [errMsg, setErrMsg] = useState("")
@@ -83,14 +88,42 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 		return "NaN"
 	}
 
-	const handleSubmit = async (e) => {
-		setPhoto("some_photo")
+	const handlePhotoUploaded = (e) => {
+        if (!e.target.files[0]) {
+            setIsPhotoUploaded(false)
+            setPhoto("")
+        } else {
+            setIsPhotoUploaded(true)
+            setPhoto(e.target.files[0])
+        }   
+    }
 
+    const handleCleanPhotoUpload = (e) => {
+        e.target.value = ""
+    }
+
+    const handleRemovePhotoBeforeUpload = (e) => {
+        setIsPhotoUploaded(false)
+        setPhoto("")
+    }
+
+    const handleDeletePhoto = async () => {
+        const answer = window.confirm("Are you sure to delete this photo?")
+        if (!answer) { return }
+
+        try {
+            await axiosPrivate.delete(`/quest/lines/delete/photo/${questLineId}`)
+            window.location.reload(false);
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+	const handleSubmit = async (e) => {
 		e.preventDefault()
 
 		try {
-			const response = await axiosPrivate.patch(`/quest/lines/update/${questLineId}`, JSON.stringify({"name": name, "unique_number": uniqueNum, "description": description, "photo": photo, "quest_current_options": questOptions}))
-			window.location.reload(false);
+			const response = await axiosPrivate.patch(`/quest/lines/update/${questLineId}`, JSON.stringify({"name": name, "unique_number": uniqueNum, "description": description, "quest_current_options": questOptions}))
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg("No server respone")
@@ -103,6 +136,26 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
             }
             handleShowErr(true)
 		}
+
+
+		if (!photo) {
+            window.location.reload(false);
+        } else {
+            let photo_data = new FormData();
+            photo_data.append("photo", photo)
+
+            try {
+                await axios.patch(`/quest/lines/update/photo/${questLineId}`, photo_data, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                })
+                window.location.reload(false);
+            } catch (err) {
+                console.log(err)
+                alert("Main info on quest line created successfully, but it was issue with update photo, please try again")
+            }
+        }
 			
 	}
 
@@ -212,12 +265,26 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 				        </Col>
 				    </Row>
 			    ))}
-	            <div className="mt-3">
-	                <Button variant="contained" component="label">
-	                    Upload photo
-	                    <input hidden accept="image/*" multiple type="file" />
-	                </Button>
-	            </div>
+	            <Stack spacing={1} direction="row">
+                    <Button variant="contained" component="label" color="error" onClick={handleDeletePhoto}>
+                        Delete Photo
+                    </Button>
+                    <Button variant="contained" component="label">
+                        Upload new photo
+                        <input hidden accept="image/*" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload}/>
+                    </Button>
+                    {isPhotoUploaded && photo.name
+                        ? (
+                            <Stack spacing={1} direction="row">
+                                <Typography gutterBottom variant="overline" component="div">{photo.name}</Typography>
+                                <IconButton edge="end" color="error" onClick={handleRemovePhotoBeforeUpload}>
+                                    <CloseIcon />
+                                </IconButton>
+                            </Stack>
+                        )
+                        : null
+                    }   
+                </Stack>
 	            <div className="mt-3">
 	                <Button variant="contained" color="success" type="submit">Update Line</Button>
 	            </div>

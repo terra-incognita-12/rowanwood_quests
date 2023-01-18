@@ -9,6 +9,7 @@ import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
+import Stack from '@mui/material/Stack';
 
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate"
 import useRedirectLogin from "../../../../hooks/useRedirectLogin"
@@ -71,19 +72,20 @@ const EditLibraryRecordsList = () => {
 
             <Row className="mt-3">
                 <Col xs={12} md={6}>
-                    <Autocomplete
-                        disablePortal
-                        id="combo-box-demo"
-                        options={dropDownRecords}
-                        onChange={(e, newValue) => {
-                            setPickedRecord(newValue)
-                        }}
-                        getOptionLabel={(option) => option.name}
-                        renderInput={(params) => <TextField fullWidth {...params} label="Records" />}
-                    />
-                </Col>
-                <Col xs={12} md={6}>
-                    <Button variant="contained" color="primary" size="large" onClick={getRecord}>Search</Button>
+                    <Stack spacing={2} direction="row">
+                        <Autocomplete
+                            fullWidth
+                            disablePortal
+                            id="combo-box-demo"
+                            options={dropDownRecords}
+                            onChange={(e, newValue) => {
+                                setPickedRecord(newValue)
+                            }}
+                            getOptionLabel={(option) => option.name}
+                            renderInput={(params) => <TextField fullWidth {...params} label="Records" />}
+                        />
+                        <Button variant="contained" color="primary" size="large" onClick={getRecord}>Search</Button>
+                    </Stack>
                 </Col>
             </Row>
             
