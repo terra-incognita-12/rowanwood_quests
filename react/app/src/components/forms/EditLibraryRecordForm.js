@@ -140,7 +140,7 @@ const EditLibraryRecordForm = ({ record }) => {
             handleShowErr(true)
 		}
 
-        if (!photo) {
+        if (!isPhotoUploaded) {
             navigate(`/library/${url}`, { replace: true})
         } else {
             let photo_data = new FormData();

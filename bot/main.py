@@ -2,6 +2,7 @@ import logging
 import asyncio
 from urllib import response
 import requests
+from time import sleep
 
 from telegram import (
 	InlineKeyboardButton, 
@@ -17,11 +18,15 @@ from telegram.ext import (
 	ConversationHandler,
 )
 
+from telegram.constants import ChatAction
+
 BACKEND_URL = 'http://127.0.0.1:8000'
-QUEST_URL = 'bad_day'
+QUEST_URL = 'blessed_pure'
 TOKEN='5962491186:AAERx0YPEL2kbOsKhYywIeP-7J9xCRpjcL4'
 
+SLEEP_BEFORE_MESSAGE = 0.5
 NEXT_STEP = 1
+
 
 logging.basicConfig(
 	format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -50,6 +55,11 @@ def get_line(unique_number: int):
 	
 	return "error"
 
+# Sending text with action and sleep
+async def current_chat_action(context, id, action):
+	await context.bot.sendChatAction(id, action)
+	sleep(SLEEP_BEFORE_MESSAGE)
+
 # BOT FUNCTIONS
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	user = update.message.from_user
@@ -59,15 +69,29 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	quest_info = get_quest_info()
 	first_line = get_line(1)
 
-	await update.message.reply_text(f'Hello {user.first_name}! Welcome to the Arena by Rowan Wood')
+	await update.message.reply_text(f"Hello {user.first_name}! Welcome to the quest \"{quest_info['name']}\" by Rowan Wood! Enjoy and don't forget to write your review on it on the website!")
+	sleep(3)
 
+	if quest_info['photo']:
+		await current_chat_action(context, update.effective_chat.id, ChatAction.UPLOAD_PHOTO)
+		await context.bot.sendPhoto(update.effective_chat.id, quest_info['photo'])
+		sleep(3)
+
+	await current_chat_action(context, update.effective_chat.id, ChatAction.TYPING)
 	await update.message.reply_text(f"QUEST INFO \n\n {quest_info['full_description']} \n\n")
+	sleep(3)
 
 	keyboard = []
 	for elem in first_line['quest_current_options']:
 		keyboard.append([InlineKeyboardButton(elem['name'], callback_data=elem['quest_next_line']['unique_number'])])
 
 	reply_markup = InlineKeyboardMarkup(keyboard)
+
+	if first_line['photo']:
+		await current_chat_action(context, update.effective_chat.id, ChatAction.UPLOAD_PHOTO)
+		await context.bot.sendPhoto(update.effective_chat.id, first_line['photo'])
+
+	await current_chat_action(context, update.effective_chat.id, ChatAction.TYPING)
 	await update.message.reply_text(first_line['description'], reply_markup=reply_markup)
 
 	return NEXT_STEP
@@ -83,6 +107,12 @@ async def next_step(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 		keyboard.append([InlineKeyboardButton(elem['name'], callback_data=elem['quest_next_line']['unique_number'])])
 
 	reply_markup = InlineKeyboardMarkup(keyboard)
+
+	if current_line['photo']:
+		await current_chat_action(context, update.effective_chat.id, ChatAction.UPLOAD_PHOTO)
+		await context.bot.sendPhoto(update.effective_chat.id, current_line['photo'])
+
+	await current_chat_action(context, update.effective_chat.id, ChatAction.TYPING)
 	await query.message.reply_text(current_line['description'], reply_markup=reply_markup)
 	if not keyboard:
 		await query.message.reply_text('To restart quest again push /start', reply_markup=reply_markup)

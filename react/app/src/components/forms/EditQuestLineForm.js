@@ -138,7 +138,7 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 		}
 
 
-		if (!photo) {
+		if (!isPhotoUploaded) {
             window.location.reload(false);
         } else {
             let photo_data = new FormData();

@@ -66,7 +66,7 @@ const QuestsList = () => {
                                 />
                                 <CardContent>
                                     <Typography gutterBottom variant="h4" component="div">{quest.name}</Typography>
-                                    <Typography variant="body1" component="div" sx={{ height: 50, position: 'relative', overflow: 'auto', maxHeight: 50}}>{quest.brief_description}</Typography>
+                                    <Typography variant="body1" component="div" sx={{ height: 100, position: 'relative', overflow: 'auto', maxHeight: 100}}>{quest.brief_description}</Typography>
                                 </CardContent>
                             </CardActionArea>
                         </Card>

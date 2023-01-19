@@ -128,7 +128,7 @@ const CreateLibraryRecordForm = () => {
             handleShowErr(true)
 		}
 
-        if (!photo) {
+        if (!isPhotoUploaded) {
             window.location.reload(false);
         } else {
             let photo_data = new FormData();

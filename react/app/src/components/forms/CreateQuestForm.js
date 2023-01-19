@@ -23,8 +23,8 @@ import axios from "../../api/axios"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
 
-// Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _
-const URL_REGEX = /^[a-z][a-z0-9-_]{3,23}$/
+// Must start with the lower case letter and after must followed by 3 to 30 char that can be lowercase, number, - and _
+const URL_REGEX = /^[a-z][a-z0-9-_]{3,30}$/
 
 const CreateQuestForm = () => {
 	const navigate = useNavigate()
@@ -73,7 +73,7 @@ const CreateQuestForm = () => {
 		e.preventDefault()
 
 		if (!URL_REGEX.test(url)) {
-			setErrMsg("Invaid quest url. Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _")
+			setErrMsg("Invaid quest url. Must start with the lower case letter and after must followed by 3 to 30 char that can be lowercase, number, - and _")
 			handleShowErr(true)
 			return
 		}
@@ -95,7 +95,7 @@ const CreateQuestForm = () => {
             handleShowErr(true)
 		}
 
-        if (!photo) {
+        if (!isPhotoUploaded) {
             navigate(`/quest/${url}`, { replace: true})
         } else {
             let photo_data = new FormData();
