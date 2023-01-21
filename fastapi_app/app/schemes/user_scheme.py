@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, constr
+from typing import List, Union
 
 class UserBaseScheme(BaseModel):
 	username: str
@@ -44,6 +45,7 @@ class UserResponse(UserBaseScheme):
 
 class ForeignKeyUserResponse(UserBaseScheme):
 	id: uuid.UUID
+	photo: Union[str, None] = None
 
 class ChangeUsernameOrEmailScheme(LoginUserScheme):
 	username: str
