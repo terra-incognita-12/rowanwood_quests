@@ -5,7 +5,6 @@ from pydantic import BaseModel, EmailStr, constr
 class UserBaseScheme(BaseModel):
 	username: str
 	email: str
-	photo: str
 
 	class Config:
 		orm_mode = True

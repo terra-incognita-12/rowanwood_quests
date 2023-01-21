@@ -105,7 +105,7 @@ const QuestInfo = ({ url }) => {
 										<div className="d-flex justify-content-between">
 											<Stack direction="row" spacing={2}>
 												<div>
-													<Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+													<Avatar alt="User photo" src={auth?.photo} />
 												</div>
 												<div>
 													<Typography variant="h5">{comment.user.username}</Typography>

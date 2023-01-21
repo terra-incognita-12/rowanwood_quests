@@ -11,8 +11,11 @@ import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from '@mui/material/IconButton';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 
 import axios from "../../api/axios"
+import ErrMsg from "../ErrMsg"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import useAuth from "../../hooks/useAuth"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
@@ -26,6 +29,14 @@ const Profile = () => {
 	const axiosPrivate = useAxiosPrivate()  
     const location = useLocation()
     const redirectLogin = useRedirectLogin(location)
+
+    const [photo, setPhoto] = useState("")
+    const [errMsg, setErrMsg] = useState("")
+	const [showErrMsg, setShowErrMsg] = useState(false)
+
+	const handleShowErr = (e) => {
+		setShowErrMsg(e)
+	}
 
     const [changeUsernameDialogOpen, setChangeUsernameDialogOpen] = useState(false)
     const handleChangeUsernameDialogOpen = () => {
@@ -50,6 +61,53 @@ const Profile = () => {
   	const handleChangePasswordDialogClose = () => {
   		setChangePasswordDialogOpen(false)
   	}
+
+    const handleUploadPhoto = (e) => {
+    	if (!e.target.files[0]) {
+            setPhoto("")
+        } else {
+            setPhoto(e.target.files[0])
+        }
+
+     	setPhoto(e.target.files[0])
+    }
+
+    const handleDeletePhoto = async () => {
+        const answer = window.confirm("Are you sure to delete this photo?")
+        if (!answer) { return }
+
+        try {
+            await axiosPrivate.delete(`/auth/delete_photo/${auth.id}`)
+            window.location.reload(false);
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    useEffect(() => {
+    	const uploadPhoto = async () => {
+
+	    	let photo_data = new FormData();
+	        photo_data.append("photo", photo)
+
+    		try {
+	            await axios.patch(`/auth/update_photo/${auth.id}`, photo_data, {
+	                headers: {
+	                    'Content-Type': 'multipart/form-data',
+	                },
+	            })
+	            setPhoto("")
+	            window.location.reload(false);
+	        } catch (err) {
+	            console.log(err)
+	            setErrMsg("Error with setting photo")
+	        }
+    	} 
+
+    	if (photo) {
+			uploadPhoto()
+    	}
+    }, [photo])
 
 	return (
 		<Card className="mt-3">
@@ -92,7 +150,47 @@ const Profile = () => {
 						<Button variant="contained" color="primary" onClick={handleChangePasswordDialogOpen}>Change Password</Button>
 					</Col>
 					<Col xs={12} md={6}>
+						{showErrMsg 
+							?
+							<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
+						    : null
+						}
 						<Typography gutterBottom variant="h6" display="flex" justifyContent="center" alignItems="center">Photo</Typography>
+						{auth.photo
+                            ? (
+                            	<Box display="flex" justifyContent="center" alignItems="center">
+	                                <Box
+	                                    component="img"
+	                                    sx={{
+	                                        height: 200,
+	                                        width: 200,
+	                                        borderRadius: '8px',
+	                                    }}
+	                                    alt="Photo"
+	                                    src={auth.photo}
+	                                />
+	                            </Box>
+                            )
+                            : null
+                        }
+                        <Box className="mt-2" display="flex" justifyContent="center" alignItems="center">
+                        	{auth.photo
+                        		? (
+                        			<Stack spacing={1} direction="row">
+                        				<Button variant="contained" component="label">
+		                                	Change Photo
+		                                	<input hidden accept="image/*" type="file" onChange={handleUploadPhoto} />
+		                            	</Button>
+                        				<Button variant="contained" color="error" onClick={handleDeletePhoto}>Delete Photo</Button>
+                        			</Stack>
+                        		)
+                        		:
+                        		<Button variant="contained" color="success" component="label">
+                                	Upload Photo
+                                	<input hidden accept="image/*" type="file" onChange={handleUploadPhoto} />
+                            	</Button>
+                        	}
+                        </Box>
 					</Col>
                 </Row>
             </CardContent>	

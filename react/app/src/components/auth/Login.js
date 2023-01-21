@@ -46,11 +46,13 @@ const Login = () => {
 				}
 			)
 
+			const id = response?.data?.id
 			const username = response?.data?.username
 			const accessToken = response?.data?.access_token
 			const role = response?.data?.role
+			const photo = response?.data?.photo
 
-			setAuth({ username, user, pass, accessToken, role })
+			setAuth({ id, username, user, pass, accessToken, role, photo })
 
 			setUser("")
 			setPass("")

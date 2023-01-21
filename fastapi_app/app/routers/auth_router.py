@@ -7,13 +7,15 @@ from fastapi import (
 	Response, 
 	status,
 	Depends,
-	HTTPException
+	HTTPException,
+	UploadFile
 )
 from sqlalchemy.orm import Session
 from pydantic import EmailStr
 from fastapi.responses import RedirectResponse
 
 from ..send_email.email import Email
+from ..s3 import s3
 from ..oauth2 import AuthJWT, require_user
 from ..schemes import user_scheme
 from ..models import User
@@ -27,6 +29,8 @@ router = APIRouter()
 
 ACCESS_X = int(settings.ACCESS_TOKEN_EXPIRES)
 REFRESH_X = int(settings.REFRESH_TOKEN_EXPIRES)
+
+FOLDER = 'user/'
 
 @router.post('/register', status_code=status.HTTP_201_CREATED)
 async def create_user(payload: user_scheme.CreateUserScheme, request: Request, db: Session = Depends(get_db)):
@@ -57,7 +61,7 @@ async def create_user(payload: user_scheme.CreateUserScheme, request: Request, d
 		print(error)
 		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='There was an error sending email')
 
-	return {'status': 'success', 'message': 'Verification token successfully sent to your email'}
+	return {'status': 'success', 'message': 'Verification token successfully sent to your email', 'id': new_user.id}
 
 @router.post('/login')
 async def login(payload: user_scheme.LoginUserScheme, request: Request, response: Response, db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
@@ -82,7 +86,7 @@ async def login(payload: user_scheme.LoginUserScheme, request: Request, response
 	response.set_cookie('refresh_token', refresh_token, REFRESH_X*60, REFRESH_X*60, '/', None, False, True, 'lax')
 	response.set_cookie('logged_in', 'True', ACCESS_X*60, ACCESS_X*60, '/', None, False, False, 'lax')
 
-	return {'username': user.username, 'status': 'success', 'role': user.role, 'access_token': access_token}
+	return {'id': user.id, 'username': user.username, 'status': 'success', 'role': user.role, 'access_token': access_token, 'photo': user.photo}
 
 @router.get('/logout')
 def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = Depends(require_user)):
@@ -220,7 +224,7 @@ def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Dep
 	response.set_cookie('access_token', access_token, ACCESS_X*60, ACCESS_X*60, '/', None, False, True, 'lax')
 	response.set_cookie('logged_in', 'True', ACCESS_X*60, ACCESS_X*60, '/', None, False, False, 'lax')
 
-	return {'username': user.username, 'email': user.email, 'role': user.role, 'access_token': access_token}
+	return {'id': user.id, 'username': user.username, 'email': user.email, 'role': user.role, 'access_token': access_token, 'photo': user.photo}
 
 @router.post('/change_username')
 def change_username(payload: user_scheme.ChangeUsernameOrEmailScheme, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
@@ -311,3 +315,44 @@ def change_password_notoken(payload: user_scheme.ChangePasswordWithoutTokenUserS
 	db.commit()
 
 	return {'success': 'OK'}
+
+# S3
+
+@router.patch('/update_photo/{id}')
+def update_user_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):
+	user_query = db.query(User).filter(User.id == id)
+	check_user = user_query.first()
+
+	if not check_user:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User doesn't exist")
+	
+	key = FOLDER + id + photo.filename
+
+	if check_user.photo:
+		old_key = check_user.photo.replace(settings.S3_FULL_URL,'')
+		s3.delete_photo(old_key)
+	
+	s3.add_new_photo(photo.file, key)
+
+	user_query.update({'photo': f'{settings.S3_FULL_URL + key}'}, synchronize_session=False)
+	db.commit()
+	db.refresh(check_user)
+
+	return {'status': 'success', 'message': 'OK'}
+
+@router.delete('/delete_photo/{id}')
+def delete_user_photo(id: str, db: Session = Depends(get_db)):
+	user_query = db.query(User).filter(User.id == id)
+	check_user = user_query.first()
+
+	if not check_user:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User doesn't exist")
+
+	key = check_user.photo.replace(settings.S3_FULL_URL,'')
+	s3.delete_photo(key)
+
+	user_query.update({'photo': ''}, synchronize_session=False)
+	db.commit()
+	db.refresh(check_user)
+
+	return {'status': 'success', 'message': 'OK'}
