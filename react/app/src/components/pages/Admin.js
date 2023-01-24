@@ -29,9 +29,6 @@ const Admin = () => {
     const location = useLocation()
     const redirectLogin = useRedirectLogin(location)
 
-    // Prevent dobule run react strict mode
-    const oneTimeRun = useRef(false)
-
     const columns = [
 		{ field: 'username', headerName: 'Username', flex: 0.7 },
 		{ field: 'email', headerName: 'Email', flex: 0.7 },
@@ -81,7 +78,7 @@ const Admin = () => {
         if (!answer) { return }
 
         try {
-			await axiosPrivate.delete(`/user/delete/${username}`)
+			const response = await axiosPrivate.delete(`/user/delete/${username}`)
             window.location.reload(false);
 		} catch (err) {
 			if (err.response?.status === 400) {
@@ -114,14 +111,9 @@ const Admin = () => {
 
     	getUsers()
 
-    	// if (oneTimeRun.current) {
-    	// 	getUsers()
-    	// }
-
     	return () => {
     		isMounted = false
     		controller.abort()
-    		// oneTimeRun.current = true
     	}
     }, [])
 

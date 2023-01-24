@@ -19,6 +19,7 @@ import QuestDetails from "./components/pages/QuestDetails"
 import LibraryDetails from "./components/pages/LibraryDetails"
 import Profile from "./components/pages/Profile"
 import Admin from "./components/pages/Admin"
+import NotExist from "./components/pages/NotExist"
 
 import Editor from "./components/pages/editor/Editor"
 
@@ -56,6 +57,7 @@ function App() {
           <Route path="login" element={<Login />} />
           <Route exact path="changepass/:token" element={<ChangePass />} />
           <Route path="unauthorized" element={<Unauthorized />} />
+          <Route path="notexist" element={<NotExist />} />
           
           <Route element={<PersistLogin />}>
             <Route path="" element={<Home />} />

@@ -56,6 +56,10 @@ class QuestLineResponseScheme(QuestLineBaseScheme):
     photo: Union[str, None] = None
     quest_current_options: List[QuestOptionResponseScheme] = []
 
+class QuestResponseSchemePreview(QuestBaseScheme):
+    id: uuid.UUID
+    photo: Union[str, None] = None
+
 class QuestResponseSchemeWithComments(QuestBaseScheme):
     id: uuid.UUID
     photo: Union[str, None] = None

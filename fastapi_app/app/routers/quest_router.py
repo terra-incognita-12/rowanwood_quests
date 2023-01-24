@@ -36,13 +36,21 @@ def create_quest(payload: quest_scheme.QuestSendScheme, db: Session = Depends(ge
 
     return {'status': 'success', 'message': 'OK', 'id': new_quest.id}
 
-# Pull quests only with user comments
-@router.get('/all/comments', response_model=List[quest_scheme.QuestResponseSchemeWithComments])
-def get_all_quests_with_comments(db: Session = Depends(get_db)):
-    quests = db.query(Quest).order_by(asc(Quest.name)).all()
+# Pull quests no comments no quests lines
+@router.get('/all/preview', response_model=List[quest_scheme.QuestResponseSchemePreview])
+def get_all_quests_preview(db: Session = Depends(get_db)):
+    quests = db.query(Quest).order_by(asc(Quest.name)).filter(Quest.is_activated == True).all()
     return quests
 
-# Pull quests only with quest lines
+
+# # Pull quests only with user comments
+# @router.get('/all/comments', response_model=List[quest_scheme.QuestResponseSchemeWithComments])
+# def get_all_quests_with_comments(db: Session = Depends(get_db)):
+#     quests = db.query(Quest).order_by(asc(Quest.name)).all()
+#     return quests
+
+
+# Pull quests with quest lines no comments
 @router.get('/all/lines', response_model=List[quest_scheme.QuestResponseSchemeWithLines])
 def get_all_quests_with_lines(db: Session = Depends(get_db)):
     quests = db.query(Quest).order_by(asc(Quest.name)).all()
