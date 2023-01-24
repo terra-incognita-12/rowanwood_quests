@@ -31,6 +31,7 @@ class Quest(Base):
 	brief_description = Column(String)
 	full_description = Column(TEXT)
 	photo = Column(String, nullable=True)
+	is_activated = Column(Boolean, default=False, nullable=False)
 	created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
 	updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
 

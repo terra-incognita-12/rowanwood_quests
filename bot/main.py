@@ -21,7 +21,7 @@ from telegram.ext import (
 from telegram.constants import ChatAction
 
 BACKEND_URL = 'http://127.0.0.1:8000'
-QUEST_URL = 'blessed_pure'
+QUEST_URL = 'training'
 TOKEN='5962491186:AAERx0YPEL2kbOsKhYywIeP-7J9xCRpjcL4'
 
 SLEEP_BEFORE_MESSAGE = 0.5

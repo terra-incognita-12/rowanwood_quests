@@ -79,7 +79,7 @@ const CreateQuestForm = () => {
 		}
 
 		try {
-			const response = await axiosPrivate.post("/quest/create", JSON.stringify({"name": name, "url": url, "telegram_url": telegramUrl, "brief_description": briefDesc, "full_description": fullDesc}))
+			const response = await axiosPrivate.post("/quest/create", JSON.stringify({"name": name, "url": url, "telegram_url": telegramUrl, "brief_description": briefDesc, "full_description": fullDesc, "is_activated": false}))
 
             questId = response.data.id
 		} catch (err) {
@@ -96,7 +96,7 @@ const CreateQuestForm = () => {
 		}
 
         if (!isPhotoUploaded) {
-            navigate(`/quest/${url}`, { replace: true})
+            window.location.reload(false);
         } else {
             let photo_data = new FormData();
             photo_data.append("photo", photo)
@@ -107,7 +107,7 @@ const CreateQuestForm = () => {
                         'Content-Type': 'multipart/form-data',
                     },
                 })
-                navigate(`/quest/${url}`, { replace: true})
+                window.location.reload(false);
             } catch (err) {
                 console.log(err)
                 alert("Main info on record created successfully, but it was issue with update photo, please try again")

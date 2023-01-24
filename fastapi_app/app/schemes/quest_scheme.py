@@ -10,6 +10,7 @@ class QuestBaseScheme(BaseModel):
     telegram_url: str
     brief_description: str
     full_description: str
+    is_activated: bool
 
     class Config:
         orm_mode = True

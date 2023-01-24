@@ -48,29 +48,31 @@ const QuestsList = () => {
             {quests.length
                 ?
                 quests.map((quest, i) => 
-                    <Col xs={12} md={4} className="mt-3" key={i}>
-                        <Card className="mt-3">
-                            <CardActionArea component={Link} to={`quest/${quest.url}`} 
-                                sx={{ "&:hover": {
-                                        backgroundColor: 'transparent',
-                                        color: 'white',
-                                        cursor: "pointer"
-                                    } 
-                                }}
-                            >
-                            
-                                <CardMedia
-                                    sx={{ height: 250 }}
-                                    image={quest.photo}
-                                    title={quest.name}
-                                />
-                                <CardContent>
-                                    <Typography gutterBottom variant="h4" component="div">{quest.name}</Typography>
-                                    <Typography variant="body1" component="div" sx={{ height: 100, position: 'relative', overflow: 'auto', maxHeight: 100}}>{quest.brief_description}</Typography>
-                                </CardContent>
-                            </CardActionArea>
-                        </Card>
-                    </Col>
+                    quest.is_activated
+                        ? (
+                        <Col xs={12} md={4} className="mt-3" key={i}>
+                            <Card className="mt-3">
+                                <CardActionArea component={Link} to={`quest/${quest.url}`} 
+                                    sx={{ "&:hover": {
+                                            backgroundColor: 'transparent',
+                                            color: 'white',
+                                            cursor: "pointer"
+                                        } 
+                                    }}
+                                >
+                                    <CardMedia
+                                        sx={{ height: 250 }}
+                                        image={quest.photo}
+                                        title={quest.name}
+                                    />
+                                    <CardContent>
+                                        <Typography gutterBottom variant="h4" component="div">{quest.name}</Typography>
+                                        <Typography variant="body1" component="div" sx={{ height: 100, position: 'relative', overflow: 'auto', maxHeight: 100}}>{quest.brief_description}</Typography>
+                                    </CardContent>
+                                </CardActionArea>
+                            </Card>
+                        </Col>
+                    ): null
                 ) : null
             }
         </Row>

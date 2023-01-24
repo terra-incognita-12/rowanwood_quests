@@ -28,6 +28,7 @@ def create_quest(payload: quest_scheme.QuestSendScheme, db: Session = Depends(ge
     if check_quest:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Quest with this url already exists')
 
+    payload.is_activated = False
     new_quest = Quest(**payload.dict())
     db.add(new_quest)
     db.commit()
@@ -76,6 +77,21 @@ def update_quest(id: str, payload:quest_scheme.QuestBaseScheme, db: Session = De
     db.refresh(check_quest)
 
     return {'status': 'success', 'message': 'OK'}   
+
+@router.patch('/update/activate/{id}')
+def update_activate_quest(id: str, db: Session = Depends(get_db)):
+    quest_query = db.query(Quest).filter(Quest.id == id)
+    check_quest = quest_query.first()
+
+    if not check_quest:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+
+    quest_query.update({'is_activated': not check_quest.is_activated}, synchronize_session=False)
+
+    db.commit()
+    db.refresh(check_quest)
+
+    return {'status': 'success', 'message': 'OK'}
 
 @router.delete('/delete/{url}')
 def delete_quest(url: str, db: Session = Depends(get_db)):

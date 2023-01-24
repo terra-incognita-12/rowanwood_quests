@@ -38,12 +38,14 @@ const EditQuestForm = ({ quest }) => {
     const questUrl = quest?.url
     const questTelegramUrl = quest?.telegram_url
     const questPhoto = quest?.photo
+    const questIsActivated = quest?.is_activated
 
 	const [name, setName] = useState("")
 	const [briefDesc, setBriefDesc] = useState("")
 	const [fullDesc, setFullDesc] = useState("")
 	const [url, setUrl] = useState("")
 	const [telegramUrl, setTelegramUrl] = useState("")
+    const [isActivated, setIsActivated] = useState("")
 
 	const [photo, setPhoto] = useState("")
     const [isPhotoUploaded, setIsPhotoUploaded] = useState(false)
@@ -58,7 +60,8 @@ const EditQuestForm = ({ quest }) => {
 		setUrl(questUrl)
 		setTelegramUrl(questTelegramUrl)
 		setPhoto(questPhoto)
-	}, [questName, questBriefDesc, questFullDesc, questUrl, questTelegramUrl, questPhoto])
+        setIsActivated(questIsActivated)
+	}, [questName, questBriefDesc, questFullDesc, questUrl, questTelegramUrl, questPhoto, questIsActivated])
 
 
 	const handleShowErr = (e) => {
@@ -82,6 +85,32 @@ const EditQuestForm = ({ quest }) => {
     const handleRemovePhotoBeforeUpload = (e) => {
         setIsPhotoUploaded(false)
         setPhoto("")
+    }
+
+    const handleQuestActivation = async () => {
+        let question = "You are about to activate this quest, make sure quest bot is running. You wish to proceed?"
+        if (isActivated) {
+            question = "You are about to deactivate this quest, make sure quest bot is off. You wish to proceed?"
+        }
+
+        const answer = window.confirm(question)
+        if (!answer) { return }
+
+        try {
+            await axiosPrivate.patch(`/quest/update/activate/${questId}`)
+            window.location.reload(false);
+        } catch (err) {
+            if (!err?.response) {
+                setErrMsg("No server respone")
+            } else if (err.response?.status === 400) {
+                redirectLogin()
+            } else if (err.response?.status === 404) {
+                setErrMsg("Quest doesn't exist")
+            } else {
+                setErrMsg("Edit Quest Failed")
+            }
+            handleShowErr(true)
+        }
     }
 
 	const handleSubmit = async (e) => {
@@ -111,7 +140,7 @@ const EditQuestForm = ({ quest }) => {
 		}
 
         if (!isPhotoUploaded) {
-            navigate(`/quest/${url}`, { replace: true})
+            window.location.reload(false);
         } else {
             let photo_data = new FormData();
             photo_data.append("photo", photo)
@@ -122,7 +151,7 @@ const EditQuestForm = ({ quest }) => {
                         'Content-Type': 'multipart/form-data',
                     },
                 })
-                navigate(`/quest/${url}`, { replace: true})
+                window.location.reload(false);
             } catch (err) {
                 console.log(err)
                 alert("Main info on quest updated successfully, but it was issue with update photo, please try again")
@@ -167,7 +196,11 @@ const EditQuestForm = ({ quest }) => {
                     <Stack spacing={2} direction="row" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Box>
                             <Typography gutterBottom variant="h3" component="div">{questName}</Typography>
-                            <Stack spacing={1} direction="row">
+                            {questIsActivated
+                                ? <Button onClick={handleQuestActivation} variant="contained" color="primary">Deactivate Quest</Button>
+                                : <Button onClick={handleQuestActivation} variant="contained" color="primary">Activate Quest</Button>
+                            }
+                            <Stack spacing={1} direction="row" className="mt-1">
                                 <Button component={Link} to={`${questUrl}`} variant="contained" color="primary">Edit Lines</Button>
                                 <Button variant="contained" color="error" onClick={handleDelete}>Delete Quest</Button>
                             </Stack>
