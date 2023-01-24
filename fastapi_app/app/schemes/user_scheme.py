@@ -40,8 +40,6 @@ class ChangePasswordTokenScheme(BaseModel):
 class UserResponse(UserBaseScheme):
 	id: uuid.UUID
 	role: str
-	created_at: datetime
-	updated_at: datetime
 
 class ForeignKeyUserResponse(UserBaseScheme):
 	id: uuid.UUID
