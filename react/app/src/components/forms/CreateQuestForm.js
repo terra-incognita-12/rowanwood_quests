@@ -85,18 +85,20 @@ const CreateQuestForm = () => {
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg("No server respone")
-			} else if (err.response?.status === 400) {
-				redirectLogin()
-			} else if (err.response?.status === 403) {
-				setErrMsg("Quest with this url already exists")
+			} else if (err?.response?.status === 400) {
+                redirectLogin()
+            } else if (err?.response?.status) {
+				setErrMsg(err?.response?.data?.detail)
 			} else {
                 setErrMsg("Create Quest Failed")
             }
             handleShowErr(true)
+            window.scrollTo(0, 0);
+            return
 		}
 
         if (!isPhotoUploaded) {
-            window.location.reload(false);
+            navigate(`/quest/${url}`, { replace: true});
         } else {
             let photo_data = new FormData();
             photo_data.append("photo", photo)
@@ -107,7 +109,7 @@ const CreateQuestForm = () => {
                         'Content-Type': 'multipart/form-data',
                     },
                 })
-                window.location.reload(false);
+                navigate(`/quest/${url}`, { replace: true});
             } catch (err) {
                 console.log(err)
                 alert("Main info on record created successfully, but it was issue with update photo, please try again")

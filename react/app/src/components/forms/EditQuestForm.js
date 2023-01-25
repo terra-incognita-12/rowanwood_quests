@@ -102,14 +102,15 @@ const EditQuestForm = ({ quest }) => {
         } catch (err) {
             if (!err?.response) {
                 setErrMsg("No server respone")
-            } else if (err.response?.status === 400) {
+            } else if (err?.response?.status === 400) {
                 redirectLogin()
-            } else if (err.response?.status === 404) {
-                setErrMsg("Quest doesn't exist")
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
             } else {
                 setErrMsg("Edit Quest Failed")
             }
             handleShowErr(true)
+            window.scrollTo(0, 0);
         }
     }
 
@@ -119,28 +120,29 @@ const EditQuestForm = ({ quest }) => {
 		if (!URL_REGEX.test(url)) {
 			setErrMsg("Invaid quest url. Must start with the lower case letter and after must followed by 3 to 30 char that can be lowercase, number, - and _")
 			handleShowErr(true)
+            window.scrollTo(0, 0);
 			return
 		}
 
 		try {
-			const response = await axiosPrivate.patch(`/quest/update/${questId}`, JSON.stringify({"name": name, "url": url, "telegram_url": telegramUrl, "brief_description": briefDesc, "full_description": fullDesc, "photo": photo}))
+			const response = await axiosPrivate.patch(`/quest/update/${questId}`, JSON.stringify({"name": name, "url": url, "telegram_url": telegramUrl, "brief_description": briefDesc, "full_description": fullDesc, is_activated: questIsActivated}))
 		} catch (err) {
 			if (!err?.response) {
                 setErrMsg("No server respone")
-            } else if (err.response?.status === 400) {
+            } else if (err?.response?.status === 400) {
                 redirectLogin()
-            } else if (err.response?.status === 403) {
-                setErrMsg("Quest with this url already exists")
-            } else if (err.response?.status === 404) {
-                setErrMsg("Quest doesn't exist")
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
             } else {
                 setErrMsg("Edit Quest Failed")
             }
             handleShowErr(true)
+            window.scrollTo(0, 0);
+            return
 		}
 
         if (!isPhotoUploaded) {
-            window.location.reload(false);
+            navigate(`/quest/${url}`, { replace: true});
         } else {
             let photo_data = new FormData();
             photo_data.append("photo", photo)
@@ -151,10 +153,19 @@ const EditQuestForm = ({ quest }) => {
                         'Content-Type': 'multipart/form-data',
                     },
                 })
-                window.location.reload(false);
+                navigate(`/quest/${url}`, { replace: true});
             } catch (err) {
-                console.log(err)
-                alert("Main info on quest updated successfully, but it was issue with update photo, please try again")
+                if (!err?.response) {
+                    setErrMsg("No server respone")
+                } else if (err?.response?.status === 400) {
+                    redirectLogin()
+                } else if (err?.response?.status) {
+                    setErrMsg(err?.response?.data?.detail)
+                } else {
+                    setErrMsg("Main info on quest updated successfully, but it was issue with update photo, please try again")
+                }
+                handleShowErr(true)
+                window.scrollTo(0, 0);
             }
         }
 	}
@@ -164,10 +175,20 @@ const EditQuestForm = ({ quest }) => {
         if (!answer) { return }
 
         try {
-            await axiosPrivate.delete(`/quest/delete/photo/${questId}`)
+            const response = await axiosPrivate.delete(`/quest/delete/photo/${questId}`)
             window.location.reload(false);
         } catch (err) {
-            console.log(err)
+            if (!err?.response) {
+                setErrMsg("No server respone")
+            } else if (err?.response?.status === 400) {
+                redirectLogin()
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
+                setErrMsg("Edit Quest Failed")
+            }
+            handleShowErr(true)
+            window.scrollTo(0, 0);
         }
     }
 
@@ -176,10 +197,20 @@ const EditQuestForm = ({ quest }) => {
         if (!answer) { return }
 
         try {
-            await axiosPrivate.delete(`/quest/delete/${url}`, JSON.stringify({"url": questUrl}))
+            const response = await axiosPrivate.delete(`/quest/delete/${url}`, JSON.stringify({"url": questUrl}))
             window.location.reload(false);
         } catch (err) {
-            console.log(err)
+            if (!err?.response) {
+                setErrMsg("No server respone")
+            } else if (err?.response?.status === 400) {
+                redirectLogin()
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
+                setErrMsg("Edit Quest Failed")
+            }
+            handleShowErr(true)
+            window.scrollTo(0, 0);
         }
     }
 

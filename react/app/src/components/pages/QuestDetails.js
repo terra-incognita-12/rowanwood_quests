@@ -24,7 +24,6 @@ import useAuth from "../../hooks/useAuth"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
 
 const QuestDetails = () => {
-
 	const { url } = useParams()
 
 	const [quest, setQuest] = useState("")

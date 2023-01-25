@@ -64,7 +64,7 @@ const Admin = () => {
 			await axiosPrivate.patch(`/user/change_role/${username}`)
             window.location.reload(false);
 		} catch (err) {
-			if (err.response?.status === 400) {
+			if (err?.response?.status === 400) {
 				redirectLogin()
 			} else {
 				console.log(err)
@@ -101,7 +101,7 @@ const Admin = () => {
     			})
     			isMounted && setRows(response.data)
     		} catch (err) {
-    			if (err.response?.status === 400) {
+    			if (err?.response?.status === 400) {
 					redirectLogin()
 				} else {
     				console.log(err)

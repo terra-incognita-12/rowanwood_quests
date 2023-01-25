@@ -201,7 +201,7 @@ def check_valid_change_password_token(payload: user_scheme.ChangePasswordTokenSc
 	if not check_user:
 		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User doesn't exist")
 
-	return {"status": "success"}
+	return {"status": "OK"}
 
 @router.get('/refresh')
 def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
@@ -209,6 +209,7 @@ def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Dep
 		Authorize.jwt_refresh_token_required()
 
 		user_id = Authorize.get_jwt_subject()
+		print(user_id)
 		if not user_id:
 			raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Can't refresh access token")
 		user = db.query(User).filter(User.id == user_id).first()
@@ -225,6 +226,11 @@ def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Dep
 	response.set_cookie('logged_in', 'True', ACCESS_X*60, ACCESS_X*60, '/', None, False, False, 'lax')
 
 	return {'id': user.id, 'username': user.username, 'email': user.email, 'role': user.role, 'access_token': access_token, 'photo': user.photo}
+
+@router.get('/verify_user')
+def verify_user(db: Session = Depends(get_db), user_id: str = Depends(require_user)):
+	user = db.query(User).filter(User.id == user_id).first()
+	return {"status": "OK"}
 
 @router.post('/change_username')
 def change_username(payload: user_scheme.ChangeUsernameOrEmailScheme, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):

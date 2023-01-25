@@ -19,6 +19,23 @@ router = APIRouter()
 
 FOLDER = 'record/'
 
+@router.post('/records/create')
+def create_record(payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db)):
+
+    check_record = db.query(LibraryRecord).filter(LibraryRecord.url == payload.url).first()
+    if check_record:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Record with this url already exists')
+
+    payload.library_tags = prepare_library_tags(payload.library_tags, db)
+
+    new_library_record = LibraryRecord(**payload.dict())
+    
+    db.add(new_library_record)
+    db.commit()
+    db.refresh(new_library_record)
+
+    return {'status': 'success', 'message': 'OK', 'id': new_library_record.id}
+
 @router.get("/records/all", response_model=List[library_scheme.LibraryRecordResponseScheme])
 def get_records(db: Session = Depends(get_db)):
     records = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).order_by(LibraryRecord.name).all()
@@ -41,24 +58,6 @@ def get_record(url: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
     
     return record
-
-
-@router.post('/records/create')
-def create_record(payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db)):
-
-    check_record = db.query(LibraryRecord).filter(LibraryRecord.url == payload.url).first()
-    if check_record:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Record with this url already exists')
-
-    payload.library_tags = prepare_library_tags(payload.library_tags, db)
-
-    new_library_record = LibraryRecord(**payload.dict())
-    
-    db.add(new_library_record)
-    db.commit()
-    db.refresh(new_library_record)
-
-    return {'status': 'success', 'message': 'OK', 'id': new_library_record.id}
 
 @router.patch('/records/update/photo/{id}')
 def update_record_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):

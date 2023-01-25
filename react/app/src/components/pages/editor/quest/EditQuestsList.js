@@ -11,6 +11,8 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
 
+import ErrMsg from "../../../ErrMsg"
+import axios from "../../../../api/axios"
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate"
 import useRedirectLogin from "../../../../hooks/useRedirectLogin"
 
@@ -22,10 +24,15 @@ const EditQuestList = () => {
     const redirectLogin = useRedirectLogin(location)
 
     const [dropDownQuests, setDropDownQuests] = useState([])
-    const [allQuests, setAllQuests] = useState([])
+    // quest picked from dropdown
     const [pickedQuest, setPickedQuest] = useState("")
+    // quest pulled from db
     const [dbQuest, setDbQuest] = useState("")
+
     const [showForm, setShowForm] = useState(false)
+
+    const [errMsg, setErrMsg] = useState("")
+    const [showErrMsg, setShowErrMsg] = useState(false)
 
     useEffect(() => {
         let isMounted = true
@@ -33,19 +40,10 @@ const EditQuestList = () => {
 
         const getQuests = async () => {
             try {
-                const response = await axiosPrivate.get("/quest/all/lines", {
+                const response = await axios.get("/quest/all/dropdown", {
                     signal: controller.signal
                 })
-                
-                let data = []
-                for (let i = 0; i < response.data.length; i++) {
-                    let data_dict = {"name": response.data[i].name, "url": response.data[i].url}
-                    data.push(data_dict)
-                }
-                if (isMounted) {
-                    setDropDownQuests(data)
-                    setAllQuests(response.data)
-                }
+                isMounted && setDropDownQuests(response.data)
             } catch (err) {
                 console.log(err)
             } 
@@ -60,9 +58,27 @@ const EditQuestList = () => {
 
     }, [])
 
-    const getQuest = () => {
-        const quest = allQuests.find(elem => elem.url === pickedQuest.url)
-        setDbQuest(quest)
+    const handleShowErr = (e) => {
+        setShowErrMsg(e)
+    }
+
+    const getQuest = async () => {
+        try {
+            const response = await axios.get(`/quest/${pickedQuest.url}`)
+            setDbQuest(response.data)
+        } catch (err) {
+            if (!err?.response) {
+                setErrMsg("No server respone")
+            } else if (err?.response?.status === 400) {
+                redirectLogin()
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
+                setErrMsg("Edit Quest Failed")
+            }
+            handleShowErr(true)
+            return
+        }
         setShowForm(true)
     }
 
@@ -71,6 +87,11 @@ const EditQuestList = () => {
             <Button component={Link} to="/editor" variant="text" size="large">&lt;&lt; Back</Button>
             <Row className="mt-3">
                 <Col xs={12} md={6}>
+                    {showErrMsg 
+                            ?
+                        <ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
+                        : null
+                    }
                     <Stack spacing={2} direction="row">
                         <Autocomplete 
                             fullWidth

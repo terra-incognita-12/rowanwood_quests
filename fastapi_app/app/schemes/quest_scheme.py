@@ -48,7 +48,6 @@ class QuestOptionResponseScheme(QuestOptionBaseScheme):
     quest_next_line: QuestNextLineScheme = None
 
 class QuestLineSendScheme(QuestLineBaseScheme):
-    # quest_id: Union[uuid.UUID, None] = None
     quest_current_options: List[QuestOptionSendScheme] = [] 
 
 class QuestLineResponseScheme(QuestLineBaseScheme):
@@ -59,6 +58,13 @@ class QuestLineResponseScheme(QuestLineBaseScheme):
 class QuestResponseSchemePreview(QuestBaseScheme):
     id: uuid.UUID
     photo: Union[str, None] = None
+
+class QuestDropDownResponseScheme(BaseModel):
+    name: str
+    url: str
+
+    class Config:
+        orm_mode = True
 
 class QuestResponseSchemeWithComments(QuestBaseScheme):
     id: uuid.UUID

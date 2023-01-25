@@ -11,9 +11,9 @@ from typing import List
 from ..s3 import s3
 from ..config import settings
 from ..database import get_db
-from ..models import Quest, Comment, QuestLine, QuestOption
+from ..models import Quest, Comment, QuestLine, QuestOption, User
 from ..schemes import quest_scheme
-from ..oauth2 import require_user
+from ..oauth2 import require_user, require_editor
 
 router = APIRouter()
 
@@ -22,11 +22,14 @@ FOLDER_QUESTLINE = 'quest_line/'
 
 # BASE QUEST
 
+# CREATE
+
 @router.post('/create', status_code=status.HTTP_201_CREATED)
-def create_quest(payload: quest_scheme.QuestSendScheme, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
+def create_quest(payload: quest_scheme.QuestSendScheme, db: Session = Depends(get_db)):
+
     check_quest = db.query(Quest).filter(Quest.url == payload.url).first()
     if check_quest:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Quest with this url already exists')
+        raise HTTPException(status_code=403, detail='Quest with this url already exists')
 
     payload.is_activated = False
     new_quest = Quest(**payload.dict())
@@ -34,7 +37,9 @@ def create_quest(payload: quest_scheme.QuestSendScheme, db: Session = Depends(ge
     db.commit()
     db.refresh(new_quest)
 
-    return {'status': 'success', 'message': 'OK', 'id': new_quest.id}
+    return {'status': 'OK', 'id': new_quest.id}
+
+# READ
 
 # Pull quests no comments no quests lines
 @router.get('/all/preview', response_model=List[quest_scheme.QuestResponseSchemePreview])
@@ -42,17 +47,9 @@ def get_all_quests_preview(db: Session = Depends(get_db)):
     quests = db.query(Quest).order_by(asc(Quest.name)).filter(Quest.is_activated == True).all()
     return quests
 
-
-# # Pull quests only with user comments
-# @router.get('/all/comments', response_model=List[quest_scheme.QuestResponseSchemeWithComments])
-# def get_all_quests_with_comments(db: Session = Depends(get_db)):
-#     quests = db.query(Quest).order_by(asc(Quest.name)).all()
-#     return quests
-
-
-# Pull quests with quest lines no comments
-@router.get('/all/lines', response_model=List[quest_scheme.QuestResponseSchemeWithLines])
-def get_all_quests_with_lines(db: Session = Depends(get_db)):
+# Pull quests only name and url for dropdown
+@router.get('/all/dropdown', response_model=List[quest_scheme.QuestDropDownResponseScheme])
+def get_all_quests_dropdown(db: Session = Depends(get_db)):
     quests = db.query(Quest).order_by(asc(Quest.name)).all()
     return quests
 
@@ -61,9 +58,11 @@ def get_quest(url: str, db: Session = Depends(get_db)):
     quest = db.query(Quest).filter(Quest.url == url).first()
 
     if not quest:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+        raise HTTPException(status_code=404, detail="Quest doesn't exist")
 
     return quest
+
+# UPDATE
 
 @router.patch('/update/{id}')
 def update_quest(id: str, payload:quest_scheme.QuestBaseScheme, db: Session = Depends(get_db)):
@@ -71,12 +70,12 @@ def update_quest(id: str, payload:quest_scheme.QuestBaseScheme, db: Session = De
     check_quest = quest_query.first()
 
     if not check_quest:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+        raise HTTPException(status_code=404, detail="Quest doesn't exist")
 
     check_quest_url = db.query(Quest).filter(Quest.url == payload.url).first()
 
     if check_quest_url and str(check_quest_url.id) != id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Quest with this url already exists')
+        raise HTTPException(status_code=403, detail='Quest with this url already exists')
 
     update_data = payload.dict(exclude_unset=True)
     quest_query.update(update_data, synchronize_session=False)
@@ -84,7 +83,7 @@ def update_quest(id: str, payload:quest_scheme.QuestBaseScheme, db: Session = De
     db.commit()
     db.refresh(check_quest)
 
-    return {'status': 'success', 'message': 'OK'}   
+    return {'status': 'OK'}   
 
 @router.patch('/update/activate/{id}')
 def update_activate_quest(id: str, db: Session = Depends(get_db)):
@@ -92,14 +91,16 @@ def update_activate_quest(id: str, db: Session = Depends(get_db)):
     check_quest = quest_query.first()
 
     if not check_quest:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+        raise HTTPException(status_code=404, detail="Quest doesn't exist")
 
     quest_query.update({'is_activated': not check_quest.is_activated}, synchronize_session=False)
 
     db.commit()
     db.refresh(check_quest)
 
-    return {'status': 'success', 'message': 'OK'}
+    return {'status': 'OK'}
+
+# DELETE
 
 @router.delete('/delete/{url}')
 def delete_quest(url: str, db: Session = Depends(get_db)):
@@ -107,7 +108,7 @@ def delete_quest(url: str, db: Session = Depends(get_db)):
     check_quest = quest_query.first()
 
     if not check_quest:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+        raise HTTPException(status_code=404, detail="Quest doesn't exist")
 
     if check_quest.photo:
         key = check_quest.photo.replace(settings.S3_FULL_URL,'')
@@ -121,18 +122,21 @@ def delete_quest(url: str, db: Session = Depends(get_db)):
     quest_query.delete(synchronize_session=False)
     db.commit()
     
-    return {'status': 'success', 'message': 'OK'}
+    return {'status': 'OK'}
 
 # LINES
 
+# CREATE
+
 @router.post('/lines/create/{url}', status_code=status.HTTP_201_CREATED)
 def create_quest_line(url: str, payload: quest_scheme.QuestLineSendScheme, db: Session = Depends(get_db)):
+
     check_quest = db.query(Quest).filter(Quest.url == url).first()
     if not check_quest:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")     
+        raise HTTPException(status_code=404, detail="Quest doesn't exist")     
     check_unique_number = db.query(QuestLine).filter(QuestLine.quest_id == check_quest.id, QuestLine.unique_number == payload.unique_number).first()
     if check_unique_number:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Quest line with this unique number already exists')
+        raise HTTPException(status_code=403, detail='Quest line with this unique number already exists')
 
     payload_options = payload.quest_current_options
     del payload.quest_current_options
@@ -148,13 +152,15 @@ def create_quest_line(url: str, payload: quest_scheme.QuestLineSendScheme, db: S
         db.commit()
         db.refresh(option)
 
-    return {'status': 'success', 'message': 'OK', 'id': new_quest_line.id}
+    return {'status': 'OK', 'id': new_quest_line.id}
+
+# READ
 
 @router.get('/lines/all/{url}', response_model=List[quest_scheme.QuestLineResponseScheme])
 def get_all_lines_for_quest(url: str, db: Session = Depends(get_db)):
     check_quest = db.query(Quest).filter(Quest.url == url).first()
     if not check_quest:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+        raise HTTPException(status_code=404, detail="Quest doesn't exist")
 
     return check_quest.quest_lines
 
@@ -162,26 +168,29 @@ def get_all_lines_for_quest(url: str, db: Session = Depends(get_db)):
 def get_line_for_quest(url: str, unique_number: int, db: Session = Depends(get_db)):
     check_quest = db.query(Quest).filter(Quest.url == url).first()
     if not check_quest:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+        raise HTTPException(status_code=404, detail="Quest doesn't exist")
 
     check_quest_line = db.query(QuestLine).filter(QuestLine.quest_id == check_quest.id, QuestLine.unique_number == unique_number).first()
     if not check_quest_line:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
+        raise HTTPException(status_code=404, detail="Quest Line doesn't exist")
 
     return check_quest_line
 
+# UPDATE
+
 @router.patch('/lines/update/{id}')
 def update_quest_line(id: str, payload: quest_scheme.QuestLineSendScheme, db: Session = Depends(get_db)):
+
     quest_line_query = db.query(QuestLine).filter(QuestLine.id == id)
     check_quest_line = quest_line_query.first()
 
     if not check_quest_line:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
+        raise HTTPException(status_code=404, detail="Quest Line doesn't exist")
 
     check_quest_line_unumber = db.query(QuestLine).filter(QuestLine.unique_number == payload.unique_number, QuestLine.quest_id == check_quest_line.quest_id).first()
 
     if check_quest_line_unumber and str(check_quest_line_unumber.id) != id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Quest with this unique number already exists')
+        raise HTTPException(status_code=403, detail='Quest with this unique number already exists')
 
     payload_options = payload.quest_current_options
     del payload.quest_current_options
@@ -201,13 +210,17 @@ def update_quest_line(id: str, payload: quest_scheme.QuestLineSendScheme, db: Se
         db.commit()
         db.refresh(option)
 
-    return {'status': 'success', 'message': 'OK', 'unique_number': check_quest_line.unique_number}  
+    return {'status': 'OK', 'unique_number': check_quest_line.unique_number}  
+
+# DELETE
+
 @router.delete('/lines/delete/{id}')
 def delete_quest_line(id: str, db: Session = Depends(get_db)):
+
     check_quest_line = db.query(QuestLine).filter(QuestLine.id == id).first()
     
     if not check_quest_line:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
+        raise HTTPException(status_code=404, detail="Quest Line doesn't exist")
 
     if check_quest_line.photo:
         key = check_quest_line.photo.replace(settings.S3_FULL_URL,'')
@@ -216,26 +229,26 @@ def delete_quest_line(id: str, db: Session = Depends(get_db)):
     db.delete(check_quest_line)
     db.commit()
 
-    return {'status': 'success', 'message': 'OK'}
+    return {'status': 'OK'}
 
-# OPTIONS
+# # OPTIONS
 
-@router.post('/options/create', status_code=status.HTTP_201_CREATED)
-def create_quest_option(payload: quest_scheme.QuestOptionSendScheme, db: Session = Depends(get_db)):
-    quest_line_query = db.query(QuestLine).options(joinedload(QuestLine.quest_options)).filter(QuestLine.id == payload.quest_line_id)
-    check_quest_line = quest_line_query.first()
-    if not check_quest_line:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
+# @router.post('/options/create', status_code=status.HTTP_201_CREATED)
+# def create_quest_option(payload: quest_scheme.QuestOptionSendScheme, db: Session = Depends(get_db)):
+#     quest_line_query = db.query(QuestLine).options(joinedload(QuestLine.quest_options)).filter(QuestLine.id == payload.quest_line_id)
+#     check_quest_line = quest_line_query.first()
+#     if not check_quest_line:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
 
-    check_quest_line.quest_options.append(QuestOption(
-        unique_name=payload.unique_name,
-        description=payload.description
-    ))
+#     check_quest_line.quest_options.append(QuestOption(
+#         unique_name=payload.unique_name,
+#         description=payload.description
+#     ))
 
-    db.commit()
-    db.refresh(check_quest_line)
+#     db.commit()
+#     db.refresh(check_quest_line)
 
-    return {'status': 'success', 'message': 'OK'}
+#     return {'status': 'success', 'message': 'OK'}
 
 # S3
 
@@ -243,11 +256,12 @@ def create_quest_option(payload: quest_scheme.QuestOptionSendScheme, db: Session
 
 @router.patch('/update/photo/{id}')
 def update_quest_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):
+
     quest_query = db.query(Quest).filter(Quest.id == id)
     check_quest = quest_query.first()
 
     if not check_quest:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+        raise HTTPException(status_code=404, detail="Quest doesn't exist")
     
     key = FOLDER_QUEST + id + photo.filename
 
@@ -261,15 +275,16 @@ def update_quest_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)
     db.commit()
     db.refresh(check_quest)
 
-    return {'status': 'success', 'message': 'OK'}
+    return {'status': 'OK'}
 
 @router.delete('/delete/photo/{id}')
 def delete_quest_photo(id: str, db: Session = Depends(get_db)):
+
     quest_query = db.query(Quest).filter(Quest.id == id)
     check_quest = quest_query.first()
 
     if not check_quest:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+        raise HTTPException(status_code=404, detail="Quest doesn't exist")
 
     key = check_quest.photo.replace(settings.S3_FULL_URL,'')
     s3.delete_photo(key)
@@ -278,17 +293,20 @@ def delete_quest_photo(id: str, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(check_quest)
 
-    return {'status': 'success', 'message': 'OK'}
+    return {'status': 'OK'}
 
 # LINES
 
 @router.patch('/lines/update/photo/{id}')
 def update_quest_line_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):
+
+    user_logged = db.query(User).filter(User.id == user_id).first()
+
     quest_line_query = db.query(QuestLine).filter(QuestLine.id == id)
     check_quest_line = quest_line_query.first()
 
     if not check_quest_line:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+        raise HTTPException(status_code=404, detail="Quest doesn't exist")
     
     key = FOLDER_QUESTLINE + id + photo.filename
 
@@ -302,15 +320,18 @@ def update_quest_line_photo(id: str, photo: UploadFile, db: Session = Depends(ge
     db.commit()
     db.refresh(check_quest_line)
 
-    return {'status': 'success', 'message': 'OK'}
+    return {'status': 'OK'}
 
 @router.delete('/lines/delete/photo/{id}')
 def delete_quest_line_photo(id: str, db: Session = Depends(get_db)):
+
+    user_logged = db.query(User).filter(User.id == user_id).first()
+
     quest_line_query = db.query(QuestLine).filter(QuestLine.id == id)
     check_quest_line = quest_line_query.first()
 
     if not check_quest_line:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest doesn't exist")
+        raise HTTPException(status_code=404, detail="Quest doesn't exist")
 
     key = check_quest_line.photo.replace(settings.S3_FULL_URL,'')
     s3.delete_photo(key)
@@ -319,4 +340,4 @@ def delete_quest_line_photo(id: str, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(check_quest_line)
 
-    return {'status': 'success', 'message': 'OK'}
+    return {'status': 'OK'}
