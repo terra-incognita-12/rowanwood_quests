@@ -4,6 +4,8 @@ from typing import List, Union
 
 from .comment_scheme import CommentResponseScheme
 
+# QUEST base, send
+
 class QuestBaseScheme(BaseModel):
     name: str
     url: str
@@ -18,6 +20,8 @@ class QuestBaseScheme(BaseModel):
 class QuestSendScheme(QuestBaseScheme):
     pass
 
+# OPTION base, send
+
 class QuestOptionBaseScheme(BaseModel):
     name: str
 
@@ -26,6 +30,8 @@ class QuestOptionBaseScheme(BaseModel):
 
 class QuestOptionSendScheme(QuestOptionBaseScheme):
     quest_next_line_id: Union[uuid.UUID, None] = None
+
+# LINE base, next_line, send
 
 class QuestLineBaseScheme(BaseModel):
     name: str
@@ -43,17 +49,23 @@ class QuestNextLineScheme(BaseModel):
     class Config:
         orm_mode = True
 
+class QuestLineSendScheme(QuestLineBaseScheme):
+    quest_current_options: List[QuestOptionSendScheme] = [] 
+
+# OPTION response
+
 class QuestOptionResponseScheme(QuestOptionBaseScheme):
     id: uuid.UUID
     quest_next_line: QuestNextLineScheme = None
 
-class QuestLineSendScheme(QuestLineBaseScheme):
-    quest_current_options: List[QuestOptionSendScheme] = [] 
+# LINE response
 
 class QuestLineResponseScheme(QuestLineBaseScheme):
     id: uuid.UUID
     photo: Union[str, None] = None
     quest_current_options: List[QuestOptionResponseScheme] = []
+
+# QUEST response (preview, dropdown, w/comments, w/lines)
 
 class QuestResponseSchemePreview(QuestBaseScheme):
     id: uuid.UUID

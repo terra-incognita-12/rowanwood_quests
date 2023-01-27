@@ -55,13 +55,12 @@ const CreateLibraryRecordForm = () => {
         const getTags = async () => {
             
             try {
-                const response = await axiosPrivate.get("/library/tags/all", {
+                const response = await axios.get("/library/tags/all", {
                     signal: controller.signal
                 })
                 let data = []
-                for (let i = 0; i < response.data.length; i++) {
-                	let data_dict = {"name": response.data[i].name}
-                	data.push(data_dict)
+                for (const tag of response.data) {
+                	data.push({"name": tag.name})
                 }
     			isMounted && setReadyTags(data)
             } catch (err) {
@@ -120,16 +119,18 @@ const CreateLibraryRecordForm = () => {
 				setErrMsg("No server respone")
 			} else if (err.response?.status === 400) {
 				redirectLogin()
-			} else if (err.response?.status === 403) {
-				setErrMsg("Record with this url already exists")
+			} else if (err.response?.status) {
+				setErrMsg(err?.response?.data?.detail)
 			} else {
                 setErrMsg("Create Record Failed")
             }
             handleShowErr(true)
+            window.scrollTo(0, 0)
+            return
 		}
 
         if (!isPhotoUploaded) {
-            window.location.reload(false);
+            navigate(`/library/${url}`, { replace: true})
         } else {
             let photo_data = new FormData();
             photo_data.append("photo", photo)

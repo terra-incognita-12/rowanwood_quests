@@ -72,9 +72,8 @@ const EditLibraryRecordForm = ({ record }) => {
                     signal: controller.signal
                 })
                 let data = []
-                for (let i = 0; i < response.data.length; i++) {
-                	let data_dict = {"name": response.data[i].name}
-                	data.push(data_dict)
+                for (const tag of response.data) {
+                    data.push({"name": tag.name})
                 }
     			isMounted && setReadyTags(data)
             } catch (err) {
@@ -122,7 +121,8 @@ const EditLibraryRecordForm = ({ record }) => {
 		if (!URL_REGEX.test(url)) {
 			setErrMsg("Invaid quest url. Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _")
 			handleShowErr(true)
-			return
+            window.scrollTo(0, 0);
+            return
 		}
 
 		try {
@@ -130,14 +130,16 @@ const EditLibraryRecordForm = ({ record }) => {
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg("No server respone")
-			} else if (err.response?.status === 400) {
+			} else if (err?.response?.status === 400) {
 				redirectLogin()
-			} else if (err.response?.status === 403) {
-				setErrMsg("Record with this url already exists")
+			} else if (err?.response?.status) {
+				setErrMsg(err?.response?.data?.detail)
 			} else {
                 setErrMsg("Update Record Failed")
             }
             handleShowErr(true)
+            window.scrollTo(0, 0);
+            return
 		}
 
         if (!isPhotoUploaded) {
@@ -154,24 +156,21 @@ const EditLibraryRecordForm = ({ record }) => {
                 })
                 navigate(`/library/${url}`, { replace: true})
             } catch (err) {
-                console.log(err)
-                alert("Main info on record updated successfully, but it was issue with update photo, please try again")
+                if (!err?.response) {
+                    setErrMsg("No server respone")
+                } else if (err?.response?.status === 400) {
+                    redirectLogin()
+                } else if (err?.response?.status) {
+                    setErrMsg(err?.response?.data?.detail)
+                } else {
+                    setErrMsg("Main info on record updated successfully, but it was issue with update photo, please try again")
+                }
+                handleShowErr(true)
+                window.scrollTo(0, 0)
             }
         }
 
 	}
-
-    const handleDelete = async () => {
-        const answer = window.confirm("Are you sure to delete this record?")
-        if (!answer) { return }
-
-        try {
-            await axiosPrivate.delete(`/library/records/delete/${url}`, JSON.stringify({"url": recordUrl}))
-            window.location.reload(false);
-        } catch (err) {
-            console.log(err)
-        }
-    }
 
     const handleDeletePhoto = async () => {
         const answer = window.confirm("Are you sure to delete this photo?")
@@ -181,9 +180,42 @@ const EditLibraryRecordForm = ({ record }) => {
             await axiosPrivate.delete(`/library/records/delete/photo/${recordId}`)
             window.location.reload(false);
         } catch (err) {
-            console.log(err)
+            if (!err?.response) {
+                setErrMsg("No server respone")
+            } else if (err?.response?.status === 400) {
+                redirectLogin()
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
+                setErrMsg("Delete Record Photo Failed")
+            }
+            handleShowErr(true)
+            window.scrollTo(0, 0)
         }
     }
+    
+    const handleDelete = async () => {
+        const answer = window.confirm("Are you sure to delete this record?")
+        if (!answer) { return }
+
+        try {
+            await axiosPrivate.delete(`/library/records/delete/${url}`, JSON.stringify({"url": recordUrl}))
+            window.location.reload(false);
+        } catch (err) {
+            if (!err?.response) {
+                setErrMsg("No server respone")
+            } else if (err?.response?.status === 400) {
+                redirectLogin()
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
+                setErrMsg("Delete Record Failed")
+            }
+            handleShowErr(true)
+            window.scrollTo(0, 0)
+        }
+    }
+
 
 	return (
 		<>

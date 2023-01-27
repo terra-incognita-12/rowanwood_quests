@@ -93,12 +93,12 @@ const CreateQuestForm = () => {
                 setErrMsg("Create Quest Failed")
             }
             handleShowErr(true)
-            window.scrollTo(0, 0);
+            window.scrollTo(0, 0)
             return
 		}
 
         if (!isPhotoUploaded) {
-            navigate(`/quest/${url}`, { replace: true});
+            navigate(`/quest/${url}`, { replace: true})
         } else {
             let photo_data = new FormData();
             photo_data.append("photo", photo)

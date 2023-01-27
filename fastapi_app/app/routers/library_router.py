@@ -7,6 +7,7 @@ from fastapi import (
     Form
 )
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import asc
 from typing import List
 from ..s3 import s3
 from ..database import get_db
@@ -19,12 +20,16 @@ router = APIRouter()
 
 FOLDER = 'record/'
 
+# RECORDS
+
+# CREATE
+
 @router.post('/records/create')
 def create_record(payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db)):
 
     check_record = db.query(LibraryRecord).filter(LibraryRecord.url == payload.url).first()
     if check_record:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Record with this url already exists')
+        raise HTTPException(status_code=403, detail='Record with this url already exists')
 
     payload.library_tags = prepare_library_tags(payload.library_tags, db)
 
@@ -34,12 +39,22 @@ def create_record(payload: library_scheme.LibraryRecordSendScheme, db: Session =
     db.commit()
     db.refresh(new_library_record)
 
-    return {'status': 'success', 'message': 'OK', 'id': new_library_record.id}
+    return {'status': 'OK', 'id': new_library_record.id}
 
-@router.get("/records/all", response_model=List[library_scheme.LibraryRecordResponseScheme])
+# READ
+
+@router.get("/records/all", response_model=List[library_scheme.LibraryRecordResponseSchemePreview])
 def get_records(db: Session = Depends(get_db)):
-    records = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).order_by(LibraryRecord.name).all()
+    records = db.query(LibraryRecord).order_by(asc(LibraryRecord.name)).all()
     return records
+
+@router.get("/records/{url}", response_model=library_scheme.LibraryRecordResponseScheme)
+def get_record(url: str, db: Session = Depends(get_db)):
+    record = db.query(LibraryRecord).filter(LibraryRecord.url == url).first()
+    if not record:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
+    
+    return record
 
 @router.get("/records/tag/{tag}", response_model=List[library_scheme.LibraryRecordBaseScheme])
 def get_records_by_tag(tag: str, db: Session = Depends(get_db)):
@@ -51,54 +66,11 @@ def get_records_by_tag(tag: str, db: Session = Depends(get_db)):
 
     return records[0]
 
-@router.get("/records/{url}", response_model=library_scheme.LibraryRecordResponseScheme)
-def get_record(url: str, db: Session = Depends(get_db)):
-    record = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).filter(LibraryRecord.url == url).first()
-    if not record:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
-    
-    return record
-
-@router.patch('/records/update/photo/{id}')
-def update_record_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):
-    record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)
-    check_record = record_query.first()
-    if not check_record:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
-
-    key = FOLDER + id + photo.filename
-
-    if check_record.photo:
-        old_key = check_record.photo.replace(settings.S3_FULL_URL,'')
-        s3.delete_photo(old_key)
-    
-    s3.add_new_photo(photo.file, key)
-
-    record_query.update({'photo': f'{settings.S3_FULL_URL + key}'}, synchronize_session=False)
-    db.commit()
-    db.refresh(check_record)
-
-    return {'status': 'success', 'message': 'OK'}
-
-@router.delete('/records/delete/photo/{id}')
-def delete_record_photo(id: str, db: Session = Depends(get_db)):
-    record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)
-    check_record = record_query.first()
-    if not check_record:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
-
-    key = check_record.photo.replace(settings.S3_FULL_URL,'')
-    s3.delete_photo(key)
-
-    record_query.update({'photo': ''}, synchronize_session=False)
-    db.commit()
-    db.refresh(check_record)
-
-    return {'status': 'success', 'message': 'OK'}
+# UPDATE
 
 @router.patch('/records/update/{id}')
 def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db)):
-    record_query = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).filter(LibraryRecord.id == id)
+    record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)
     check_record = record_query.first()
     if not check_record:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
@@ -118,11 +90,13 @@ def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: 
     db.commit()
     db.refresh(check_record)
 
-    return {'status': 'success', 'message': 'OK'}
+    return {'status': 'OK'}
+
+# DELETE
 
 @router.delete('/records/delete/{url}')
 def delete_record(url: str, db: Session = Depends(get_db)):
-    record_query = db.query(LibraryRecord).options(joinedload(LibraryRecord.library_tags)).filter(LibraryRecord.url == url)
+    record_query = db.query(LibraryRecord).filter(LibraryRecord.url == url)
     check_record = record_query.first()
 
     if not check_record:
@@ -138,11 +112,13 @@ def delete_record(url: str, db: Session = Depends(get_db)):
     record_query.delete(synchronize_session=False)
     db.commit()
     
-    return {'status': 'success', 'message': 'OK'}
+    return {'status': 'OK'}
+
+# TAGS
 
 @router.get("/tags/all", response_model=List[library_scheme.LibraryTagResponseScheme])
 def get_tags(db: Session = Depends(get_db)):
-    tags = db.query(LibraryTag).options(joinedload(LibraryTag.library_records)).all()
+    tags = db.query(LibraryTag).order_by(asc(LibraryTag.name)).all()
     return tags
 
 @router.patch('/tags/update/{id}')
@@ -163,7 +139,7 @@ def update_tag(id: str, payload: library_scheme.LibraryTagSendScheme, db: Sessio
     db.commit()
     db.refresh(check_tag)
 
-    return {'status': 'success', 'message': 'OK'}
+    return {'status': 'OK'}
 
 @router.delete('/tags/delete/{id}')
 def delete_tag(id: str, db: Session = Depends(get_db)):
@@ -178,7 +154,46 @@ def delete_tag(id: str, db: Session = Depends(get_db)):
     tag_query.delete(synchronize_session=False)
     db.commit()
     
-    return {'status': 'success', 'message': 'OK'}
+    return {'status': 'OK'}
+
+# S3
+
+@router.patch('/records/update/photo/{id}')
+def update_record_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):
+    record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)
+    check_record = record_query.first()
+    if not check_record:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
+
+    key = FOLDER + id + photo.filename
+
+    if check_record.photo:
+        old_key = check_record.photo.replace(settings.S3_FULL_URL,'')
+        s3.delete_photo(old_key)
+    
+    s3.add_new_photo(photo.file, key)
+
+    record_query.update({'photo': f'{settings.S3_FULL_URL + key}'}, synchronize_session=False)
+    db.commit()
+    db.refresh(check_record)
+
+    return {'status': 'OK'}
+
+@router.delete('/records/delete/photo/{id}')
+def delete_record_photo(id: str, db: Session = Depends(get_db)):
+    record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)
+    check_record = record_query.first()
+    if not check_record:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
+
+    key = check_record.photo.replace(settings.S3_FULL_URL,'')
+    s3.delete_photo(key)
+
+    record_query.update({'photo': ''}, synchronize_session=False)
+    db.commit()
+    db.refresh(check_record)
+
+    return {'status': 'OK'}
 
 # MISC
 
@@ -196,6 +211,3 @@ def prepare_library_tags(payload_tags: List, db: Session):
             payload_temp.append(tag)
 
     return payload_temp
-
-# def add_new_photo()
-

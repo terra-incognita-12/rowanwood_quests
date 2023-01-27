@@ -11,7 +11,9 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
 
+import ErrMsg from "../../../ErrMsg"
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate"
+import axios from "../../../../api/axios"
 import useRedirectLogin from "../../../../hooks/useRedirectLogin"
 
 import EditLibraryRecordForm from "../../../forms/EditLibraryRecordForm"
@@ -22,10 +24,12 @@ const EditLibraryRecordsList = () => {
     const redirectLogin = useRedirectLogin(location)
 
     const [dropDownRecords, setDropDownRecords] = useState([])
-    const [allRecords, setAllRecords] = useState([])
     const [pickedRecord, setPickedRecord] = useState("")
     const [dbRecord, setDbRecord] = useState("")
     const [showForm, setShowForm] = useState(false)
+
+    const [errMsg, setErrMsg] = useState("")
+    const [showErrMsg, setShowErrMsg] = useState(false)
 
     useEffect(() => {
 		let isMounted = true
@@ -33,19 +37,11 @@ const EditLibraryRecordsList = () => {
 
         const getRecords = async () => {
             try {
-                const response = await axiosPrivate.get("/library/records/all", {
+                const response = await axios.get("/library/records/all", {
                     signal: controller.signal
                 })
-                
-                let data = []
-                for (let i = 0; i < response.data.length; i++) {
-                	let data_dict = {"name": response.data[i].name, "url": response.data[i].url}
-                	data.push(data_dict)
-                }
-    			if (isMounted) {
-                    setDropDownRecords(data)
-                    setAllRecords(response.data)
-                }
+
+                isMounted && setDropDownRecords(response.data)
             } catch (err) {
                 console.log(err)
             } 
@@ -60,9 +56,27 @@ const EditLibraryRecordsList = () => {
 
 	}, [])
 
-    const getRecord = () => {
-        const record = allRecords.find(elem => elem.url === pickedRecord.url)
-        setDbRecord(record)
+    const handleShowErr = (e) => {
+        setShowErrMsg(e)
+    }
+
+    const getRecord = async () => {
+        try {
+            const response = await axios.get(`/library/records/${pickedRecord.url}`)
+            setDbRecord(response.data)
+        } catch (err) {
+            if (!err?.response) {
+                setErrMsg("No server respone")
+            } else if (err?.response?.status === 400) {
+                redirectLogin()
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
+                setErrMsg("Edit Record Failed")
+            }
+            handleShowErr(true)
+            return
+        }
         setShowForm(true)
     }
 

@@ -18,12 +18,12 @@ const Library = () => {
 
     let tagParam = searchParams.get("tag")
 
-	const [allRecords, setAllRecords] = useState([])
-    const [allTags, setAllTags] = useState([])
-    
-    const [dropDownRecords, setDropDownRecords] = useState([])
+    const [records, setRecords] = useState([])
+
     const [pickedRecord, setPickedRecord] = useState("")
     const [inputPickedRecord, setInputPickedRecord] = useState("")
+    
+    const [tags, setTags] = useState([])
 
     const [dropDownTags, setDropDownTags] = useState([])
     const [pickedTag, setPickedTag] = useState("")
@@ -46,17 +46,8 @@ const Library = () => {
                 const response = await axios.get("/library/records/all", {
                     signal: controller.signal
                 })
-                
-                let recordsData = []
-                
-                for (const i of response.data) {
-                    recordsData.push({"name": i.name, "url": i.url})
-                }
 
-                if (isMounted) {
-                    setAllRecords(response.data)
-                    setDropDownRecords(recordsData)
-                }
+                isMounted && setRecords(response.data)
             } catch (err) {
                 console.log(err)
             } 
@@ -69,26 +60,26 @@ const Library = () => {
                 })
 
                 let searchTagsData = []
-                let tagsData = []
+                let tagsOnlyName = []
 
-                for (const i of response.data) {
-                    tagsData.push({"name": i.name})
+                for (const tag of response.data) {
+                    tagsOnlyName.push({"name": tag.name})
                 }
 
                 // If page opened with get-request tag
                 if (tagParam) {
-                    for (const i of response.data) {
-                        if (i.name === tagParam) {
-                            for (const j of i.library_records) {
-                                searchTagsData.push({"name": j.name, "url": j.url})
+                    for (const tag of response.data) {
+                        if (tag.name === tagParam) {
+                            for (const record of tag.library_records) {
+                                searchTagsData.push(record)
                             }
                         }
                     }
                 }
 
                 if (isMounted) {
-                    setAllTags(response.data)
-                    setDropDownTags(tagsData)
+                    setTags(response.data)
+                    setDropDownTags(tagsOnlyName)
                     setSearchRecords(searchTagsData)
                 }
             } catch (err) {
@@ -109,28 +100,29 @@ const Library = () => {
     }, [])
 
     const getMatchingRecords = () => {
-        let records = []
+        let searched_records = []
         if (pickedRecord) {
-            records = allRecords.filter(elem => elem.name.toLowerCase().includes(pickedRecord.name.toLowerCase()))
+            searched_records = records.filter(elem => elem.name.toLowerCase().includes(pickedRecord.name.toLowerCase()))
             setPickedRecord("")
         } else {
-            records = allRecords.filter(elem => elem.name.toLowerCase().includes(inputPickedRecord.toLowerCase()))
+            searched_records = records.filter(elem => elem.name.toLowerCase().includes(inputPickedRecord.toLowerCase()))
         }
 
         if (searchParams.has("tag")) {
             searchParams.delete("tag")
             setSearchParams(searchParams)
         }
-        setSearchRecords(records)
+
+        setSearchRecords(searched_records)
         setSearchResult(true)
     }
 
     const getRecordsByTag = () => {
         let records = []
-        for (const i of allTags) {
-            if (i.name === pickedTag.name) {
-                for (const j of i.library_records) {
-                    records.push({"name": j.name, "url": j.url})
+        for (const tag of tags) {
+            if (tag.name === pickedTag.name) {
+                for (const record of tag.library_records) {
+                    records.push(record)
                 }
             }
         }
@@ -139,6 +131,7 @@ const Library = () => {
             searchParams.delete("tag")
             setSearchParams(searchParams)
         }
+
         setSearchRecords(records)
         setSearchResult(true)
     }
@@ -151,7 +144,7 @@ const Library = () => {
                         <Autocomplete fullWidth
                             disablePortal
                             freeSolo
-                            options={dropDownRecords}
+                            options={records}
                             onChange={(e, newValue) => {
                                 setPickedRecord(newValue)
                             }}
@@ -189,7 +182,7 @@ const Library = () => {
                                 {searchRecords.length
                                     ?
                                     searchRecords.map((record, i) =>
-                                        <div>
+                                        <div key={i}>
                                             <Button component={Link} to={`${record.url}`} variant="text">{record.name}</Button>
                                         </div>  
                                     ) : <Typography gutterBottom variant="h7">No results found</Typography>
@@ -205,7 +198,7 @@ const Library = () => {
                 <Card className="mt-3">
                     <CardContent>
                         <Typography gutterBottom variant="h4">All Records</Typography>
-                        {allRecords.map((record, i) => 
+                        {records.map((record, i) => 
                             <div key={i}>
                                 {record.name.charAt(0) === listLetter
                                     ?

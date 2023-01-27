@@ -46,7 +46,6 @@ const EditLibraryTagForm = ({ tag }) => {
 	useEffect(() => {
 		setName(tagName)
 		setRecords(tagRecords)
-        console.log(records)
 	}, [tagName, tagRecords])
 
 	const handleShowErr = (e) => {
@@ -56,23 +55,23 @@ const EditLibraryTagForm = ({ tag }) => {
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 
-        // TODO: REGEX FOR NAME
-
 		try {
 			const response = await axiosPrivate.patch(`/library/tags/update/${tagId}`, JSON.stringify({"name": name}))
 
 			window.location.reload(false);
 		} catch (err) {
 			if (!err?.response) {
-				setErrMsg("No server respone")
-			} else if (err.response?.status === 400) {
-				redirectLogin()
-			} else if (err.response?.status === 403) {
-				setErrMsg("Record with this url already exists")
-			} else {
-                setErrMsg("Update Record Failed")
+                setErrMsg("No server respone")
+            } else if (err?.response?.status === 400) {
+                redirectLogin()
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
+                setErrMsg("Update Tag Failed")
             }
             handleShowErr(true)
+            window.scrollTo(0, 0);
+            return
 		}
 	}
 
@@ -84,7 +83,17 @@ const EditLibraryTagForm = ({ tag }) => {
             await axiosPrivate.delete(`/library/tags/delete/${tagId}`)
             window.location.reload(false);
         } catch (err) {
-            console.log(err)
+            if (!err?.response) {
+                setErrMsg("No server respone")
+            } else if (err?.response?.status === 400) {
+                redirectLogin()
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
+                setErrMsg("Delete Tag Failed")
+            }
+            handleShowErr(true)
+            window.scrollTo(0, 0);
         }
     }
 

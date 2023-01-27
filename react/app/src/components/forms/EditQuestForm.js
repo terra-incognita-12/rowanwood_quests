@@ -165,7 +165,7 @@ const EditQuestForm = ({ quest }) => {
                     setErrMsg("Main info on quest updated successfully, but it was issue with update photo, please try again")
                 }
                 handleShowErr(true)
-                window.scrollTo(0, 0);
+                window.scrollTo(0, 0)
             }
         }
 	}
@@ -185,10 +185,10 @@ const EditQuestForm = ({ quest }) => {
             } else if (err?.response?.status) {
                 setErrMsg(err?.response?.data?.detail)
             } else {
-                setErrMsg("Edit Quest Failed")
+                setErrMsg("Delete Quest Photo Failed")
             }
             handleShowErr(true)
-            window.scrollTo(0, 0);
+            window.scrollTo(0, 0)
         }
     }
 
@@ -207,10 +207,10 @@ const EditQuestForm = ({ quest }) => {
             } else if (err?.response?.status) {
                 setErrMsg(err?.response?.data?.detail)
             } else {
-                setErrMsg("Edit Quest Failed")
+                setErrMsg("Delete Quest Failed")
             }
             handleShowErr(true)
-            window.scrollTo(0, 0);
+            window.scrollTo(0, 0)
         }
     }
 
