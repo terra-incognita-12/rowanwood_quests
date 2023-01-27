@@ -15,8 +15,7 @@ import { CardActionArea } from '@mui/material';
 import axios from "../../api/axios"
 
 const Home = () => {
-
-	const [quests, setQuests] = useState("")
+	const [quests, setQuests] = useState([])
 
     useEffect(() => {
         let isMounted = true

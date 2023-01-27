@@ -1,5 +1,5 @@
 import { useState, useEffect, forwardRef } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useParams } from "react-router"
 
 import Row from 'react-bootstrap/Row'
@@ -10,7 +10,6 @@ import { DataGrid } from '@mui/x-data-grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-
 import Dialog from '@mui/material/Dialog';
 import ListItemText from '@mui/material/ListItemText';
 import ListItem from '@mui/material/ListItem';
@@ -21,6 +20,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
+
 
 import CreateQuestLineForm from "../../../forms/CreateQuestLineForm"
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate"
@@ -45,6 +45,8 @@ const Transition = forwardRef(function Transition(props, ref) {
 const QuestLinesList = () => {
 
 	const { url } = useParams()
+	const navigate = useNavigate()
+
 	const axiosPrivate = useAxiosPrivate()
 
 	const [rows, setRows] = useState([])
@@ -82,7 +84,11 @@ const QuestLinesList = () => {
                     setQuestsLinesList(dataQuestLines)
                 }
             } catch (err) {
-                console.log(err)
+               if (err?.response?.status === 404) {
+                    navigate(`/notexist?err=${err?.response?.data?.detail}`)
+                } else {
+                    console.log(err)
+                }
             } 
         }
 
@@ -99,13 +105,15 @@ const QuestLinesList = () => {
 		<div className="mt-3">
 			<Button component={Link} to="/editor/quest/edit" variant="text" size="large">&lt;&lt; Back</Button>
 			<Card className="mt-3">
-	            <CardContent style={{ height: 700, width: '100%' }}>
+	            <CardContent sx={{ height: 'auto', overflow: "auto" }}>
 	                <Typography gutterBottom variant="h3" component="div">Quest Lines</Typography>
 	                <Button variant="contained" color="primary" onClick={handleLineModalOpen}>Create New Line</Button>
 	                <DataGrid
+	                	disableSelectionOnClick
 	                	className="mt-2"
 				        rows={rows}
 				        columns={columns}
+				        autoHeight={true}
 				    />
 	            </CardContent>
 	        </Card>

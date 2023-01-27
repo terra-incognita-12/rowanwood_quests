@@ -20,6 +20,7 @@ import LibraryDetails from "./components/pages/LibraryDetails"
 import Profile from "./components/pages/Profile"
 import Admin from "./components/pages/Admin"
 import NotExist from "./components/pages/NotExist"
+import OtherError from "./components/pages/OtherErrors"
 
 import Editor from "./components/pages/editor/Editor"
 
@@ -58,6 +59,7 @@ function App() {
           <Route exact path="changepass/:token" element={<ChangePass />} />
           <Route path="unauthorized" element={<Unauthorized />} />
           <Route path="notexist" element={<NotExist />} />
+          <Route path="othererror" element={<OtherError />} />
           
           <Route element={<PersistLogin />}>
             <Route path="" element={<Home />} />
