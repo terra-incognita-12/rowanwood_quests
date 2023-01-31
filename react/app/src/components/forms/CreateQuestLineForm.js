@@ -79,12 +79,11 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 
 	const handleSubmit = async (e) => {
 		let questLineId = ""
-		setPhoto("some_photo")
 
 		e.preventDefault()
 
 		try {
-			const response = await axiosPrivate.post(`/quest/lines/create/${url}`, JSON.stringify({"name": name, "unique_number": uniqueNum, "description": description, "photo": photo, "quest_current_options": questOptions}))
+			const response = await axiosPrivate.post(`/quest/lines/create/${url}`, JSON.stringify({"name": name, "unique_number": uniqueNum, "description": description, "quest_current_options": questOptions}))
 
 			questLineId = response.data.id
 		} catch (err) {
@@ -92,12 +91,14 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 				setErrMsg("No server respone")
 			} else if (err.response?.status === 400) {
 				redirectLogin()
-			} else if (err.response?.status === 403) {
-				setErrMsg("Quest line with this unique number already exists")
+			} else if (err.response?.status) {
+				setErrMsg(err?.response?.data?.detail)
 			} else {
-                setErrMsg("Create Quest Line Failed")
+                setErrMsg("Create Record Failed")
             }
             handleShowErr(true)
+            window.scrollTo(0, 0)
+            return
 		}
 
 		if (!isPhotoUploaded) {
@@ -105,18 +106,17 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
         } else {
             let photo_data = new FormData();
             photo_data.append("photo", photo)
-
             try {
                 await axios.patch(`/quest/lines/update/photo/${questLineId}`, photo_data, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
                 })
-                window.location.reload(false);
             } catch (err) {
                 console.log(err)
                 alert("Main info on quest line created successfully, but it was issue with update photo, please try again")
             }
+            window.location.reload(false);
         }
 			
 	}

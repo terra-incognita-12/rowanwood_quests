@@ -37,13 +37,12 @@ const EditLibraryTagsList = () => {
                     signal: controller.signal
                 })
                 
-                let data = []
-                for (let i = 0; i < response.data.length; i++) {
-                	let data_dict = {"name": response.data[i].name}
-                	data.push(data_dict)
+                let dataName = []
+                for (const tag of response.data) {
+                	dataName.push({"name": tag.name})
                 }
     			if (isMounted) {
-                    setDropDownTags(data)
+                    setDropDownTags(dataName)
                     setAllTags(response.data)
                 }
             } catch (err) {

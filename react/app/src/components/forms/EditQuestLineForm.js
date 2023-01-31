@@ -44,7 +44,7 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 	const [photo, setPhoto] = useState("")
 	const [isPhotoUploaded, setIsPhotoUploaded] = useState(false)
 
-	const [questOptions, setQuestOptions] = useState([{ name: "", quest_next_line_id: "" }])
+	const [questOptions, setQuestOptions] = useState([{ "name": "", "quest_next_line_id": "" }])
 
 	const [errMsg, setErrMsg] = useState("")
 	const [showErrMsg, setShowErrMsg] = useState(false)
@@ -55,8 +55,8 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 		setDescription(questLineDesc)
 
 		let newQuestOptions = []
-		for (let i = 0; i < questLineOptions.length; i++) {
-			let newOptionField = { name: questLineOptions[i].name, quest_next_line_id:questLineOptions[i].quest_next_line.id }
+		for (const option of questLineOptions) {
+			let newOptionField = { "name": option.name, "quest_next_line_id": option.quest_next_line.id }
 			newQuestOptions.push(newOptionField)
 		}
 		setQuestOptions(newQuestOptions)
@@ -68,7 +68,7 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 	}
  
 	const addNewOptionField = () => {
-	    let newOptionField = { name: "", quest_next_line_id: "" }
+	    let newOptionField = { "name": "", "quest_next_line_id": "" }
 	    setQuestOptions([...questOptions, newOptionField])
 	}
 
@@ -79,9 +79,9 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 	}
 
 	const getQuestNameById = (id) => {
-		for (let i = 0; i < questLinesList.length; i++) {
-			if (questLinesList[i].id === id) {
-				return questLinesList[i].name
+		for (const line of questLinesList) {
+			if (line.id === id) {
+				return line.name
 			}
 		}
 
@@ -115,7 +115,15 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
             await axiosPrivate.delete(`/quest/lines/delete/photo/${questLineId}`)
             window.location.reload(false);
         } catch (err) {
-            console.log(err)
+            if (!err?.response) {
+                setErrMsg("No server respone")
+            } else if (err?.response?.status === 400) {
+                redirectLogin()
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
+                setErrMsg("Delete Line Photo Failed")
+            }
         }
     }
 
@@ -127,19 +135,19 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg("No server respone")
-			} else if (err.response?.status === 400) {
+			} else if (err?.response?.status === 400) {
 				redirectLogin()
-			} else if (err.response?.status === 403) {
-				setErrMsg("Quest line with this unique number already exists")
+			} else if (err?.response?.status) {
+				setErrMsg(err?.response?.data?.detail)
 			} else {
-                setErrMsg("Create Quest Line Failed")
+                setErrMsg("Update Line Failed")
             }
             handleShowErr(true)
+            return
 		}
 
-
 		if (!isPhotoUploaded) {
-            window.location.reload(false);
+            navigate("/editor/quest/edit/training", { replace: true})
         } else {
             let photo_data = new FormData();
             photo_data.append("photo", photo)
@@ -150,11 +158,11 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
                         'Content-Type': 'multipart/form-data',
                     },
                 })
-                window.location.reload(false);
             } catch (err) {
                 console.log(err)
-                alert("Main info on quest line created successfully, but it was issue with update photo, please try again")
+                alert("Main info on quest line updated successfully, but it was issue with update photo, please try again")
             }
+            navigate("/editor/quest/edit/training", { replace: true})
         }
 			
 	}

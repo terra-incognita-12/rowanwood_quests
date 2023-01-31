@@ -300,8 +300,6 @@ def delete_quest_photo(id: str, db: Session = Depends(get_db)):
 @router.patch('/lines/update/photo/{id}')
 def update_quest_line_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):
 
-    user_logged = db.query(User).filter(User.id == user_id).first()
-
     quest_line_query = db.query(QuestLine).filter(QuestLine.id == id)
     check_quest_line = quest_line_query.first()
 
@@ -324,8 +322,6 @@ def update_quest_line_photo(id: str, photo: UploadFile, db: Session = Depends(ge
 
 @router.delete('/lines/delete/photo/{id}')
 def delete_quest_line_photo(id: str, db: Session = Depends(get_db)):
-
-    user_logged = db.query(User).filter(User.id == user_id).first()
 
     quest_line_query = db.query(QuestLine).filter(QuestLine.id == id)
     check_quest_line = quest_line_query.first()

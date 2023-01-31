@@ -23,6 +23,7 @@ import Slide from '@mui/material/Slide';
 import Stack from '@mui/material/Stack';
 
 import EditQuestLineForm from "../../../forms/EditQuestLineForm"
+import axios from "../../../../api/axios"
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate"
 import useRedirectLogin from "../../../../hooks/useRedirectLogin"
 
@@ -70,29 +71,31 @@ const QuestLine = () => {
         const getQuestLine = async () => {
             
             try {
-                const response = await axiosPrivate.get(`/quest/lines/${url}/${unique_number}`, {
+                const response = await axios.get(`/quest/lines/${url}/${unique_number}`, {
                     signal: controller.signal
                 })
                 isMounted && setQuestLine(response.data)
             } catch (err) {
-                console.log(err)
+                if (err?.response?.status === 404) {
+                    navigate(`/notexist?err=${err?.response?.data?.detail}`)
+                } else {
+                    console.log(err)
+                }
+                return
             } 
         }
 
         const getLines = async () => {
             try {
-                const response = await axiosPrivate.get(`/quest/lines/all/${url}`, {
+                const response = await axios.get(`/quest/lines/all/${url}`, {
                     signal: controller.signal
                 })
 
                 let dataQuestLines = [] 
-                for (let i = 0; i < response.data.length; i++) {
-                    let dataDict = {"id": response.data[i].id, "name": response.data[i].name}
-                    dataQuestLines.push(dataDict)
+                for (const line of response.data) {
+                    dataQuestLines.push({"id": line.id, "name": line.name})
                 }
-                if (isMounted) {
-                    setQuestsLinesList(dataQuestLines)
-                }
+                isMounted && setQuestsLinesList(dataQuestLines) 
             } catch (err) {
                 console.log(err)
             } 
@@ -105,7 +108,7 @@ const QuestLine = () => {
             isMounted = false
             controller.abort()
         }
-    }, [url ,unique_number])
+    }, [url, unique_number])
 
     return (
         <div className="mt-3">

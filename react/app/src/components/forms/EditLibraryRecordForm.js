@@ -138,7 +138,7 @@ const EditLibraryRecordForm = ({ record }) => {
                 setErrMsg("Update Record Failed")
             }
             handleShowErr(true)
-            window.scrollTo(0, 0);
+            window.scrollTo(0, 0)
             return
 		}
 

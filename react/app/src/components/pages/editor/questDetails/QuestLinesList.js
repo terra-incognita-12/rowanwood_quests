@@ -21,8 +21,8 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 
-
 import CreateQuestLineForm from "../../../forms/CreateQuestLineForm"
+import axios from "../../../../api/axios"
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate"
 import useRedirectLogin from "../../../../hooks/useRedirectLogin"
 
@@ -68,21 +68,20 @@ const QuestLinesList = () => {
 
         const getLines = async () => {
             try {
-                const response = await axiosPrivate.get(`/quest/lines/all/${url}`, {
+                const response = await axios.get(`/quest/lines/all/${url}`, {
                     signal: controller.signal
                 })
                 let dataRows = []
                 let dataQuestLines = [] 
-                for (let i = 0; i < response.data.length; i++) {
-                    let dataDict = {"id": response.data[i].unique_number, "name": response.data[i].name}
-                    dataRows.push(dataDict)
-                    dataDict = {"id": response.data[i].id, "name": response.data[i].name}
-                    dataQuestLines.push(dataDict)
+                for (const line of response.data) {
+                    dataRows.push({"id": line.unique_number, "name": line.name})
+                    dataQuestLines.push({"id": line.id, "name": line.name})
                 }
                 if (isMounted) {
-                    setRows(dataRows)
-                    setQuestsLinesList(dataQuestLines)
+                	setRows(dataRows)
+                	setQuestsLinesList(dataQuestLines)
                 }
+              
             } catch (err) {
                if (err?.response?.status === 404) {
                     navigate(`/notexist?err=${err?.response?.data?.detail}`)
@@ -123,6 +122,7 @@ const QuestLinesList = () => {
 		        open={lineModalOpen}
 		        onClose={handleLineModalClose}
 		        TransitionComponent={Transition}
+		        disableScrollLock
 		    >
 		        <AppBar sx={{ position: 'relative' }}>
 		        	<Toolbar>
