@@ -29,7 +29,6 @@ class ChangePasswordWithTokenUserScheme(BaseModel):
 	new_password_confirm: str
 
 class ChangePasswordWithoutTokenUserScheme(BaseModel):
-	email: EmailStr
 	old_password: str
 	new_password: constr(min_length=8)
 	new_password_confirm: str
@@ -45,5 +44,10 @@ class ForeignKeyUserResponse(UserBaseScheme):
 	id: uuid.UUID
 	photo: Union[str, None] = None
 
-class ChangeUsernameOrEmailScheme(LoginUserScheme):
+class ChangeUsernameScheme(BaseModel):
 	username: str
+	password: constr(min_length=8)
+
+class ChangeEmailScheme(BaseModel):
+	email: EmailStr
+	password: constr(min_length=8)

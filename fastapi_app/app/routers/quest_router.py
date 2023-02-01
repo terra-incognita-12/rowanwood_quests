@@ -231,25 +231,6 @@ def delete_quest_line(id: str, db: Session = Depends(get_db)):
 
     return {'status': 'OK'}
 
-# # OPTIONS
-
-# @router.post('/options/create', status_code=status.HTTP_201_CREATED)
-# def create_quest_option(payload: quest_scheme.QuestOptionSendScheme, db: Session = Depends(get_db)):
-#     quest_line_query = db.query(QuestLine).options(joinedload(QuestLine.quest_options)).filter(QuestLine.id == payload.quest_line_id)
-#     check_quest_line = quest_line_query.first()
-#     if not check_quest_line:
-#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Quest Line doesn't exist")
-
-#     check_quest_line.quest_options.append(QuestOption(
-#         unique_name=payload.unique_name,
-#         description=payload.description
-#     ))
-
-#     db.commit()
-#     db.refresh(check_quest_line)
-
-#     return {'status': 'success', 'message': 'OK'}
-
 # S3
 
 # BASE QUEST

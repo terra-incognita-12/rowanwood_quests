@@ -1,6 +1,8 @@
 from decouple import config
 
 class Settings:
+	SITE_ADDRESS=config('SITE_ADDRESS')
+
 	POSTGRES_NAME=config('POSTGRES_NAME')
 	POSTGRES_USER=config('POSTGRES_USER')
 	POSTGRES_PASS=config('POSTGRES_PASS')

@@ -67,24 +67,19 @@ const ChangeUsernameDialog = ({ open, close, user }) => {
 		}
 
 		try {
-			const response = await axiosPrivate.post('/auth/change_password_notoken', JSON.stringify({ "old_password": oldPass, "new_password": newPass, "new_password_confirm": confNewPass, "email": user }))
+			const response = await axiosPrivate.patch('/user/change_password_notoken', JSON.stringify({ "old_password": oldPass, "new_password": newPass, "new_password_confirm": confNewPass }))
 			alert("Your password changed! Use new password to login next time!")
 			closeDialog()
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg("No server respone")
-			} else if (err.response?.status === 400) {
+			} else if (err?.response?.status === 400) {
 				redirectLogin()
-			} else if (err.response?.status === 401) {
-                setErrMsg("Wrong password")
-			} else if (err.response?.status === 404) {
-				setErrMsg("User doesn't exist")
-			} else if (err.response?.status === 403) {
-				setErrMsg("Passwords do not match")
+			} else if (err?.response?.status) {
+				setErrMsg(err?.response?.data?.detail)
 			} else {
-                setErrMsg("Change Password Failed")
+                setErrMsg("Change password failed")
             }
-
             handleShowErr(true)
 		}
 	}

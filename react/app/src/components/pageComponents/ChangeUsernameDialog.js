@@ -59,23 +59,18 @@ const ChangeUsernameDialog = ({ open, close, user }) => {
 		}
 
 		try {
-			const response = await axiosPrivate.post('/auth/change_username', JSON.stringify({ "username": username, "password": pass, "email": user }))
+			const response = await axiosPrivate.patch('/user/change_username', JSON.stringify({ "username": username, "password": pass }))
 			window.location.reload(false);
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg("No server respone")
-			} else if (err.response?.status === 400) {
+			} else if (err?.response?.status === 400) {
 				redirectLogin()
-			} else if (err.response?.status === 401) {
-                setErrMsg("Wrong password")
-            } else if (err.response?.status === 403) {
-				setErrMsg("User with this username already exists")
-			} else if (err.response?.status === 404) {
-				setErrMsg("User doesn't exist")
+			} else if (err?.response?.status) {
+				setErrMsg(err?.response?.data?.detail)
 			} else {
-                setErrMsg("Change username Failed")
+                setErrMsg("Chagne username failed")
             }
-
             handleShowErr(true)
 		}
 	}

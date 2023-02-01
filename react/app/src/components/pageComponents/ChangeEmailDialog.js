@@ -59,24 +59,19 @@ const ChangeEmailDialog = ({ open, close, username }) => {
 		}
 
 		try {
-			const response = await axiosPrivate.post('/auth/change_email', JSON.stringify({ "username": username, "password": pass, "email": email }))
+			const response = await axiosPrivate.patch('/user/change_email', JSON.stringify({ "email": email, "password": pass }))
 			alert("Email with change email link was sent to you!")
 			closeDialog()
 		} catch (err) {
 			if (!err?.response) {
 				setErrMsg("No server respone")
-			} else if (err.response?.status === 400) {
+			} else if (err?.response?.status === 400) {
 				redirectLogin()
-			} else if (err.response?.status === 401) {
-                setErrMsg("Wrong password")
-            } else if (err.response?.status === 403) {
-				setErrMsg("User with this email already exists")
-			} else if (err.response?.status === 404) {
-				setErrMsg("User doesn't exist")
+			} else if (err?.response?.status) {
+				setErrMsg(err?.response?.data?.detail)
 			} else {
-                setErrMsg("Change username Failed")
+                setErrMsg("Change email failed")
             }
-
             handleShowErr(true)
 		}
 	}

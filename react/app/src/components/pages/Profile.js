@@ -14,9 +14,9 @@ import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 
-import axios from "../../api/axios"
 import ErrMsg from "../ErrMsg"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
+import useAxiosPrivateMultipart from "../../hooks/useAxiosPrivateMultipart"
 import useAuth from "../../hooks/useAuth"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
 
@@ -27,6 +27,7 @@ import ChangePasswordDialog from "../pageComponents/ChangePasswordDialog"
 const Profile = () => {
 	const { auth } = useAuth()
 	const axiosPrivate = useAxiosPrivate()  
+	const axiosPrivateMultipart = useAxiosPrivateMultipart()
     const location = useLocation()
     const redirectLogin = useRedirectLogin(location)
 
@@ -77,7 +78,7 @@ const Profile = () => {
         if (!answer) { return }
 
         try {
-            await axiosPrivate.delete(`/auth/delete_photo/${auth.id}`)
+            await axiosPrivate.delete(`/user/delete_photo`)
             window.location.reload(false);
         } catch (err) {
             console.log(err)
@@ -91,11 +92,7 @@ const Profile = () => {
 	        photo_data.append("photo", photo)
 
     		try {
-	            await axios.patch(`/auth/update_photo/${auth.id}`, photo_data, {
-	                headers: {
-	                    'Content-Type': 'multipart/form-data',
-	                },
-	            })
+	            await axiosPrivateMultipart.patch(`/user/update_photo`, photo_data)
 	            setPhoto("")
 	            window.location.reload(false);
 	        } catch (err) {
@@ -131,19 +128,19 @@ const Profile = () => {
 						</Typography>
 						<hr/>
 						<Typography gutterBottom variant="h6" display="flex" alignItems="center" sx={{ ml: 1 }}>
-							Role:
-							<Paper elevation={3} sx={{ ml: 2, pl: 1, pr: 1 }}>
-								{auth.role}
-							</Paper>
-						</Typography>
-						<hr/>
-						<Typography gutterBottom variant="h6" display="flex" alignItems="center" sx={{ ml: 1 }}>
 							Email:
 							<Paper elevation={3} sx={{ ml: 2, pl: 1 }}>
 								{auth.user}
 								<IconButton onClick={handleChangeEmailDialogOpen}>
 									<EditIcon/>
 								</IconButton>
+							</Paper>
+						</Typography>
+						<hr/>
+						<Typography gutterBottom variant="h6" display="flex" alignItems="center" sx={{ ml: 1 }}>
+							Role:
+							<Paper elevation={3} sx={{ ml: 2, pl: 1, pr: 1 }}>
+								{auth.role}
 							</Paper>
 						</Typography>
 						<hr/>
