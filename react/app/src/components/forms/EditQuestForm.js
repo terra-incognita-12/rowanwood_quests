@@ -21,6 +21,7 @@ import IconButton from '@mui/material/IconButton';
 import ErrMsg from "../ErrMsg"
 import axios from "../../api/axios"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
+import useAxiosPrivateMultipart from "../../hooks/useAxiosPrivateMultipart"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
 
 const URL_REGEX = /^[a-z][a-z0-9-_]{3,30}$/
@@ -28,7 +29,8 @@ const URL_REGEX = /^[a-z][a-z0-9-_]{3,30}$/
 const EditQuestForm = ({ quest }) => {
 	const navigate = useNavigate()
 	const location = useLocation()
-	const axiosPrivate = useAxiosPrivate()  
+	const axiosPrivate = useAxiosPrivate()
+    const axiosPrivateMultipart = useAxiosPrivateMultipart()  
     const redirectLogin = useRedirectLogin(location)
 
     const questId = quest?.id
@@ -148,11 +150,7 @@ const EditQuestForm = ({ quest }) => {
             photo_data.append("photo", photo)
 
             try {
-                await axios.patch(`/quest/update/photo/${questId}`, photo_data, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                })
+                const response = await axiosPrivateMultipart.patch(`/quest/update/photo/${questId}`, photo_data)
                 navigate(`/quest/${url}`, { replace: true});
             } catch (err) {
                 if (!err?.response) {
@@ -332,7 +330,7 @@ const EditQuestForm = ({ quest }) => {
                             </Button>
                             <Button variant="contained" component="label">
                                 Upload new photo
-                                <input hidden accept="image/*" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload}/>
+                                <input hidden accept="image/jpeg" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload}/>
                             </Button>
                             {isPhotoUploaded && photo.name
                                 ? (

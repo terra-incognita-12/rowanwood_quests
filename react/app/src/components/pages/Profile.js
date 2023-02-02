@@ -92,7 +92,7 @@ const Profile = () => {
 	        photo_data.append("photo", photo)
 
     		try {
-	            await axiosPrivateMultipart.patch(`/user/update_photo`, photo_data)
+	            const response = await axiosPrivateMultipart.patch(`/user/update_photo`, photo_data)
 	            setPhoto("")
 	            window.location.reload(false);
 	        } catch (err) {

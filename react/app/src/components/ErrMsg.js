@@ -1,9 +1,13 @@
-import Alert from "react-bootstrap/Alert"
+// import Alert from "react-bootstrap/Alert"
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+
 
 const ErrMsg = ({ msg, handleShowErr }) => {
 	return (
-		<Alert variant="danger" className="mt-2" onClose={() => handleShowErr(false)} dismissible>
-			<p>{msg}</p>
+		<Alert severity="error" onClose={() => handleShowErr(false)}>
+			<AlertTitle>Error</AlertTitle>
+			{msg}
 		</Alert>
 	)
 }

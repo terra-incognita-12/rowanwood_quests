@@ -16,6 +16,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import ErrMsg from "../ErrMsg"
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import useRedirectLogin from '../../hooks/useRedirectLogin'
+import LoadingBackdrop from "../Backdrop"
 
 const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/
 
@@ -24,6 +25,8 @@ const ChangeEmailDialog = ({ open, close, username }) => {
 	const location = useLocation()
 	const axiosPrivate = useAxiosPrivate()  
     const redirectLogin = useRedirectLogin(location)
+
+	const [backdropOpen, setBackdropOpen] = useState(false)
 
 	const [email, setEmail] = useState("")
 	const [validEmail, setValidEmail] = useState(false)
@@ -51,6 +54,8 @@ const ChangeEmailDialog = ({ open, close, username }) => {
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 
+		setBackdropOpen(true)
+
 		const valid = EMAIL_REGEX.test(email)
 		if (!valid) {
 			setErrMsg("Invalid entry")
@@ -73,11 +78,15 @@ const ChangeEmailDialog = ({ open, close, username }) => {
                 setErrMsg("Change email failed")
             }
             handleShowErr(true)
+		} finally {
+			setBackdropOpen(false)
 		}
 	}
 
 	return (
-		<Dialog open={open} onClose={close} maxWidth='sm' fullWidth={true}>
+		<>
+		<LoadingBackdrop open={backdropOpen} />
+		<Dialog open={open} onClose={close} maxWidth='sm' fullWidth={true} sx={{ zIndex: '2' }}>
 			{showErrMsg 
 				?
 				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
@@ -130,6 +139,7 @@ const ChangeEmailDialog = ({ open, close, username }) => {
 		        </DialogActions>
 		    </Form>
       </Dialog>
+      </>
 	)
 }
 

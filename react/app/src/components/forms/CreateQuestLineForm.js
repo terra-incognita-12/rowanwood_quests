@@ -23,12 +23,14 @@ import Toolbar from '@mui/material/Toolbar';
 import ErrMsg from "../ErrMsg"
 import axios from "../../api/axios"
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
+import useAxiosPrivateMultipart from "../../hooks/useAxiosPrivateMultipart"
 import useRedirectLogin from '../../hooks/useRedirectLogin'
 
 const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 	const navigate = useNavigate()
 	const location = useLocation()
-	const axiosPrivate = useAxiosPrivate()  
+	const axiosPrivate = useAxiosPrivate()
+	const axiosPrivateMultipart = useAxiosPrivateMultipart()  
     const redirectLogin = useRedirectLogin(location)
 
 	const [name, setName] = useState("")
@@ -107,11 +109,7 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
             let photo_data = new FormData();
             photo_data.append("photo", photo)
             try {
-                await axios.patch(`/quest/lines/update/photo/${questLineId}`, photo_data, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                })
+                const response = await axiosPrivateMultipart.patch(`/quest/lines/update/photo/${questLineId}`)
             } catch (err) {
                 console.log(err)
                 alert("Main info on quest line created successfully, but it was issue with update photo, please try again")
@@ -223,7 +221,7 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 	            <Stack spacing={2} direction="row">
                     <Button variant="contained" component="label">
                         Upload Photo
-                        <input hidden accept="image/*" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload} />
+                        <input hidden accept="image/jpeg" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload} />
                     </Button>
                     {isPhotoUploaded && photo.name
                         ? (

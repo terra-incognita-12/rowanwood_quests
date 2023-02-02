@@ -21,6 +21,7 @@ import IconButton from '@mui/material/IconButton';
 import ErrMsg from '../ErrMsg'
 import axios from "../../api/axios"
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
+import useAxiosPrivateMultipart from "../../hooks/useAxiosPrivateMultipart"
 import useRedirectLogin from '../../hooks/useRedirectLogin'
 
 // Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _
@@ -29,7 +30,8 @@ const URL_REGEX = /^[a-z][a-z0-9-_]{3,23}$/
 const CreateLibraryRecordForm = () => {
 	const navigate = useNavigate()
 	const location = useLocation()
-	const axiosPrivate = useAxiosPrivate()  
+	const axiosPrivate = useAxiosPrivate()
+    const axiosPrivateMultipart = useAxiosPrivateMultipart()  
     const redirectLogin = useRedirectLogin(location)
     const filter = createFilterOptions()
 
@@ -136,11 +138,7 @@ const CreateLibraryRecordForm = () => {
             photo_data.append("photo", photo)
 
             try {
-                await axios.patch(`/library/records/update/photo/${recordId}`, photo_data, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                })
+                const response = await axiosPrivateMultipart.patch(`/library/records/update/photo/${recordId}`, photo_data)
                 navigate(`/library/${url}`, { replace: true})
             } catch (err) {
                 console.log(err)
@@ -256,7 +254,7 @@ const CreateLibraryRecordForm = () => {
                         <Stack spacing={2} direction="row">
                             <Button variant="contained" component="label">
                                 Upload Photo
-                                <input hidden accept="image/*" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload} />
+                                <input hidden accept="image/jpeg" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload} />
                             </Button>
                             {isPhotoUploaded && photo.name
                                 ? (

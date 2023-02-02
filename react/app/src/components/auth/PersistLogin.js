@@ -1,9 +1,13 @@
 import { Outlet, useLocation } from "react-router-dom"
 import { useState, useEffect } from "react"
 
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+
 import useRefreshToken from "../../hooks/useRefreshToken"
 import useAuth from "../../hooks/useAuth"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
+import LoadingBackdrop from "../Backdrop"
 
 const PersistLogin = () => {
 	const [isLoading, setIsLoading] = useState(true)
@@ -29,7 +33,7 @@ const PersistLogin = () => {
 	return (
 		<>
 			{isLoading
-				? <p>Loading...</p>
+				? <LoadingBackdrop open={isLoading} /> 
 				: <Outlet />
 			}
 		</>

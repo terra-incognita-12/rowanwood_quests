@@ -16,6 +16,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import ErrMsg from "../ErrMsg"
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import useRedirectLogin from '../../hooks/useRedirectLogin'
+import LoadingBackdrop from "../Backdrop"
 
 const PASS_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/
 
@@ -24,6 +25,8 @@ const ChangeUsernameDialog = ({ open, close, user }) => {
 	const location = useLocation()
 	const axiosPrivate = useAxiosPrivate()  
     const redirectLogin = useRedirectLogin(location)
+
+    const [backdropOpen, setBackdropOpen] = useState(false)
 
 	const [oldPass, setOldPass] = useState("")
 
@@ -59,6 +62,8 @@ const ChangeUsernameDialog = ({ open, close, user }) => {
 	const handleSubmit = async (e) => {
 		e.preventDefault()
 
+		setBackdropOpen(true)
+
 		const valid = PASS_REGEX.test(newPass)
 		if (!valid || newPass !== confNewPass) {
 			setErrMsg("Invalid entry")
@@ -81,11 +86,15 @@ const ChangeUsernameDialog = ({ open, close, user }) => {
                 setErrMsg("Change password failed")
             }
             handleShowErr(true)
+		} finally {
+			setBackdropOpen(false)
 		}
 	}
 
 	return (
-		<Dialog open={open} onClose={close} maxWidth='sm' fullWidth={true}>
+		<>
+		<LoadingBackdrop open={backdropOpen} />
+		<Dialog open={open} onClose={close} maxWidth='sm' fullWidth={true} sx={{ zIndex: '2' }}>
 			{showErrMsg 
 				?
 				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
@@ -157,6 +166,7 @@ const ChangeUsernameDialog = ({ open, close, user }) => {
 		        </DialogActions>
 		    </Form>
       </Dialog>
+      </>
 	)
 }
 
