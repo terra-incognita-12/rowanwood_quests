@@ -18,10 +18,13 @@ import FormHelperText from '@mui/material/FormHelperText';
 
 import axios from "../../../api/axios"
 import ErrMsg from "../../ErrMsg"
+import LoadingBackdrop from "../../Backdrop"
 
 const PASS_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/
 
 const ChangePass = () => {
+	const [backdropOpen, setBackdropOpen] = useState(false)
+
 	const navigate = useNavigate()
 
 	const [pass, setPass] = useState("")
@@ -66,6 +69,8 @@ const ChangePass = () => {
 	}
 
 	const handleSubmit = async (e) => {
+		setBackdropOpen(true)
+
 		e.preventDefault()
 
 		const validPass = PASS_REGEX.test(pass)
@@ -73,6 +78,7 @@ const ChangePass = () => {
 		if (!validPass || pass !== confPass) {
 			setErrMsg("Invalid entry")
 			handleShowErr(true)
+			setBackdropOpen(false)
 			return
 		}
 
@@ -87,21 +93,20 @@ const ChangePass = () => {
 			navigate("/login", { replace: true})
 		} catch (err) {
 			if (!err?.response) {
-				setErrMsg("No server respone")
-			} else if (err.response?.status === 400) {
-				setErrMsg("Passwords do not match")
-			} else if (err.response?.status === 401) {
-				setErrMsg("Link is expired. Request again link for change password")
-			} else if (err.response?.status === 403) {
-				setErrMsg("User no longer exists, or link is invalid")
-			} else {
-                setErrMsg("Change password failed")
+                setErrMsg("No server respone")
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
+                setErrMsg("Change Password Failed")
             }
+            setBackdropOpen(false)
             handleShowErr(true)
 		}
 	}
 
 	return (
+		<>
+		<LoadingBackdrop open={backdropOpen} />
 		<Row className="justify-content-center mt-5">
 			<Col xs={12} lg={5}>
 				{showErrMsg 
@@ -154,6 +159,7 @@ const ChangePass = () => {
 				</Card>
 			</Col>
 		</Row>
+		</>
 	)
 }
 

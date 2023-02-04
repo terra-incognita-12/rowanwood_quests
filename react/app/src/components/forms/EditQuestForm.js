@@ -116,7 +116,7 @@ const EditQuestForm = ({ quest }) => {
                 setErrMsg("Edit Quest Failed")
             }
             handleShowErr(true)
-            window.scrollTo(0, 0);
+            window.scrollTo(0, 0)
         } finally {
             setBackdropOpen(false)
         }

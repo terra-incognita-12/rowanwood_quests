@@ -32,14 +32,14 @@ REFRESH_X = int(settings.REFRESH_TOKEN_EXPIRES)
 
 FOLDER = 'user/'
 
-@router.post('/register', status_code=status.HTTP_201_CREATED)
+@router.post('/register', status_code=201)
 async def create_user(payload: user_scheme.CreateUserScheme, request: Request, db: Session = Depends(get_db)):
 	if payload.password != payload.password_confirm:
-	   	raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Passwords do not match')
+	   	raise HTTPException(status_code=403, detail='Passwords do not match')
 	
 	check_user = db.query(User).filter(User.email == EmailStr(payload.email.lower())).first()
 	if check_user:
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Account with this credentials already exists')
+		raise HTTPException(status_code=403, detail='Account with this credentials already exists')
 
 	payload.password = Hasher.get_password_hash(payload.password)
 	del payload.password_confirm
@@ -59,15 +59,15 @@ async def create_user(payload: user_scheme.CreateUserScheme, request: Request, d
 		await Email(new_user, url, [payload.email]).send_verification_email_link()
 	except Exception as error:
 		print(error)
-		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='There was an error sending email')
+		raise HTTPException(status_code=500, detail='There was an error sending email')
 
-	return {'status': 'success', 'message': 'Verification token successfully sent to your email', 'id': new_user.id}
+	return {'status': 'OK', 'id': new_user.id}
 
 @router.post('/login')
 async def login(payload: user_scheme.LoginUserScheme, request: Request, response: Response, db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
 	user = db.query(User).filter(User.email == EmailStr(payload.email.lower())).first()
 	if not user or not Hasher.verify_password(payload.password, user.password):
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Incorrect Email or Password')
+		raise HTTPException(status_code=403, detail='Incorrect Email or Password')
 	
 	if not user.is_email_verified:
 		try:
@@ -76,8 +76,8 @@ async def login(payload: user_scheme.LoginUserScheme, request: Request, response
 			await Email(user, url, [payload.email]).send_verification_email_link()
 		except Exception as error:
 			print(error)
-			raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='Your email is not verified, but it was an error sending email, try to login next time')
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Your email is not verified, please verify your email address, link was sent on your email')
+			raise HTTPException(status_code=500, detail='Your email is not verified, but it was an error sending email, try to login next time')
+		raise HTTPException(status_code=403, detail='Your email is not verified, please verify your email address, link was sent on your email')
 
 	access_token = Authorize.create_access_token(subject=str(user.id), expires_time=timedelta(minutes=ACCESS_X))
 	refresh_token = Authorize.create_refresh_token(subject=str(user.id), expires_time=timedelta(minutes=REFRESH_X))
@@ -93,7 +93,7 @@ def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = De
 	Authorize.unset_jwt_cookies()
 	response.set_cookie('logged_in', '', -1)
 
-	return {'status': 'success'}
+	return {'status': 'OK'}
 
 @router.get('/verify_email/{token}', response_class=RedirectResponse, status_code=302)
 def email_verification(token: str, db: Session = Depends(get_db)):
@@ -101,29 +101,25 @@ def email_verification(token: str, db: Session = Depends(get_db)):
 	username = token_decode[0]
 	expire_time = token_decode[1]
 	if time.time() > expire_time:
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Link is expired')
+		raise HTTPException(status_code=401, detail='Link is expired')
 
 	user_query = db.query(User).filter(User.username == username)
 	check_user = user_query.first()
 	if not check_user:
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token or user doesn't exist")
+		raise HTTPException(status_code=403, detail="Invalid token or user doesn't exist")
 	if check_user.is_email_verified:
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Email can only be verified once')
+		raise HTTPException(status_code=403, detail='Email can only be verified once')
 
 	user_query.update({'is_email_verified': True}, synchronize_session=False)
 	db.commit()
 
-	# return {
-	# 	"status": "success",
-	# 	"message": "Account verified successfully"
-	# }
-	return "http://localhost:3000/"
+	return f"{settings.SITE_ADDRESS}"
 
 @router.post('/forget_password')
 async def forget_password(payload: user_scheme.ForgetPasswordUserScheme, request: Request, db: Session = Depends(get_db)):
 	user = db.query(User).filter(User.email == EmailStr(payload.email.lower())).first()
 	if not user:
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User with this email don't exsist")
+		raise HTTPException(status_code=404, detail="User with this email don't exsist")
 	
 	token = EmailToken.get_email_token(user.username, settings.EMAIL_TOKEN_EXPIRES_SECONDS)
 	try:
@@ -133,13 +129,13 @@ async def forget_password(payload: user_scheme.ForgetPasswordUserScheme, request
 		else:
 			url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/auth/verify_change_password/{token}"
 			await Email(user, url, [payload.email]).send_verification_change_password_link()
-			return {'status': 'success', 'message': 'Password recover link was sent to your email'}
+			return {'status': 'OK'}
 
 	except Exception as error:
 		print(error)
-		raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='There was an error sending email')
+		raise HTTPException(status_code=500, detail='There was an error sending email')
 
-	raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Your email is not verified, please verify your email address, link was sent on your email')
+	raise HTTPException(status_code=401, detail='Your email is not verified, please verify your email address, link was sent on your email')
 
 @router.get('/verify_change_password/{token}', response_class=RedirectResponse, status_code=302)
 def change_password_verification(token: str, db: Session = Depends(get_db)):
@@ -147,59 +143,50 @@ def change_password_verification(token: str, db: Session = Depends(get_db)):
 	username = token_decode[0]
 	expire_time = token_decode[1]
 	if time.time() > expire_time:
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Link is expired')
+		raise HTTPException(status_code=401, detail='Link is expired')
 
 	user_query = db.query(User).filter(User.username == username)
 	check_user = user_query.first()
 	if not check_user:
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid token or user doesn't exist")
+		raise HTTPException(status_code=403, detail="Invalid token or user doesn't exist")
 
-	# password_token = EmailToken.get_email_token(str(random.randint(10000, 99999)), settings.EMAIL_TOKEN_EXPIRES_SECONDS)
 	password_token = EmailToken.get_email_token(check_user.username, settings.EMAIL_TOKEN_EXPIRES_SECONDS)
 	user_query.update({'password_token': password_token}, synchronize_session=False)
 	db.commit()
 
-	# return {
-	# 	"status": "success",
-	# 	"username": username,
-	# 	"password_token": password_token
-	# }
-	return f"http://localhost:3000/changepass/{password_token}"
+	return f"{settings.SITE_ADDRESS}/changepass/{password_token}"
 
 @router.post('/confirm_change_password')
 def confirm_change_password(payload: user_scheme.ChangePasswordWithTokenUserScheme, db: Session = Depends(get_db)):
 	if payload.new_password != payload.new_password_confirm:
-		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Passwords do not match')
+		raise HTTPException(status_code=403, detail='Passwords do not match')
 
 	token_decode = EmailToken.decode_token(payload.password_token)
 	username = token_decode[0]
 	expire_time = token_decode[1]
 	if time.time() > expire_time:
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Link is expired')
+		raise HTTPException(status_code=401, detail='Link is expired')
 
 	user_query = db.query(User).filter(User.username == username)
 	check_user = user_query.first()
 
 	if not check_user:
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User doesn't exist")
+		raise HTTPException(status_code=403, detail="User doesn't exist")
 	if check_user.password_token != payload.password_token:
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Invalid token')
+		raise HTTPException(status_code=403, detail='Invalid token')
 
 	payload.new_password = Hasher.get_password_hash(payload.new_password)
 
 	user_query.update({'password': payload.new_password, 'password_token': None}, synchronize_session=False)
 	db.commit()
 
-	return {
-		"status": "success",
-		"message": "Password changed successfully"
-	}
+	return {"status": "OK"}
 
 @router.post('/check_valid_change_password_token')
 def check_valid_change_password_token(payload: user_scheme.ChangePasswordTokenScheme, db: Session = Depends(get_db)):
 	check_user = db.query(User).filter(User.password_token == payload.password_token).first()
 	if not check_user:
-		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User doesn't exist")
+		raise HTTPException(status_code=404, detail="User doesn't exist")
 
 	return {"status": "OK"}
 
@@ -211,18 +198,40 @@ def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Dep
 		user_id = Authorize.get_jwt_subject()
 		print(user_id)
 		if not user_id:
-			raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Can't refresh access token")
+			raise HTTPException(status_code=403, detail="Can't refresh access token")
 		user = db.query(User).filter(User.id == user_id).first()
 		if not user:
-			raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='The user belonging to this token no logger exist')
+			raise HTTPException(status_code=403, detail='The user belonging to this token no logger exist')
 		access_token = Authorize.create_access_token(subject=str(user.id), expires_time=timedelta(minutes=ACCESS_X))
 	except Exception as e:
 		error = e.__class__.__name__
 		if error == 'MissingTokenError':
-			raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Please provide refresh token')
-		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=error)
+			raise HTTPException(status_code=400, detail='Please provide refresh token')
+		raise HTTPException(status_code=400, detail=error)
 
 	response.set_cookie('access_token', access_token, ACCESS_X*60, ACCESS_X*60, '/', None, False, True, 'lax')
 	response.set_cookie('logged_in', 'True', ACCESS_X*60, ACCESS_X*60, '/', None, False, False, 'lax')
 
 	return {'id': user.id, 'username': user.username, 'email': user.email, 'role': user.role, 'access_token': access_token, 'photo': user.photo}
+
+@router.patch('/update_photo/{id}')
+def update_user_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):
+	user_query = db.query(User).filter(User.id == id)
+	check_user = user_query.first()
+
+	if not check_user:
+		raise HTTPException(status_code=404, detail="User doesn't exist")
+	
+	key = FOLDER + id + photo.filename
+
+	if check_user.photo:
+		old_key = check_user.photo.replace(settings.S3_FULL_URL,'')
+		s3.delete_photo(old_key)
+	
+	s3.add_new_photo(photo.file, key)
+
+	user_query.update({'photo': f'{settings.S3_FULL_URL + key}'}, synchronize_session=False)
+	db.commit()
+	db.refresh(check_user)
+
+	return {'status': 'OK'}

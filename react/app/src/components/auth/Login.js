@@ -11,12 +11,14 @@ import InputLabel from '@mui/material/InputLabel';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import LoadingBackdrop from "../Backdrop"
 
 import axios from "../../api/axios"
 import useAuth from "../../hooks/useAuth"
 import ErrMsg from "../ErrMsg"
 
 const Login = () => {
+	const [backdropOpen, setBackdropOpen] = useState(false)
 	const [user, setUser] = useState("")
 	const [pass, setPass] = useState("")
 	const [errMsg, setErrMsg] = useState("")
@@ -33,6 +35,8 @@ const Login = () => {
 	}
 
 	const handleSubmit = async (e) => {
+		setBackdropOpen(true)
+
 		e.preventDefault()
 
 		try {
@@ -60,19 +64,21 @@ const Login = () => {
 
 		} catch (err) {
 			if (!err?.response) {
-				setErrMsg("No response from server")
-			} else if (err.response?.status === 401 || err.response?.status === 422) {
-				setErrMsg("Incorrect Email or Password")
-			} else if (err.response?.status === 403) {
-				setErrMsg("Your email is not verified, please verify your email address, link was sent on your email")
-			} else {
-				setErrMsg("Login Failed")
-			}
-			handleShowErr(true)
+                setErrMsg("No server respone")
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
+                setErrMsg("Login Failed")
+            }
+            handleShowErr(true)
+		} finally {
+			setBackdropOpen(false)
 		}
 	}
 
 	return (
+		<>
+        <LoadingBackdrop open={backdropOpen} />
 		<Row className="justify-content-center mt-5">
 			<Col xs={12} lg={5}>
 				{showErrMsg 
@@ -113,6 +119,7 @@ const Login = () => {
 				</Card>
 			</Col>
 		</Row>
+		</>
 	)
 }
 

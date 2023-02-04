@@ -75,7 +75,7 @@ def email_verification(token: str, request: Request, db: Session = Depends(get_d
 	new_email = token_decode[1]
 	expire_time = token_decode[2]
 	if time.time() > expire_time:
-		raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Link is expired')
+		raise HTTPException(status_code=401, detail='Link is expired')
 
 	user_query = db.query(User).filter(User.email == EmailStr(old_email.lower()))
 	check_user = user_query.first()

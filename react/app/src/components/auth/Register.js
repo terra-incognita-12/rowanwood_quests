@@ -18,6 +18,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Stack from '@mui/material/Stack';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
+import LoadingBackdrop from "../Backdrop"
 
 import axios from "../../api/axios"
 import ErrMsg from "../ErrMsg"
@@ -31,6 +32,8 @@ const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/
 const PASS_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/
 
 const Register = () => {
+	const [backdropOpen, setBackdropOpen] = useState(false)
+
 	const navigate = useNavigate()
 
 	const [username, setUsername] = useState("")
@@ -94,6 +97,8 @@ const Register = () => {
     }
 
 	const handleSubmit = async (e) => {
+		setBackdropOpen(true)
+
 		let userId = ""
 
 		e.preventDefault()
@@ -105,6 +110,7 @@ const Register = () => {
 		if (!valid1 || !valid2 || !valid3 || pass !== confPass) {
 			setErrMsg("Invalid entry")
 			handleShowErr(true)
+			setBackdropOpen(false)
 			return
 		}
 
@@ -119,17 +125,16 @@ const Register = () => {
 			userId = response.data.id
 		} catch (err) {
 			if (!err?.response) {
-				setErrMsg("No server respone")
-			} else if (err.response?.status === 400) {
-				setErrMsg("Passwords do not match")
-			} else if (err.response?.status === 403) {
-				setErrMsg("Account with this credentials already exists")
-			} else if (err.response?.status === 500) {
-				setErrMsg("There was an error sending email")
-			} else {
+                setErrMsg("No server respone")
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
                 setErrMsg("Registration Failed")
             }
             handleShowErr(true)
+            setBackdropOpen(false)
+            window.scrollTo(0, 0)
+            return
 		}
 
 		if (!isPhotoUploaded) {
@@ -155,8 +160,9 @@ const Register = () => {
 	}
 
 	return (
+		<>
+        <LoadingBackdrop open={backdropOpen} />
 		<Row className="justify-content-center mt-5">
-
 			<Col xs={12} lg={5}>
 				{showErrMsg 
 					?
@@ -262,6 +268,7 @@ const Register = () => {
 				</Card>
 			</Col>
 		</Row>
+		</>
 	)
 }
 

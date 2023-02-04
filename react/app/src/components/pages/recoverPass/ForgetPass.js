@@ -16,8 +16,11 @@ import Typography from '@mui/material/Typography';
 
 import axios from "../../../api/axios"
 import ErrMsg from "../../ErrMsg"
+import LoadingBackdrop from "../../Backdrop"
 
 const ForgetPass = () => {
+	const [backdropOpen, setBackdropOpen] = useState(false)
+
 	const navigate = useNavigate()
 
 	const [email, setEmail] = useState("")
@@ -30,6 +33,8 @@ const ForgetPass = () => {
 	}
 
 	const handleSubmit = async (e) => {
+		setBackdropOpen(true)
+
 		e.preventDefault()
 
 		try {
@@ -45,21 +50,20 @@ const ForgetPass = () => {
 			navigate("/login", { replace: true})
 		} catch (err) {
 			if (!err?.response) {
-				setErrMsg("No server respone")
-			} else if (err.response?.status === 401) {
-				setErrMsg("User with this email don't exsist")
-			} else if (err.response?.status === 403) {
-				setErrMsg("Your email is not verified, please verify your email address, link was sent on your email")
-			} else if (err.response?.status === 500) {
-				setErrMsg("There was an error sending email")
-			} else {
-                setErrMsg("Registration Failed")
+                setErrMsg("No server respone")
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
+                setErrMsg("Send link Failed")
             }
+            setBackdropOpen(false)
             handleShowErr(true)
 		}	
 	}
 
 	return (
+		<>
+		<LoadingBackdrop open={backdropOpen} />
 		<Row className="justify-content-center mt-5">
 			<Col xs={12} lg={5}>
 				{showErrMsg 
@@ -90,6 +94,7 @@ const ForgetPass = () => {
 				</Card>
 			</Col>
 		</Row>
+		</>
 	)
 }
 
