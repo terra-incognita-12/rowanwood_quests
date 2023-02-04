@@ -23,10 +23,12 @@ import axios from "../../api/axios"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import useAxiosPrivateMultipart from "../../hooks/useAxiosPrivateMultipart"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
+import LoadingBackdrop from "../Backdrop"
 
 const URL_REGEX = /^[a-z][a-z0-9-_]{3,30}$/
 
 const EditQuestForm = ({ quest }) => {
+    const [backdropOpen, setBackdropOpen] = useState(false)
 	const navigate = useNavigate()
 	const location = useLocation()
 	const axiosPrivate = useAxiosPrivate()
@@ -98,6 +100,8 @@ const EditQuestForm = ({ quest }) => {
         const answer = window.confirm(question)
         if (!answer) { return }
 
+        setBackdropOpen(true)
+
         try {
             await axiosPrivate.patch(`/quest/update/activate/${questId}`)
             window.location.reload(false);
@@ -113,15 +117,20 @@ const EditQuestForm = ({ quest }) => {
             }
             handleShowErr(true)
             window.scrollTo(0, 0);
+        } finally {
+            setBackdropOpen(false)
         }
     }
 
 	const handleSubmit = async (e) => {
+        setBackdropOpen(true)
+
 		e.preventDefault()
 		
 		if (!URL_REGEX.test(url)) {
 			setErrMsg("Invaid quest url. Must start with the lower case letter and after must followed by 3 to 30 char that can be lowercase, number, - and _")
 			handleShowErr(true)
+            setBackdropOpen(false)
             window.scrollTo(0, 0);
 			return
 		}
@@ -139,6 +148,7 @@ const EditQuestForm = ({ quest }) => {
                 setErrMsg("Edit Quest Failed")
             }
             handleShowErr(true)
+            setBackdropOpen(false)
             window.scrollTo(0, 0);
             return
 		}
@@ -166,11 +176,14 @@ const EditQuestForm = ({ quest }) => {
                 window.scrollTo(0, 0)
             }
         }
+        setBackdropOpen(false)
 	}
 
     const handleDeletePhoto = async () => {
         const answer = window.confirm("Are you sure to delete this photo?")
         if (!answer) { return }
+
+        setBackdropOpen(true)
 
         try {
             const response = await axiosPrivate.delete(`/quest/delete/photo/${questId}`)
@@ -187,12 +200,16 @@ const EditQuestForm = ({ quest }) => {
             }
             handleShowErr(true)
             window.scrollTo(0, 0)
+        } finally {
+            setBackdropOpen(false)
         }
     }
 
 	const handleDelete = async () => {
         const answer = window.confirm("Are you sure to delete this quest?")
         if (!answer) { return }
+
+        setBackdropOpen(true)
 
         try {
             const response = await axiosPrivate.delete(`/quest/delete/${url}`, JSON.stringify({"url": questUrl}))
@@ -209,11 +226,14 @@ const EditQuestForm = ({ quest }) => {
             }
             handleShowErr(true)
             window.scrollTo(0, 0)
+        } finally {
+            setBackdropOpen(false)
         }
     }
 
 	return (
 		<>
+            <LoadingBackdrop open={backdropOpen} />
 			{showErrMsg 
 				?
 				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />

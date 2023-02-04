@@ -25,8 +25,10 @@ import axios from "../../api/axios"
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import useAxiosPrivateMultipart from "../../hooks/useAxiosPrivateMultipart"
 import useRedirectLogin from '../../hooks/useRedirectLogin'
+import LoadingBackdrop from "../Backdrop"
 
 const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
+	const [backdropOpen, setBackdropOpen] = useState(false)
 	const navigate = useNavigate()
 	const location = useLocation()
 	const axiosPrivate = useAxiosPrivate()
@@ -80,6 +82,8 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 	}
 
 	const handleSubmit = async (e) => {
+		setBackdropOpen(true)
+
 		let questLineId = ""
 
 		e.preventDefault()
@@ -99,6 +103,7 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
                 setErrMsg("Create Record Failed")
             }
             handleShowErr(true)
+            setBackdropOpen(false)
             window.scrollTo(0, 0)
             return
 		}
@@ -116,10 +121,12 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
             }
             window.location.reload(false);
         }
-			
+        setBackdropOpen(false)			
 	}
 
 	return (
+		<>
+		<LoadingBackdrop open={backdropOpen} />
 		<Container className="mt-5">
 			{showErrMsg 
 				?
@@ -240,6 +247,7 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 	            </div>
 	        </Form>
 		</Container>
+		</>
 	)
 }
 

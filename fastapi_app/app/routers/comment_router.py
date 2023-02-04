@@ -14,9 +14,8 @@ from ..oauth2 import require_user
 
 router = APIRouter()
 
-@router.post('/create', status_code=status.HTTP_201_CREATED)
+@router.post('/create')
 def create_comment(payload: comment_scheme.CreateCommentScheme, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
-    payload.user_id = uuid.UUID(user_id)
 
     quest = db.query(Quest).filter(Quest.url == payload.quest_url).first()
     if not quest:
@@ -24,7 +23,7 @@ def create_comment(payload: comment_scheme.CreateCommentScheme, db: Session = De
 
     new_comment = Comment(
         text_comment=payload.text_comment,
-        user_id=payload.user_id,
+        user_id=uuid.UUID(user_id),
         quest_id=quest.id
     )
 
@@ -32,9 +31,9 @@ def create_comment(payload: comment_scheme.CreateCommentScheme, db: Session = De
     db.commit()
     db.refresh(new_comment)
 
-    return {'status': 'success', 'message': 'Comment created succesfully'}
+    return {'status': 'OK'}
 
-@router.post('/delete', status_code=status.HTTP_200_OK)
+@router.post('/delete')
 def delete_comment(payload: comment_scheme.DeleteCommentScheme, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
     comment = db.query(Comment).filter(Comment.id == payload.id).first()
 
@@ -44,4 +43,4 @@ def delete_comment(payload: comment_scheme.DeleteCommentScheme, db: Session = De
     db.delete(comment)
     db.commit()
 
-    return {'status', 'ok'}
+    return {'status': 'OK'}

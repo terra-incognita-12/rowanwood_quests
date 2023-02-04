@@ -25,8 +25,10 @@ import axios from "../../api/axios"
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import useAxiosPrivateMultipart from "../../hooks/useAxiosPrivateMultipart"
 import useRedirectLogin from '../../hooks/useRedirectLogin'
+import LoadingBackdrop from "../Backdrop"
 
 const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList, url }) => {
+	const [backdropOpen, setBackdropOpen] = useState(false)
 	const navigate = useNavigate()
 	const location = useLocation()
 	const axiosPrivate = useAxiosPrivate()
@@ -113,6 +115,8 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
         const answer = window.confirm("Are you sure to delete this photo?")
         if (!answer) { return }
 
+        setBackdropOpen(true)
+
         try {
             await axiosPrivate.delete(`/quest/lines/delete/photo/${questLineId}`)
             window.location.reload(false);
@@ -126,10 +130,14 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
             } else {
                 setErrMsg("Delete Line Photo Failed")
             }
+        } finally {
+        	setBackdropOpen(false)
         }
     }
 
 	const handleSubmit = async (e) => {
+		setBackdropOpen(true)
+
 		e.preventDefault()
 
 		try {
@@ -145,12 +153,11 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
                 setErrMsg("Update Line Failed")
             }
             handleShowErr(true)
+            setBackdropOpen(false)
             return
 		}
 
-		if (!isPhotoUploaded) {
-            navigate("/editor/quest/edit/training", { replace: true})
-        } else {
+        if (isPhotoUploaded) {
             let photo_data = new FormData();
             photo_data.append("photo", photo)
 
@@ -158,14 +165,16 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
                 const response = await axiosPrivateMultipart.patch(`/quest/lines/update/photo/${questLineId}`, photo_data)
             } catch (err) {
                 console.log(err)
+                setBackdropOpen(false)
                 alert("Main info on quest line updated successfully, but it was issue with update photo, please try again")
-            }
-            navigate("/editor/quest/edit/training", { replace: true})
+            } 
         }
-			
+        navigate("/editor/quest/edit/training", { replace: true})	
 	}
 
 	return (
+		<>
+		<LoadingBackdrop open={backdropOpen} />
 		<Container className="mt-5">
 			{showErrMsg 
 				?
@@ -296,6 +305,7 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 	            </div>
 	        </Form>
 		</Container>
+		</>
 	)
 }
 

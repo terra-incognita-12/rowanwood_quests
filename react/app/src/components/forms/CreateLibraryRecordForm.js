@@ -23,11 +23,13 @@ import axios from "../../api/axios"
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import useAxiosPrivateMultipart from "../../hooks/useAxiosPrivateMultipart"
 import useRedirectLogin from '../../hooks/useRedirectLogin'
+import LoadingBackdrop from "../Backdrop"
 
 // Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _
 const URL_REGEX = /^[a-z][a-z0-9-_]{3,23}$/
 
 const CreateLibraryRecordForm = () => {
+    const [backdropOpen, setBackdropOpen] = useState(false)
 	const navigate = useNavigate()
 	const location = useLocation()
 	const axiosPrivate = useAxiosPrivate()
@@ -103,6 +105,7 @@ const CreateLibraryRecordForm = () => {
     }
 
 	const handleSubmit = async (e) => {
+        setBackdropOpen(true)
         let recordId = ""
 
 		e.preventDefault()
@@ -110,6 +113,7 @@ const CreateLibraryRecordForm = () => {
 		if (!URL_REGEX.test(url)) {
 			setErrMsg("Invaid quest url. Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _")
 			handleShowErr(true)
+            setBackdropOpen(false)
 			return
 		}
 
@@ -127,6 +131,7 @@ const CreateLibraryRecordForm = () => {
                 setErrMsg("Create Record Failed")
             }
             handleShowErr(true)
+            setBackdropOpen(false)
             window.scrollTo(0, 0)
             return
 		}
@@ -145,10 +150,12 @@ const CreateLibraryRecordForm = () => {
                 alert("Main info on record created successfully, but it was issue with update photo, please try again")
             }
         }
+        setBackdropOpen(false)
 	}
 
 	return (
 		<>
+            <LoadingBackdrop open={backdropOpen} /> 
 			{showErrMsg 
 				?
 				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />

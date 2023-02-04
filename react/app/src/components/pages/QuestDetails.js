@@ -22,11 +22,13 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import CommentForm from "../forms/CommentForm"
 import useAuth from "../../hooks/useAuth"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
+import LoadingBackdrop from "../Backdrop"
 
 const QuestDetails = () => {
 	const { url } = useParams()
 
 	const [quest, setQuest] = useState("")
+	const [backdropOpen, setBackdropOpen] = useState(false)
 	const [commentChanged, setCommentChanged] = useState(false)
 	const { auth } = useAuth()
 	const navigate = useNavigate()
@@ -41,11 +43,20 @@ const QuestDetails = () => {
 			await axiosPrivate.post("/comment/delete", JSON.stringify({id}))
 			handleCommentChanged()
 		} catch (err) {
-			redirectLogin()
+			if (!err?.response) {
+				console.log("No server respone")
+			} else if (err?.response?.status === 400) {
+				redirectLogin()
+			} else if (err?.response?.status) {
+				console.log(err?.response?.data?.detail)
+			} else {
+                console.log("Delete comment failed")
+            }
 		}
 	}
 
 	useEffect(() => {
+		setBackdropOpen(true)
         let isMounted = true
         const controller = new AbortController()
 
@@ -63,7 +74,9 @@ const QuestDetails = () => {
             	} else {
                 	console.log(err)
             	}
-            } 
+            } finally {
+            	setBackdropOpen(false)
+            }
         }
 
         getQuest()
@@ -75,6 +88,8 @@ const QuestDetails = () => {
     }, [commentChanged])
 
 	return (
+		<>
+		<LoadingBackdrop open={backdropOpen} />
 		<div className="mt-3">
             <Button component={Link} to="/" variant="text" size="large">&lt;&lt; Back</Button>
             <Card className="mt-3">
@@ -147,6 +162,7 @@ const QuestDetails = () => {
                 </CardContent>
             </Card>
         </div>
+        </>
 	)
 }
 

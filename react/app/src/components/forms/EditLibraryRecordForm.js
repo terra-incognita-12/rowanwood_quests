@@ -24,11 +24,13 @@ import axios from "../../api/axios"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import useAxiosPrivateMultipart from "../../hooks/useAxiosPrivateMultipart"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
+import LoadingBackdrop from "../Backdrop"
 
 // Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _
 const URL_REGEX = /^[a-z][a-z0-9-_]{3,23}$/
 
 const EditLibraryRecordForm = ({ record }) => {
+    const [backdropOpen, setBackdropOpen] = useState(false)
 	const navigate = useNavigate()
 	const location = useLocation()
 	const axiosPrivate = useAxiosPrivate()
@@ -116,6 +118,8 @@ const EditLibraryRecordForm = ({ record }) => {
     }
 
 	const handleSubmit = async (e) => {
+        setBackdropOpen(true)
+
 		e.preventDefault()
 
         !tags && setTags([])
@@ -124,6 +128,7 @@ const EditLibraryRecordForm = ({ record }) => {
 			setErrMsg("Invaid quest url. Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _")
 			handleShowErr(true)
             window.scrollTo(0, 0);
+            setBackdropOpen(false)
             return
 		}
 
@@ -140,6 +145,7 @@ const EditLibraryRecordForm = ({ record }) => {
                 setErrMsg("Update Record Failed")
             }
             handleShowErr(true)
+            setBackdropOpen(false)
             window.scrollTo(0, 0)
             return
 		}
@@ -167,7 +173,7 @@ const EditLibraryRecordForm = ({ record }) => {
                 window.scrollTo(0, 0)
             }
         }
-
+        setBackdropOpen(false)
 	}
 
     const handleDeletePhoto = async () => {
@@ -189,12 +195,16 @@ const EditLibraryRecordForm = ({ record }) => {
             }
             handleShowErr(true)
             window.scrollTo(0, 0)
+        } finally {
+            setBackdropOpen(false)
         }
     }
     
     const handleDelete = async () => {
         const answer = window.confirm("Are you sure to delete this record?")
         if (!answer) { return }
+
+        setBackdropOpen(true)    
 
         try {
             await axiosPrivate.delete(`/library/records/delete/${url}`, JSON.stringify({"url": recordUrl}))
@@ -211,12 +221,15 @@ const EditLibraryRecordForm = ({ record }) => {
             }
             handleShowErr(true)
             window.scrollTo(0, 0)
+        } finally {
+            setBackdropOpen(false)
         }
     }
 
 
 	return (
 		<>
+            <LoadingBackdrop open={backdropOpen} />
 			{showErrMsg 
 				?
 				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
