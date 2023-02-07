@@ -176,7 +176,7 @@ const Profile = () => {
                         			<Stack spacing={1} direction="row">
                         				<Button variant="contained" component="label">
 		                                	Change Photo
-		                                	<input hidden accept="image/*" type="file" onChange={handleUploadPhoto} />
+		                                	<input hidden accept="image/jpeg" type="file" onChange={handleUploadPhoto} />
 		                            	</Button>
                         				<Button variant="contained" color="error" onClick={handleDeletePhoto}>Delete Photo</Button>
                         			</Stack>
@@ -184,7 +184,7 @@ const Profile = () => {
                         		:
                         		<Button variant="contained" color="success" component="label">
                                 	Upload Photo
-                                	<input hidden accept="image/*" type="file" onChange={handleUploadPhoto} />
+                                	<input hidden accept="image/jpeg" type="file" onChange={handleUploadPhoto} />
                             	</Button>
                         	}
                         </Box>

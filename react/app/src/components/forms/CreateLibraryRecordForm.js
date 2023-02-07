@@ -136,21 +136,19 @@ const CreateLibraryRecordForm = () => {
             return
 		}
 
-        if (!isPhotoUploaded) {
-            navigate(`/library/${url}`, { replace: true})
-        } else {
+        if (isPhotoUploaded) {
             let photo_data = new FormData();
             photo_data.append("photo", photo)
 
             try {
                 const response = await axiosPrivateMultipart.patch(`/library/records/update/photo/${recordId}`, photo_data)
-                navigate(`/library/${url}`, { replace: true})
             } catch (err) {
                 console.log(err)
-                alert("Main info on record created successfully, but it was issue with update photo, please try again")
+                alert("Main info on record created successfully, but it was issue with update photo, please try upload photo again")
             }
         }
         setBackdropOpen(false)
+        navigate(`/library/${url}`, { replace: true})
 	}
 
 	return (
