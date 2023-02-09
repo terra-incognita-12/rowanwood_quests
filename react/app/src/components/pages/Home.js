@@ -11,8 +11,10 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import { CardActionArea } from '@mui/material';
+import Box from '@mui/material/Box';
 
 import axios from "../../api/axios"
+import HeadQuote from "../HeadQuote"
 
 const Home = () => {
 	const [quests, setQuests] = useState([])
@@ -42,14 +44,13 @@ const Home = () => {
     }, [])
 
 	return (
-		<div className="mt-3">	
-			<Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">GRATVS GLADIATOR FORTIS</Typography>
-			<Typography gutterBottom variant="h6" display="flex" justifyContent="center" alignItems="center" color="text.secondary">Welcome Brave Gladiator</Typography>
+		<div className="mt-3">
+            <HeadQuote quote="VINCIT QUI PATITUR" translation="He conquers who endures" />
 			<Row>
 	            {quests.length
 	                ?
 	                quests.map((quest, i) => 
-                        <Col xs={12} md={4} className="mt-3" key={i}>
+                        <Col xs={12} md={4} key={i}>
                             <Card className="mt-3">
                                 <CardActionArea component={Link} to={`quest/${quest.url}`} 
                                     sx={{ "&:hover": {

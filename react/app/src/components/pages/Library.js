@@ -12,6 +12,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
 
 import axios from "../../api/axios"
+import HeadQuote from "../HeadQuote"
 
 const Library = () => {
 	let [searchParams, setSearchParams] = useSearchParams();
@@ -138,6 +139,7 @@ const Library = () => {
 
 	return (
 		<div className="mt-3">
+            <HeadQuote quote="SAPIENTIA POTENTIA EST" translation="Wisdom is power"/>
 			<Row>
                 <Col xs={12} md={6}>
                     <Stack spacing={2} direction="row">

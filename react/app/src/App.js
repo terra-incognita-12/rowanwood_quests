@@ -1,6 +1,8 @@
+import "./index.css"
 import "bootstrap/dist/css/bootstrap.min.css"
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+
 
 import { Routes, Route } from "react-router-dom"
 
@@ -41,7 +43,11 @@ import Unauthorized from "./components/pages/Unauthorized"
 
 const darkTheme = createTheme({
     palette: {
-      mode: 'dark',
+      mode: "dark",
+    },
+    typography: {
+      fontFamily: "QuattrocentoRegular",
+      fontSize: 15,
     },
   });
 

@@ -107,91 +107,92 @@ const Profile = () => {
     }, [photo])
 
 	return (
-		<Card className="mt-3">
+		<div className="mt-3">
+			<Card>
+				<ChangeUsernameDialog open={changeUsernameDialogOpen} close={handleChangeUsernameDialogClose} user={auth.user} />
+				<ChangeEmailDialog open={changeEmailDialogOpen} close={handleChangeEmailDialogClose} username={auth.username} />
+				<ChangePasswordDialog open={changePasswordDialogOpen} close={handleChangePasswordDialogClose} user={auth.user} />
 
-			<ChangeUsernameDialog open={changeUsernameDialogOpen} close={handleChangeUsernameDialogClose} user={auth.user} />
-			<ChangeEmailDialog open={changeEmailDialogOpen} close={handleChangeEmailDialogClose} username={auth.username} />
-			<ChangePasswordDialog open={changePasswordDialogOpen} close={handleChangePasswordDialogClose} user={auth.user} />
-
-			<CardContent>
-                <Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">Profile</Typography>
-				<Row>
-					<Col xs={12} md={6}>
-						<Typography gutterBottom variant="h6" display="flex" alignItems="center" sx={{ ml: 1 }}>
-							Username:
-							<Paper elevation={3} sx={{ ml: 2, pl: 1 }}>
-								{auth.username}
-								<IconButton onClick={handleChangeUsernameDialogOpen}>
-									<EditIcon/>
-								</IconButton>
-							</Paper>
-						</Typography>
-						<hr/>
-						<Typography gutterBottom variant="h6" display="flex" alignItems="center" sx={{ ml: 1 }}>
-							Email:
-							<Paper elevation={3} sx={{ ml: 2, pl: 1 }}>
-								{auth.user}
-								<IconButton onClick={handleChangeEmailDialogOpen}>
-									<EditIcon/>
-								</IconButton>
-							</Paper>
-						</Typography>
-						<hr/>
-						<Typography gutterBottom variant="h6" display="flex" alignItems="center" sx={{ ml: 1 }}>
-							Role:
-							<Paper elevation={3} sx={{ ml: 2, pl: 1, pr: 1 }}>
-								{auth.role}
-							</Paper>
-						</Typography>
-						<hr/>
-						<Button variant="contained" color="primary" onClick={handleChangePasswordDialogOpen}>Change Password</Button>
-					</Col>
-					<Col xs={12} md={6}>
-						{showErrMsg 
-							?
-							<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
-						    : null
-						}
-						<Typography gutterBottom variant="h6" display="flex" justifyContent="center" alignItems="center">Photo</Typography>
-						{auth.photo
-                            ? (
-                            	<Box display="flex" justifyContent="center" alignItems="center">
-	                                <Box
-	                                    component="img"
-	                                    sx={{
-	                                        height: 200,
-	                                        width: 200,
-	                                        borderRadius: '8px',
-	                                    }}
-	                                    alt="Photo"
-	                                    src={auth.photo}
-	                                />
-	                            </Box>
-                            )
-                            : null
-                        }
-                        <Box className="mt-2" display="flex" justifyContent="center" alignItems="center">
-                        	{auth.photo
-                        		? (
-                        			<Stack spacing={1} direction="row">
-                        				<Button variant="contained" component="label">
-		                                	Change Photo
-		                                	<input hidden accept="image/jpeg" type="file" onChange={handleUploadPhoto} />
-		                            	</Button>
-                        				<Button variant="contained" color="error" onClick={handleDeletePhoto}>Delete Photo</Button>
-                        			</Stack>
-                        		)
-                        		:
-                        		<Button variant="contained" color="success" component="label">
-                                	Upload Photo
-                                	<input hidden accept="image/jpeg" type="file" onChange={handleUploadPhoto} />
-                            	</Button>
-                        	}
-                        </Box>
-					</Col>
-                </Row>
-            </CardContent>	
-		</Card>
+				<CardContent>
+	                <Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">Profile</Typography>
+					<Row>
+						<Col xs={12} md={6}>
+							<Typography gutterBottom variant="h6" display="flex" alignItems="center" sx={{ ml: 1 }}>
+								Username:
+								<Paper elevation={3} sx={{ ml: 2, pl: 1 }}>
+									{auth.username}
+									<IconButton onClick={handleChangeUsernameDialogOpen}>
+										<EditIcon/>
+									</IconButton>
+								</Paper>
+							</Typography>
+							<hr/>
+							<Typography gutterBottom variant="h6" display="flex" alignItems="center" sx={{ ml: 1 }}>
+								Email:
+								<Paper elevation={3} sx={{ ml: 2, pl: 1 }}>
+									{auth.user}
+									<IconButton onClick={handleChangeEmailDialogOpen}>
+										<EditIcon/>
+									</IconButton>
+								</Paper>
+							</Typography>
+							<hr/>
+							<Typography gutterBottom variant="h6" display="flex" alignItems="center" sx={{ ml: 1 }}>
+								Role:
+								<Paper elevation={3} sx={{ ml: 2, pl: 1, pr: 1 }}>
+									{auth.role}
+								</Paper>
+							</Typography>
+							<hr/>
+							<Button variant="contained" color="primary" onClick={handleChangePasswordDialogOpen}>Change Password</Button>
+						</Col>
+						<Col xs={12} md={6}>
+							{showErrMsg 
+								?
+								<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
+							    : null
+							}
+							<Typography gutterBottom variant="h6" display="flex" justifyContent="center" alignItems="center">Photo</Typography>
+							{auth.photo
+	                            ? (
+	                            	<Box display="flex" justifyContent="center" alignItems="center">
+		                                <Box
+		                                    component="img"
+		                                    sx={{
+		                                        height: 200,
+		                                        width: 200,
+		                                        borderRadius: '8px',
+		                                    }}
+		                                    alt="Photo"
+		                                    src={auth.photo}
+		                                />
+		                            </Box>
+	                            )
+	                            : null
+	                        }
+	                        <Box className="mt-2" display="flex" justifyContent="center" alignItems="center">
+	                        	{auth.photo
+	                        		? (
+	                        			<Stack spacing={1} direction="row">
+	                        				<Button variant="contained" component="label">
+			                                	Change Photo
+			                                	<input hidden accept="image/jpeg" type="file" onChange={handleUploadPhoto} />
+			                            	</Button>
+	                        				<Button variant="contained" color="error" onClick={handleDeletePhoto}>Delete Photo</Button>
+	                        			</Stack>
+	                        		)
+	                        		:
+	                        		<Button variant="contained" color="success" component="label">
+	                                	Upload Photo
+	                                	<input hidden accept="image/jpeg" type="file" onChange={handleUploadPhoto} />
+	                            	</Button>
+	                        	}
+	                        </Box>
+						</Col>
+	                </Row>
+	            </CardContent>	
+			</Card>
+		</div>
 	)
 }
 

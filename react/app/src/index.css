@@ -1,0 +1,11 @@
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+@font-face {
+    font-family: "QuattrocentoRegular";
+    src: local("QuattrocentoRegular"),
+        url("./fonts/Quattrocento/Quattrocento-Regular.ttf") format("truetype");
+}
