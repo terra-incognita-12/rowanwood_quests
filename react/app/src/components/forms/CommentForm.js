@@ -9,6 +9,10 @@ import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 
+
+import useAuth from "../../hooks/useAuth"
+
+
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
 import LoadingBackdrop from "../Backdrop"
@@ -24,11 +28,20 @@ const CommentForm = ({ url, handleCommentChanged }) => {
     const [errMsg, setErrMsg] = useState("")
 	const [showErrMsg, setShowErrMsg] = useState(false)
 
+
+
+	const { auth } = useAuth()
+
+
 	const handleShowErr = (e) => {
 		setShowErrMsg(e)
 	}
 
 	const handleSubmit = async (e) => {
+		console.log(auth)
+
+
+
 		setBackdropOpen(true)
 		
 		e.preventDefault()

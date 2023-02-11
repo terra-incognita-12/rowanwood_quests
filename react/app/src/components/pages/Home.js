@@ -20,6 +20,9 @@ const Home = () => {
 	const [quests, setQuests] = useState([])
 
     useEffect(() => {
+
+        // console.log(Cookies.get("logged_in"))
+
         let isMounted = true
         const controller = new AbortController()
 

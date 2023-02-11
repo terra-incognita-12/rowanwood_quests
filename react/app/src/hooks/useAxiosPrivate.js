@@ -4,15 +4,23 @@ import { axiosPrivate } from "../api/axios"
 import useRefreshToken from "./useRefreshToken"
 import useAuth from "./useAuth"
 
+import Cookies from "js-cookie"
+
 const useAxiosPrivate = () => {
 	const refresh = useRefreshToken()
 	const { auth } = useAuth()
 
 	useEffect(() => {
+		let token = auth?.accessToken
+		const isLogged = Cookies.get("logged_in")
+		if (!isLogged) {
+			token = 0
+		}
+
 		const requestInterceptor = axiosPrivate.interceptors.request.use(
 			config => {
 				if (!config.headers["Authorization"]) {
-					config.headers["Authorization"] = `Bearer ${auth?.accessToken}`
+					config.headers["Authorization"] = `Bearer ${token}`
 				}
 				return config
 			}, (error) => Promise.reject(error)

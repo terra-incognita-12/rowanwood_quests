@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { useState } from "react"
 
 import AppBar from '@mui/material/AppBar';
@@ -13,39 +13,64 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-// import AdbIcon from '@mui/icons-material/Adb';
 
 import useAuth from "../hooks/useAuth"
-
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+import axios from "../api/axios"
+import useAxiosPrivate from "../hooks/useAxiosPrivate"
+import useRedirectLogin from "../hooks/useRedirectLogin"
 
 const Sitenavbar = () => {
-	const { auth } = useAuth()
+	const { auth, setAuth } = useAuth()
+	const axiosPrivate = useAxiosPrivate()
+	const navigate = useNavigate()
+	const location = useLocation()
+	const redirectLogin = useRedirectLogin(location)
 
 	const [anchorElNav, setAnchorElNav] = useState(null);
 	const [anchorElUser, setAnchorElUser] = useState(null);
 
 	const handleOpenNavMenu = (event) => {
-	setAnchorElNav(event.currentTarget);
+		setAnchorElNav(event.currentTarget);
 	};
 	const handleOpenUserMenu = (event) => {
-	setAnchorElUser(event.currentTarget);
+		setAnchorElUser(event.currentTarget);
 	};
 
 	const handleCloseNavMenu = () => {
-	setAnchorElNav(null);
+		setAnchorElNav(null);
 	};
 
 	const handleCloseUserMenu = () => {
-	setAnchorElUser(null);
+		setAnchorElUser(null);
 	};
+
+	const logout = async () => {
+		try {
+			const response = await axiosPrivate('/auth/logout', {
+				withCredentials: true
+			})
+			setAuth({})
+			navigate("/login", { replace: true})
+		} catch (err) {
+			let msg = ""
+			if (!err?.response) {
+				msg = "No server respone"
+			} else if (err.response?.status === 400) {
+				redirectLogin()
+			} else if (err.response?.status) {
+				msg = err?.response?.data?.detail
+			} else {
+                msg = "Logout Failed"
+            }
+
+            alert(msg)
+		}
+	}
 
 	return (
 		<AppBar position="static">
 		 	<Container maxWidth="xl">
 				<Toolbar disableGutters>
-					{/*<AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />*/}
 					<Typography
 					variant="h6"
 					noWrap
@@ -119,14 +144,12 @@ const Sitenavbar = () => {
 									: null 
 							}
 						</Menu>
-					</Box>
-
-					{/*<AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />*/}
-					
+					</Box>					
 					<Typography
 						variant="h5"
 						noWrap
-						component="a"
+						component={Link}
+						to="/"
 						href=""
 						sx={{
 							mr: 2,
@@ -223,7 +246,7 @@ const Sitenavbar = () => {
 							  	<MenuItem component={Link} to="/profile">
 								    <Typography textAlign="center">Profile</Typography>
 								</MenuItem>
-								<MenuItem component={Link} to="/logout">
+								<MenuItem component={Link} onClick={logout}>
 								    <Typography textAlign="center">Logout</Typography>
 								</MenuItem>
 							</Menu>

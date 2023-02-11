@@ -3,14 +3,12 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
-
 import { Routes, Route } from "react-router-dom"
 
 import Layout from "./components/Layout"
 
 import Login from "./components/auth/Login"
 import Register from "./components/auth/Register"
-import Logout from "./components/auth/Logout"
 import RequireAuth from "./components/auth/RequireAuth"
 import PersistLogin from "./components/auth/PersistLogin"
 
@@ -77,7 +75,6 @@ function App() {
             
             <Route element={<RequireAuth allowedRoles={['user', 'admin', 'editor']} />}>
               <Route path="profile" element={<Profile />} />
-              <Route path="logout" element={<Logout />} />
             </Route>
 
             <Route element={<RequireAuth allowedRoles={['admin', 'editor']} />}>

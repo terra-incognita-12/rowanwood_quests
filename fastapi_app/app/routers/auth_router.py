@@ -58,8 +58,7 @@ async def create_user(payload: user_scheme.CreateUserScheme, request: Request, d
 		url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/auth/verify_email/{token}"
 		await Email(new_user, url, [payload.email]).send_verification_email_link()
 	except Exception as error:
-		print(error)
-		raise HTTPException(status_code=500, detail='There was an error sending email')
+		raise HTTPException(status_code=500, detail='There was an error sending email, login with your credentials and activation link will be sent again')
 
 	return {'status': 'OK', 'id': new_user.id}
 
@@ -82,16 +81,23 @@ async def login(payload: user_scheme.LoginUserScheme, request: Request, response
 	access_token = Authorize.create_access_token(subject=str(user.id), expires_time=timedelta(minutes=ACCESS_X))
 	refresh_token = Authorize.create_refresh_token(subject=str(user.id), expires_time=timedelta(minutes=REFRESH_X))
 
-	response.set_cookie('access_token', access_token, ACCESS_X*60, ACCESS_X*60, '/', None, False, True, 'lax')
-	response.set_cookie('refresh_token', refresh_token, REFRESH_X*60, REFRESH_X*60, '/', None, False, True, 'lax')
-	response.set_cookie('logged_in', 'True', ACCESS_X*60, ACCESS_X*60, '/', None, False, False, 'lax')
+	Authorize.set_access_cookies(access_token)
+	Authorize.set_refresh_cookies(refresh_token)
+
+	# response.set_cookie('access_token', access_token, ACCESS_X*60, ACCESS_X*60, '/', None, False, True, 'lax')
+	# response.set_cookie('refresh_token', refresh_token, REFRESH_X*60, REFRESH_X*60, '/', None, False, True, 'lax')
+	response.set_cookie('logged_in', 'True', REFRESH_X*60, REFRESH_X*60, '/', None, False, False, 'lax')
 
 	return {'id': user.id, 'username': user.username, 'status': 'success', 'role': user.role, 'access_token': access_token, 'photo': user.photo}
 
 @router.get('/logout')
-def logout(response: Response, Authorize: AuthJWT = Depends(), user_id: str = Depends(require_user)):
+def logout(response: Response, Authorize: AuthJWT = Depends()):
+	Authorize.jwt_required()
 	Authorize.unset_jwt_cookies()
-	response.set_cookie('logged_in', '', -1)
+	# response.delete_cookie('access_token')
+	# response.delete_cookie('refresh_token')
+	response.delete_cookie('logged_in')
+	# response.set_cookie('logged_in', '', -1)
 
 	return {'status': 'OK'}
 
@@ -194,9 +200,7 @@ def check_valid_change_password_token(payload: user_scheme.ChangePasswordTokenSc
 def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
 	try:
 		Authorize.jwt_refresh_token_required()
-
 		user_id = Authorize.get_jwt_subject()
-		print(user_id)
 		if not user_id:
 			raise HTTPException(status_code=403, detail="Can't refresh access token")
 		user = db.query(User).filter(User.id == user_id).first()
@@ -204,13 +208,13 @@ def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Dep
 			raise HTTPException(status_code=403, detail='The user belonging to this token no logger exist')
 		access_token = Authorize.create_access_token(subject=str(user.id), expires_time=timedelta(minutes=ACCESS_X))
 	except Exception as e:
+		print(e)
 		error = e.__class__.__name__
 		if error == 'MissingTokenError':
 			raise HTTPException(status_code=400, detail='Please provide refresh token')
 		raise HTTPException(status_code=400, detail=error)
 
-	response.set_cookie('access_token', access_token, ACCESS_X*60, ACCESS_X*60, '/', None, False, True, 'lax')
-	response.set_cookie('logged_in', 'True', ACCESS_X*60, ACCESS_X*60, '/', None, False, False, 'lax')
+	Authorize.set_access_cookies(access_token)
 
 	return {'id': user.id, 'username': user.username, 'email': user.email, 'role': user.role, 'access_token': access_token, 'photo': user.photo}
 

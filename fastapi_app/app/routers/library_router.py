@@ -14,7 +14,7 @@ from ..database import get_db
 from ..config import settings
 from ..models import LibraryRecord, LibraryTag
 from ..schemes import library_scheme
-from ..oauth2 import require_user
+from ..oauth2 import require_editor
 
 router = APIRouter()
 
@@ -25,7 +25,7 @@ FOLDER = 'record/'
 # CREATE
 
 @router.post('/records/create')
-def create_record(payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db)):
+def create_record(payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
 
     check_record = db.query(LibraryRecord).filter(LibraryRecord.url == payload.url).first()
     if check_record:
@@ -69,7 +69,7 @@ def get_records_by_tag(tag: str, db: Session = Depends(get_db)):
 # UPDATE
 
 @router.patch('/records/update/{id}')
-def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db)):
+def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)
     check_record = record_query.first()
     if not check_record:
@@ -95,7 +95,7 @@ def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: 
 # DELETE
 
 @router.delete('/records/delete/{url}')
-def delete_record(url: str, db: Session = Depends(get_db)):
+def delete_record(url: str, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     record_query = db.query(LibraryRecord).filter(LibraryRecord.url == url)
     check_record = record_query.first()
 
@@ -122,7 +122,7 @@ def get_tags(db: Session = Depends(get_db)):
     return tags
 
 @router.patch('/tags/update/{id}')
-def update_tag(id: str, payload: library_scheme.LibraryTagSendScheme, db: Session = Depends(get_db)):
+def update_tag(id: str, payload: library_scheme.LibraryTagSendScheme, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     tag_query = db.query(LibraryTag).filter(LibraryTag.id == id)
     check_tag = tag_query.first()
     if not check_tag:
@@ -142,7 +142,7 @@ def update_tag(id: str, payload: library_scheme.LibraryTagSendScheme, db: Sessio
     return {'status': 'OK'}
 
 @router.delete('/tags/delete/{id}')
-def delete_tag(id: str, db: Session = Depends(get_db)):
+def delete_tag(id: str, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     tag_query = db.query(LibraryTag).options(joinedload(LibraryTag.library_records)).filter(LibraryTag.id == id)
     check_tag = tag_query.first()
     if not check_tag:
@@ -159,7 +159,7 @@ def delete_tag(id: str, db: Session = Depends(get_db)):
 # S3
 
 @router.patch('/records/update/photo/{id}')
-def update_record_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):
+def update_record_photo(id: str, photo: UploadFile, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)
     check_record = record_query.first()
     if not check_record:
@@ -180,7 +180,7 @@ def update_record_photo(id: str, photo: UploadFile, db: Session = Depends(get_db
     return {'status': 'OK'}
 
 @router.delete('/records/delete/photo/{id}')
-def delete_record_photo(id: str, db: Session = Depends(get_db)):
+def delete_record_photo(id: str, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)
     check_record = record_query.first()
     if not check_record:
