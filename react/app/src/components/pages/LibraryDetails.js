@@ -37,7 +37,7 @@ const LibraryDetails = () => {
                 } else {
                     console.log(err)
                 }
-            } 
+            }
         }
 
         getRecord()
@@ -56,44 +56,45 @@ const LibraryDetails = () => {
                     <Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">{record.name}</Typography>
                     {record.photo
                         ? (
-                            <Box display="flex" justifyContent="center" alignItems="center" className="mb-3">
+                            <Box className="figure w-50 float-end m-3">
                                 <Box
                                     component="img"
                                     sx={{
-                                        height: 600,
-                                        width: 600,
-                                        maxHeight: { xs: 400, md: 600 },
-                                        maxWidth: { xs: 400, md: 600 },
-                                        borderRadius: '16px',
+                                        height: 550,
+                                        width: 550,
+                                        maxHeight: { xs: 200, sm: 400, md: 450, lg: 550 },
+                                        maxWidth: { xs: 200, sm: 400, md: 450, lg: 550 },
                                     }}
                                     alt="Photo"
                                     src={record.photo}
+                                    className="figure-img img-fluid rounded img-thumbnail"
                                 />
                             </Box>
                         )
                         : null
                     }
-                    
-                    <Typography 
-                        gutterBottom 
-                        variant="body1"
-                        sx={isSmallScreen
-                            ? { p: 3 }
-                            : { p: 1 }
-                        }
-                    >
+                
+                    <Typography
+                          gutterBottom
+                          variant="body1"
+                          sx={isSmallScreen
+                              ? { p: 3 }
+                              : { p: 1 }
+                          }
+                      >
                         {record.description}
                     </Typography>
+
                     {record.library_tags?.length
                         ?
-                        record.library_tags.map((tag, i) =>             
+                        record.library_tags.map((tag, i) =>
                             <Button component={Link} to={`/library?tag=${tag.name}`} key={i} variant="text">#{tag.name} </Button>
                         )
                         : null
                     }
                 </CardContent>
             </Card>
-        </div>				
+        </div>
 	)
 }
 

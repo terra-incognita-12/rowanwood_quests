@@ -32,7 +32,7 @@ const QuestDetails = () => {
 	const [commentChanged, setCommentChanged] = useState(false)
 	const { auth } = useAuth()
 	const navigate = useNavigate()
-	const axiosPrivate = useAxiosPrivate()  
+	const axiosPrivate = useAxiosPrivate()
     const location = useLocation()
     const redirectLogin = useRedirectLogin(location)
 
@@ -97,26 +97,26 @@ const QuestDetails = () => {
                     <Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">{quest.name}</Typography>
                     {quest.photo
                         ? (
-                            <Box display="flex" justifyContent="center" alignItems="center" className="mb-3">
+                            <Box className="figure w-50 float-end m-3">
                                 <Box
                                     component="img"
                                     sx={{
-                                        height: 600,
-                                        width: 600,
-                                        maxHeight: { xs: 400, md: 600 },
-                                        maxWidth: { xs: 400, md: 600 },
-                                        borderRadius: '16px',
+                                        height: 550,
+                                        width: 550,
+                                        maxHeight: { xs: 200, sm: 400, md: 450, lg: 550 },
+                                        maxWidth: { xs: 200, sm: 400, md: 450, lg: 550 },
                                     }}
                                     alt="Photo"
                                     src={quest.photo}
+                                    className="figure-img img-fluid rounded img-thumbnail"
                                 />
                             </Box>
                         )
                         : null
                     }
-                    <Typography gutterBottom variant="h6">Telegram address: <i>@{quest.telegram_url}</i></Typography>
-                    <hr/>
                     <Typography gutterBottom variant="body1">{quest.full_description}</Typography>
+                    <hr/>
+                    <Typography gutterBottom variant="h6">Telegram address: <i>@{quest.telegram_url}</i></Typography>
                     <Button component={Link} to={`/library?tag=${quest.url}`} variant="text">#{quest.url} </Button>
                     <hr/>
                     {quest.quest_comments?.length
@@ -140,7 +140,7 @@ const QuestDetails = () => {
 												<div>
 													<IconButton edge="start" color="error" onClick={() => handleCommentDelete(comment.id)}>
                             							<DeleteForeverIcon />
-                            						</IconButton>	
+                            						</IconButton>
 												</div>
 												: null
 											}
