@@ -11,14 +11,16 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
 
+import ErrMsg from "../../../ErrMsg"
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate"
+import axios from "../../../../api/axios"
 import useRedirectLogin from "../../../../hooks/useRedirectLogin"
 
 import EditLibraryTagForm from "../../../forms/EditLibraryTagForm"
 
 const EditLibraryTagsList = () => {
 	const location = useLocation()
-	const axiosPrivate = useAxiosPrivate()  
+	const axiosPrivate = useAxiosPrivate()
     const redirectLogin = useRedirectLogin(location)
 
     const [dropDownTags, setDropDownTags] = useState([])
@@ -27,27 +29,23 @@ const EditLibraryTagsList = () => {
     const [dbTag, setDbTag] = useState("")
     const [showForm, setShowForm] = useState(false)
 
+    const [errMsg, setErrMsg] = useState("")
+    const [showErrMsg, setShowErrMsg] = useState(false)
+
     useEffect(() => {
 		let isMounted = true
         const controller = new AbortController()
 
         const getTags = async () => {
             try {
-                const response = await axiosPrivate.get("/library/tags/all", {
+                const response = await axios.get("/library/tags/all", {
                     signal: controller.signal
                 })
                 
-                let dataName = []
-                for (const tag of response.data) {
-                	dataName.push({"name": tag.name})
-                }
-    			if (isMounted) {
-                    setDropDownTags(dataName)
-                    setAllTags(response.data)
-                }
+                isMounted && setDropDownTags(response.data)
             } catch (err) {
                 console.log(err)
-            } 
+            }
         }
 
         getTags()
@@ -59,9 +57,27 @@ const EditLibraryTagsList = () => {
 
 	}, [])
 
-    const getTag = () => {
-        const record = allTags.find(elem => elem.name === pickedTag.name)
-        setDbTag(record)
+    const handleShowErr = (e) => {
+        setShowErrMsg(e)
+    }
+
+    const getTag = async () => {
+        try {
+            const response = await axios.get(`/library/tags/${pickedTag.id}`)
+            setDbTag(response.data)
+        } catch (err) {
+            if (!err?.response) {
+                setErrMsg("No server respone")
+            } else if (err?.response?.status === 400) {
+                redirectLogin()
+            } else if (err?.response?.status) {
+                setErrMsg(err?.response?.data?.detail)
+            } else {
+                setErrMsg("Edit Tag Failed")
+            }
+            handleShowErr(true)
+            return
+        }
         setShowForm(true)
     }
 
@@ -71,6 +87,11 @@ const EditLibraryTagsList = () => {
 
             <Row className="mt-3">
                 <Col xs={12} md={6}>
+                    {showErrMsg
+                        ?
+                        <ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
+                        : null
+                    }
                     <Stack spacing={2} direction="row">
                         <Autocomplete
                             fullWidth
@@ -89,7 +110,7 @@ const EditLibraryTagsList = () => {
             </Row>
             
             {showForm
-                ? <EditLibraryTagForm tag={dbTag} /> 
+                ? <EditLibraryTagForm tag={dbTag} />
                 : null
             }
 		</div>

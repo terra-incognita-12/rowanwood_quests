@@ -1,5 +1,5 @@
 from fastapi import (
-    APIRouter, 
+    APIRouter,
     Depends,
     status,
     HTTPException,
@@ -27,9 +27,15 @@ FOLDER_QUESTLINE = 'quest_line/'
 @router.post('/create', status_code=status.HTTP_201_CREATED)
 def create_quest(payload: quest_scheme.QuestSendScheme, db: Session = Depends(get_db)):
 
-    check_quest = db.query(Quest).filter(Quest.url == payload.url).first()
-    if check_quest:
+    check_quest_url = db.query(Quest).filter(Quest.url == payload.url).first()
+    
+    if check_quest_url:
         raise HTTPException(status_code=403, detail='Quest with this url already exists')
+    
+    check_quest_telegram = db.query(Quest).filter(Quest.telegram_url == payload.telegram_url).first()
+    
+    if check_quest_telegram:
+        raise HTTPException(status_code=403, detail='Quest with this telegram url already exists')
 
     payload.is_activated = False
     new_quest = Quest(**payload.dict())
@@ -55,6 +61,10 @@ def get_all_quests_dropdown(db: Session = Depends(get_db)):
 
 @router.get('/{url}', response_model=quest_scheme.QuestResponseSchemeWithComments)
 def get_quest(url: str, db: Session = Depends(get_db)):
+    print(url)
+    if not url or url == "undefined":
+        raise HTTPException(status_code=404, detail="Enter Correct Quest")
+    
     quest = db.query(Quest).filter(Quest.url == url).first()
 
     if not quest:
@@ -76,6 +86,11 @@ def update_quest(id: str, payload:quest_scheme.QuestBaseScheme, db: Session = De
 
     if check_quest_url and str(check_quest_url.id) != id:
         raise HTTPException(status_code=403, detail='Quest with this url already exists')
+        
+    check_quest_telegram = db.query(Quest).filter(Quest.telegram_url == payload.telegram_url).first()
+    
+    if check_quest_telegram and str(check_quest_telegram.id) != id:
+        raise HTTPException(status_code=403, detail='Quest with this telegram url already exists')
 
     update_data = payload.dict(exclude_unset=True)
     quest_query.update(update_data, synchronize_session=False)
@@ -83,7 +98,7 @@ def update_quest(id: str, payload:quest_scheme.QuestBaseScheme, db: Session = De
     db.commit()
     db.refresh(check_quest)
 
-    return {'status': 'OK'}   
+    return {'status': 'OK'}
 
 @router.patch('/update/activate/{id}')
 def update_activate_quest(id: str, db: Session = Depends(get_db)):
@@ -133,7 +148,7 @@ def create_quest_line(url: str, payload: quest_scheme.QuestLineSendScheme, db: S
 
     check_quest = db.query(Quest).filter(Quest.url == url).first()
     if not check_quest:
-        raise HTTPException(status_code=404, detail="Quest doesn't exist")     
+        raise HTTPException(status_code=404, detail="Quest doesn't exist")
     check_unique_number = db.query(QuestLine).filter(QuestLine.quest_id == check_quest.id, QuestLine.unique_number == payload.unique_number).first()
     if check_unique_number:
         raise HTTPException(status_code=403, detail='Quest line with this unique number already exists')
@@ -210,7 +225,7 @@ def update_quest_line(id: str, payload: quest_scheme.QuestLineSendScheme, db: Se
         db.commit()
         db.refresh(option)
 
-    return {'status': 'OK', 'unique_number': check_quest_line.unique_number}  
+    return {'status': 'OK', 'unique_number': check_quest_line.unique_number}
 
 # DELETE
 

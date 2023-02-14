@@ -4,6 +4,10 @@ footer {
     width: 100%;
 }
 
+.quest-col {
+    display: grid;
+}
+
 @font-face {
     font-family: "QuattrocentoRegular";
     src: local("QuattrocentoRegular"),

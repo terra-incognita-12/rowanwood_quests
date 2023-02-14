@@ -33,7 +33,7 @@ const CreateLibraryRecordForm = () => {
 	const navigate = useNavigate()
 	const location = useLocation()
 	const axiosPrivate = useAxiosPrivate()
-    const axiosPrivateMultipart = useAxiosPrivateMultipart()  
+    const axiosPrivateMultipart = useAxiosPrivateMultipart()
     const redirectLogin = useRedirectLogin(location)
     const filter = createFilterOptions()
 
@@ -69,7 +69,7 @@ const CreateLibraryRecordForm = () => {
     			isMounted && setReadyTags(data)
             } catch (err) {
                 console.log(err)
-            } 
+            }
         }
 
         getTags()
@@ -92,7 +92,7 @@ const CreateLibraryRecordForm = () => {
         } else {
             setIsPhotoUploaded(true)
             setPhoto(e.target.files[0])
-        }   
+        }
     }
 
     const handleCleanPhotoUpload = (e) => {
@@ -153,8 +153,8 @@ const CreateLibraryRecordForm = () => {
 
 	return (
 		<>
-            <LoadingBackdrop open={backdropOpen} /> 
-			{showErrMsg 
+            <LoadingBackdrop open={backdropOpen} />
+			{showErrMsg
 				?
 				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
 			    : null
@@ -230,10 +230,10 @@ const CreateLibraryRecordForm = () => {
                                     options={readyTags}
                                     getOptionLabel={(option) => option.name}
                                     renderInput={(params) => (
-                                        <TextField 
+                                        <TextField
                                             {...params}
-                                            label="Tags" 
-                                            placeholder="Input tags" 
+                                            label="Tags"
+                                            placeholder="Input tags"
                                             id="tags"
                                         />
                                     )}
@@ -271,7 +271,7 @@ const CreateLibraryRecordForm = () => {
                                     </Stack>
                                 )
                                 : null
-                            }   
+                            }
                         </Stack>
                         <div className="mt-3">
                             <Button variant="contained" color="success" type="submit">Create Record</Button>

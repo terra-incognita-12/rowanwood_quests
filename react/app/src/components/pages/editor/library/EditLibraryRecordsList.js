@@ -20,7 +20,7 @@ import EditLibraryRecordForm from "../../../forms/EditLibraryRecordForm"
 
 const EditLibraryRecordsList = () => {
 	const location = useLocation()
-	const axiosPrivate = useAxiosPrivate()  
+	const axiosPrivate = useAxiosPrivate()
     const redirectLogin = useRedirectLogin(location)
 
     const [dropDownRecords, setDropDownRecords] = useState([])
@@ -44,7 +44,7 @@ const EditLibraryRecordsList = () => {
                 isMounted && setDropDownRecords(response.data)
             } catch (err) {
                 console.log(err)
-            } 
+            }
         }
 
         getRecords()
@@ -61,6 +61,8 @@ const EditLibraryRecordsList = () => {
     }
 
     const getRecord = async () => {
+        console.log(pickedRecord)
+      
         try {
             const response = await axios.get(`/library/records/${pickedRecord.url}`)
             setDbRecord(response.data)
@@ -86,6 +88,11 @@ const EditLibraryRecordsList = () => {
 
             <Row className="mt-3">
                 <Col xs={12} md={6}>
+                    {showErrMsg
+                        ?
+                        <ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
+                        : null
+                    }
                     <Stack spacing={2} direction="row">
                         <Autocomplete
                             fullWidth
@@ -104,7 +111,7 @@ const EditLibraryRecordsList = () => {
             </Row>
             
             {showForm
-                ? <EditLibraryRecordForm record={dbRecord} /> 
+                ? <EditLibraryRecordForm record={dbRecord} />
                 : null
             }
 		</div>

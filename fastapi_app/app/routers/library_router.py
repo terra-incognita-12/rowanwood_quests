@@ -1,5 +1,5 @@
 from fastapi import (
-    APIRouter, 
+    APIRouter,
     Depends,
     status,
     HTTPException,
@@ -50,17 +50,22 @@ def get_records(db: Session = Depends(get_db)):
 
 @router.get("/records/{url}", response_model=library_scheme.LibraryRecordResponseScheme)
 def get_record(url: str, db: Session = Depends(get_db)):
+    if not url or url == "undefined":
+        raise HTTPException(status_code=404, detail="Enter Correct Record")
+        
     record = db.query(LibraryRecord).filter(LibraryRecord.url == url).first()
+    
     if not record:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
+        raise HTTPException(status_code=404, detail="Record doesn't exist")
     
     return record
 
+# get records by tag
 @router.get("/records/tag/{tag}", response_model=List[library_scheme.LibraryRecordBaseScheme])
 def get_records_by_tag(tag: str, db: Session = Depends(get_db)):
-    tags = db.query(LibraryTag).options(joinedload(LibraryTag.library_records)).filter(LibraryTag.name == tag).all()
+    tags = db.query(LibraryTag).filter(LibraryTag.name == tag).first()
     if not tags:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
+        raise HTTPException(status_code=404, detail="Record or tag doesn't exist")
 
     records = [x.library_records for x in tags]
 
@@ -73,12 +78,12 @@ def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: 
     record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)
     check_record = record_query.first()
     if not check_record:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
+        raise HTTPException(status_code=404, detail="Record doesn't exist")
 
     check_record_url = db.query(LibraryRecord).filter(LibraryRecord.url == payload.url).first()
 
     if check_record_url and str(check_record_url.id) != id:
-         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Record with this url already exists')
+         raise HTTPException(status_code=403, detail='Record with this url already exists')
 
     payload_temp = prepare_library_tags(payload.library_tags, db)
     del payload.library_tags
@@ -100,7 +105,7 @@ def delete_record(url: str, db: Session = Depends(get_db), user_id: str = Depend
     check_record = record_query.first()
 
     if not check_record:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record doesn't exist")
+        raise HTTPException(status_code=404, detail="Record doesn't exist")
 
     if check_record.photo:
         key = check_record.photo.replace(settings.S3_FULL_URL,'')
@@ -116,22 +121,38 @@ def delete_record(url: str, db: Session = Depends(get_db), user_id: str = Depend
 
 # TAGS
 
+# READ
+
 @router.get("/tags/all", response_model=List[library_scheme.LibraryTagResponseScheme])
 def get_tags(db: Session = Depends(get_db)):
     tags = db.query(LibraryTag).order_by(asc(LibraryTag.name)).all()
     return tags
+
+@router.get("/tags/{id}", response_model=library_scheme.LibraryTagResponseScheme)
+def get_tag(id: str, db: Session = Depends(get_db)):
+    if not id or id == "undefined":
+        raise HTTPException(status_code=404, detail="Enter Correct Tag")
+        
+    tag = db.query(LibraryTag).filter(LibraryTag.id == id).first()
+    
+    if not tag:
+        raise HTTPException(status_code=404, detail="Tag doesn't exist")
+    
+    return tag
+
+# UPDATE
 
 @router.patch('/tags/update/{id}')
 def update_tag(id: str, payload: library_scheme.LibraryTagSendScheme, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     tag_query = db.query(LibraryTag).filter(LibraryTag.id == id)
     check_tag = tag_query.first()
     if not check_tag:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag doesn't exist")
+        raise HTTPException(status_code=404, detail="Tag doesn't exist")
 
     check_tag_name = db.query(LibraryTag).filter(LibraryTag.name == payload.name).first()
 
     if check_tag_name and str(check_tag_name.id) != id:
-         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Tag with this name already exists')
+         raise HTTPException(status_code=403, detail='Tag with this name already exists')
 
     update_data = payload.dict(exclude_unset=True)
 
@@ -141,12 +162,14 @@ def update_tag(id: str, payload: library_scheme.LibraryTagSendScheme, db: Sessio
 
     return {'status': 'OK'}
 
+# DELETE
+
 @router.delete('/tags/delete/{id}')
 def delete_tag(id: str, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
-    tag_query = db.query(LibraryTag).options(joinedload(LibraryTag.library_records)).filter(LibraryTag.id == id)
+    tag_query = db.query(LibraryTag).filter(LibraryTag.id == id)
     check_tag = tag_query.first()
     if not check_tag:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag doesn't exist")
+        raise HTTPException(status_code=404, detail="Tag doesn't exist")
 
     check_tag.library_records = []
     db.commit()

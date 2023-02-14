@@ -10,17 +10,17 @@ import Sitenavbar from "./Sitenavbar"
 
 const Layout = () => {
 	return (
-		<Container 
-			maxWidth={false} 
-			disableGutters 
-			sx={{ position: "relative", minHeight: "100vh" }}
+		<Container
+			maxWidth={false}
+			disableGutters
+			sx={{ position: "relative", minHeight: "100vh", pb: 4 }}
 		>
 			<Sitenavbar />
 			<Container maxWidth="lg">
 				<Outlet />
 			</Container>
 			<footer>
-				<Paper elevation={0}>
+			  <Paper sx={{ backgroundColor: "black" }}>
 					<Typography variant="body1" display="flex" justifyContent="center" alignItems="center" color="text.secondary">ANNO MMXXIII</Typography>
 				</Paper>
 			</footer>

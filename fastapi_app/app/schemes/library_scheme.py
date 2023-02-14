@@ -31,7 +31,7 @@ class LibraryRecordResponseSchemePreview(BaseModel):
 	url: str
 
 	class Config:
-		orm_mode = True 
+		orm_mode = True
 
 class LibraryRecordResponseScheme(LibraryRecordBaseScheme):
 	id: uuid.UUID
@@ -42,7 +42,7 @@ class LibraryRecordResponseScheme(LibraryRecordBaseScheme):
 
 class LibraryTagSendScheme(LibraryTagBaseScheme):
 	pass
-
+	
 class LibraryTagResponseScheme(LibraryTagBaseScheme):
 	id: uuid.UUID
 	library_records: List[LibraryRecordResponseSchemePreview]

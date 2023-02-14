@@ -47,14 +47,14 @@ def require_editor(db: Session = Depends(get_db), Authorize: AuthJWT = Depends()
         user_id = Authorize.get_jwt_subject()
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='User no longer exist')
+            raise HTTPException(status_code=403, detail='User no longer exist')
         if not user.is_email_verified:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User's email is not verified")
+            raise HTTPException(status_code=403, detail="User's email is not verified")
         if user.role == 'user':
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User is unauthorized for that action")
+            raise HTTPException(status_code=403, detail="User is unauthorized for that action")
     except Exception as e:
         error = e.__class__.__name__
         if error == 'MissingTokenError':
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='You are not logged in')
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Token is invalid or has expired')
+            raise HTTPException(status_code=401, detail='You are not logged in')
+        raise HTTPException(status_code=401, detail='Token is invalid or has expired')
     return user_id

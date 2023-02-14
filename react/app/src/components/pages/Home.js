@@ -21,8 +21,6 @@ const Home = () => {
 
     useEffect(() => {
 
-        // console.log(Cookies.get("logged_in"))
-
         let isMounted = true
         const controller = new AbortController()
 
@@ -35,7 +33,7 @@ const Home = () => {
                 isMounted && setQuests(response.data)
             } catch (err) {
                 console.log(err)
-            } 
+            }
         }
 
         getQuests()
@@ -48,19 +46,21 @@ const Home = () => {
 
 	return (
 		<div className="mt-3">
-            <HeadQuote quote="VINCIT QUI PATITUR" translation="He conquers who endures" />
+      <HeadQuote quote="VINCIT QUI PATITUR" translation="He conquers who endures" />
 			<Row>
 	            {quests.length
 	                ?
-	                quests.map((quest, i) => 
-                        <Col xs={12} md={4} key={i}>
-                            <Card className="mt-3">
-                                <CardActionArea component={Link} to={`quest/${quest.url}`} 
-                                    sx={{ "&:hover": {
+	                quests.map((quest, i) =>
+                        <Col xs={12} md={4} key={i} className="quest-col">
+                            <Card className="mt-3" sx={{ borderRadius: '20px'}} >
+                                <CardActionArea component={Link} to={`quest/${quest.url}`}
+                                    sx={{
+                                            height: "100%",
+                                            "&:hover": {
                                             backgroundColor: 'transparent',
                                             color: 'white',
                                             cursor: "pointer"
-                                        } 
+                                        }
                                     }}
                                 >
                                     <CardMedia
@@ -70,7 +70,7 @@ const Home = () => {
                                     />
                                     <CardContent>
                                         <Typography gutterBottom variant="h4" component="div">{quest.name}</Typography>
-                                        <Typography variant="body1" component="div" sx={{ height: 100, position: 'relative', overflow: 'auto', maxHeight: 100}}>{quest.brief_description}</Typography>
+                                        <Typography variant="body2" component="div" sx={{ height: 100, position: 'relative', overflow: 'auto', maxHeight: 100}}>{quest.brief_description}</Typography>
                                     </CardContent>
                                 </CardActionArea>
                             </Card>
