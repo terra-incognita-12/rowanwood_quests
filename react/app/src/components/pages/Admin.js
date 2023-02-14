@@ -25,7 +25,7 @@ import Slide from '@mui/material/Slide';
 const Admin = () => {
 	const [rows, setRows] = useState([])
 
-    const axiosPrivate = useAxiosPrivate()  
+    const axiosPrivate = useAxiosPrivate()
     const location = useLocation()
     const redirectLogin = useRedirectLogin(location)
 
@@ -33,23 +33,23 @@ const Admin = () => {
 		{ field: 'username', headerName: 'Username', flex: 0.7 },
 		{ field: 'email', headerName: 'Email', flex: 0.7 },
 		{ field: 'role', headerName: 'Role', flex: 0.7 },
-		{ 	
+		{
 			field: 'changeRole',
 			flex: 0.5,
 			headerName: 'Change Role',
-			renderCell: (params) => 
+			renderCell: (params) =>
 	      		<Button onClick={() => handleChangeUserRole(params.row.username, params.row.role)} size="small">
 	      			{params.row.role === "editor"
 	      				? "Make User"
 	      				: "Make Editor"
 	      			}
-	      		</Button>, 
+	      		</Button>,
 		},
-		{ 	
+		{
 			field: 'deleteUser',
 			flex: 0.3,
 			headerName: 'Delete User',
-			renderCell: (params) => 
+			renderCell: (params) =>
 	      		<IconButton onClick={() => handleDeleteUser(params.row.username)} size="small" color="error"><HighlightOffIcon/></IconButton>,
 		},
 	];
@@ -69,7 +69,7 @@ const Admin = () => {
 			} else {
 				console.log(err)
 			}
-		}	
+		}
 
     }
 
@@ -86,7 +86,7 @@ const Admin = () => {
 			} else {
 				console.log(err)
 			}
-		}	
+		}
 
     }
 
@@ -123,6 +123,15 @@ const Admin = () => {
 	            <CardContent sx={{ height: 'auto', overflow: "auto" }}>
 	                <Typography gutterBottom variant="h3" component="div">Users</Typography>
 	                <DataGrid
+	                	disableSelectionOnClick
+	                	className="mt-2"
+				        rows={rows}
+				        columns={columns}
+				        autoHeight={true}
+				    />
+				      <hr/>
+				      <Typography gutterBottom variant="h3" component="div">Activation Menu</Typography>
+				      <DataGrid
 	                	disableSelectionOnClick
 	                	className="mt-2"
 				        rows={rows}

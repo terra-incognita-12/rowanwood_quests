@@ -77,7 +77,6 @@ const Sitenavbar = () => {
 					sx={{
 						mr: 2,
 						display: { xs: 'none', md: 'flex' },
-						fontFamily: 'monospace',
 						fontWeight: 700,
 						letterSpacing: '.3rem',
 						color: 'inherit',
@@ -126,8 +125,8 @@ const Sitenavbar = () => {
 						    <MenuItem component={Link} to="/about">
 						    	<Typography textAlign="center">About</Typography>
 						    </MenuItem>
-						    { auth?.role === 'admin' 
-								? 
+						    { auth?.role === 'admin'
+								?
 								<>
 								  	<MenuItem component={Link} to="/editor">
 						    			<Typography textAlign="center">Editor</Typography>
@@ -135,16 +134,16 @@ const Sitenavbar = () => {
 						    		<MenuItem component={Link} to="/admin">
 						    			<Typography textAlign="center">Admin</Typography>
 						    		</MenuItem>
-								</>	
+								</>
 								: auth?.role === 'editor'
-									? 
+									?
 									<MenuItem component={Link} to="/editor">
 						    			<Typography textAlign="center">Editor</Typography>
 						    		</MenuItem>
-									: null 
+									: null
 							}
 						</Menu>
-					</Box>					
+					</Box>
 					<Typography
 						variant="h5"
 						noWrap
@@ -155,7 +154,6 @@ const Sitenavbar = () => {
 							mr: 2,
 						  	display: { xs: 'flex', md: 'none' },
 						  	flexGrow: 1,
-						  	fontFamily: 'monospace',
 						  	fontWeight: 700,
 						  	letterSpacing: '.3rem',
 						  	color: 'inherit',
@@ -186,8 +184,8 @@ const Sitenavbar = () => {
 					  	>
 					    About
 					  	</Button>
-					  	{ auth?.role === 'admin' 
-							? 
+					  	{ auth?.role === 'admin'
+							?
 							<>
 							  	<Button
 								    component={Link}
@@ -204,9 +202,9 @@ const Sitenavbar = () => {
 							    Admin
 							  	</Button>
 								
-							</>	
+							</>
 							: auth?.role === 'editor'
-								? 
+								?
 								<Button
 								    component={Link}
 								    to="/editor"
@@ -214,12 +212,12 @@ const Sitenavbar = () => {
 							  	>
 							    Editor
 							  	</Button>
-								: null 
+								: null
 						}
 					</Box>
 
 					<Box sx={{ flexGrow: 0 }}>
-					{ auth?.user 
+					{ auth?.user
 						?
 						<>
 							<Tooltip title="Open settings">
