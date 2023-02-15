@@ -24,6 +24,7 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import useAxiosPrivateMultipart from "../../hooks/useAxiosPrivateMultipart"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
 import LoadingBackdrop from "../Backdrop"
+import useAuth from "../../hooks/useAuth"
 
 const URL_REGEX = /^[a-z][a-z0-9-_]{3,30}$/
 
@@ -32,8 +33,9 @@ const EditQuestForm = ({ quest }) => {
 	const navigate = useNavigate()
 	const location = useLocation()
 	const axiosPrivate = useAxiosPrivate()
-    const axiosPrivateMultipart = useAxiosPrivateMultipart()  
+    const axiosPrivateMultipart = useAxiosPrivateMultipart()
     const redirectLogin = useRedirectLogin(location)
+    const { auth } = useAuth()
 
     const questId = quest?.id
     const questName = quest?.name
@@ -51,6 +53,8 @@ const EditQuestForm = ({ quest }) => {
 	const [telegramUrl, setTelegramUrl] = useState("")
     const [isActivated, setIsActivated] = useState("")
 
+  const [isPending, setIsPending] = useState("")
+
 	const [photo, setPhoto] = useState("")
     const [isPhotoUploaded, setIsPhotoUploaded] = useState(false)
 
@@ -66,6 +70,34 @@ const EditQuestForm = ({ quest }) => {
 		setPhoto(questPhoto)
         setIsActivated(questIsActivated)
 	}, [questName, questBriefDesc, questFullDesc, questUrl, questTelegramUrl, questPhoto, questIsActivated])
+	
+	useEffect(() => {
+	  let isMounted = true
+    const controller = new AbortController()
+    
+    const getPendingStatus = async () => {
+      try {
+        const response = await axiosPrivate.get(`/quest/activation/${questId}`, {
+          signal: controller.signal
+        })
+        isMounted && setIsPending(response.data.status)
+        console.log(response.data.status)
+      } catch (err) {
+    		if (err?.response?.status === 400) {
+    			redirectLogin()
+    		} else {
+    				console.log(err)
+    		}
+    	}
+    }
+  	
+  	getPendingStatus()
+  	
+  	return () => {
+  		isMounted = false
+  		controller.abort()
+  	}
+	}, [])
 
 
 	const handleShowErr = (e) => {
@@ -79,7 +111,7 @@ const EditQuestForm = ({ quest }) => {
         } else {
             setIsPhotoUploaded(true)
             setPhoto(e.target.files[0])
-        }   
+        }
     }
 
     const handleCleanPhotoUpload = (e) => {
@@ -92,9 +124,9 @@ const EditQuestForm = ({ quest }) => {
     }
 
     const handleQuestActivation = async () => {
-        let question = "You are about to activate this quest, make sure quest bot is running. You wish to proceed?"
+        let question = "You are about to request activation for this quest, make sure that all is nice and square! You wish to proceed?"
         if (isActivated) {
-            question = "You are about to deactivate this quest, make sure quest bot is off. You wish to proceed?"
+            question = "You are about to request deactivation this quest, make sure you have a good reason why! You wish to proceed?"
         }
 
         const answer = window.confirm(question)
@@ -103,7 +135,7 @@ const EditQuestForm = ({ quest }) => {
         setBackdropOpen(true)
 
         try {
-            await axiosPrivate.patch(`/quest/update/activate/${questId}`)
+            const response = await axiosPrivate.post("/quest/activation/create", JSON.stringify({"user_id": auth.id, "quest_id": questId}))
             window.location.reload(false);
         } catch (err) {
             if (!err?.response) {
@@ -234,7 +266,7 @@ const EditQuestForm = ({ quest }) => {
 	return (
 		<>
             <LoadingBackdrop open={backdropOpen} />
-			{showErrMsg 
+			{showErrMsg
 				?
 				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
 			    : null
@@ -245,9 +277,13 @@ const EditQuestForm = ({ quest }) => {
                     <Stack spacing={2} direction="row" sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Box>
                             <Typography gutterBottom variant="h3" component="div">{questName}</Typography>
-                            {questIsActivated
-                                ? <Button onClick={handleQuestActivation} variant="contained" color="primary">Deactivate Quest</Button>
-                                : <Button onClick={handleQuestActivation} variant="contained" color="primary">Activate Quest</Button>
+                            {isPending
+                              ?
+                              <Button variant="contained" color="primary" disabled>Request Pending...</Button>
+                              :
+                              questIsActivated
+                                ? <Button onClick={handleQuestActivation} variant="contained" color="primary">Request Deactivation</Button>
+                                : <Button onClick={handleQuestActivation} variant="contained" color="primary">Request Activation</Button>
                             }
                             <Stack spacing={1} direction="row" className="mt-1">
                                 <Button component={Link} to={`${questUrl}`} variant="contained" color="primary">Edit Lines</Button>
@@ -362,7 +398,7 @@ const EditQuestForm = ({ quest }) => {
                                     </Stack>
                                 )
                                 : null
-                            }   
+                            }
                         </Stack>
                         <div className="mt-3">
                             <Button variant="contained" color="success" type="submit">Update Quest</Button>

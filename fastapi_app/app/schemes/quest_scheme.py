@@ -51,7 +51,7 @@ class QuestNextLineScheme(BaseModel):
         orm_mode = True
 
 class QuestLineSendScheme(QuestLineBaseScheme):
-    quest_current_options: List[QuestOptionSendScheme] = [] 
+    quest_current_options: List[QuestOptionSendScheme] = []
 
 # OPTION response
 
@@ -100,6 +100,19 @@ class QuestResponseSchemeForActivation(BaseModel):
 # QUEST ACTIVATION crud
 
 class QuestActivationBaseScheme(BaseModel):
+    user_id: Union[uuid.UUID, None] = None
+    quest_id: Union[uuid.UUID, None] = None
+    
+    class Config:
+        orm_mode = True
+        
+class QuestActivationSendScheme(QuestActivationBaseScheme):
+    pass
+
+class QuestActivationResponseScheme(BaseModel):
     id: uuid.UUID
     user_requested: UserResponse
     quest_requested: QuestResponseSchemeForActivation
+    
+    class Config:
+        orm_mode = True

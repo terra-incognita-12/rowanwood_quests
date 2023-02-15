@@ -11,7 +11,7 @@ from typing import List
 from ..s3 import s3
 from ..config import settings
 from ..database import get_db
-from ..models import Quest, Comment, QuestLine, QuestOption, User
+from ..models import Quest, Comment, QuestLine, QuestOption, User, QuestActivationRequest
 from ..schemes import quest_scheme
 from ..oauth2 import require_user, require_editor
 
@@ -139,13 +139,47 @@ def delete_quest(url: str, db: Session = Depends(get_db)):
     
     return {'status': 'OK'}
 
-# QUEST ACTIVATION 
+# QUEST ACTIVATION
 
 # CREATE
 
-# @router.post('/create', status_code=status.HTTP_201_CREATED)
-# def create_quest_activation(payload: quest_scheme.QuestActivationBaseScheme, db: Session = Depends(get_db)):
+@router.post('/activation/create', status_code=status.HTTP_201_CREATED)
+def create_quest_activation(payload: quest_scheme.QuestActivationSendScheme, db: Session = Depends(get_db)):
+    new_activation_request = QuestActivationRequest(**payload.dict())
+    db.add(new_activation_request)
+    db.commit()
+    db.refresh(new_activation_request)
 
+    return {'status': 'OK'}
+
+# READ
+
+@router.get('/activation/all', response_model=List[quest_scheme.QuestActivationResponseScheme])
+def get_all_activation_requests(db: Session = Depends(get_db)):
+    requests = db.query(QuestActivationRequest).all()
+    return requests
+
+@router.get('/activation/{quest_id}')
+def get_if_quest_is_pending(quest_id: str, db: Session = Depends(get_db)):
+    quest = db.query(QuestActivationRequest).filter(QuestActivationRequest.quest_id == quest_id).first()
+    if quest:
+        return {'status': True}
+    return {'status': False}
+
+# DELETE
+
+@router.delete('/activation/delete/{id}')
+def delete_activation_request(id: str, db: Session = Depends(get_db)):
+
+    check_request = db.query(QuestActivationRequest).filter(QuestActivationRequest.id == id).first()
+    
+    if not check_request:
+        raise HTTPException(status_code=404, detail="Activation request dosen't exists")
+
+    db.delete(check_request)
+    db.commit()
+
+    return {'status': 'OK'}
 
 # LINES
 
