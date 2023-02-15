@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List, Union
 
 from .comment_scheme import CommentResponseScheme
+from .user_scheme import UserResponse
 
 # QUEST base, send
 
@@ -65,7 +66,7 @@ class QuestLineResponseScheme(QuestLineBaseScheme):
     photo: Union[str, None] = None
     quest_current_options: List[QuestOptionResponseScheme] = []
 
-# QUEST response (preview, dropdown, w/comments, w/lines)
+# QUEST response (preview, dropdown, w/comments, w/lines, for activation)
 
 class QuestResponseSchemePreview(QuestBaseScheme):
     id: uuid.UUID
@@ -88,5 +89,17 @@ class QuestResponseSchemeWithLines(QuestBaseScheme):
     photo: Union[str, None] = None
     quest_lines: List[QuestLineResponseScheme] = []
 
+class QuestResponseSchemeForActivation(BaseModel):
+    id: uuid.UUID
+    name: str
+    is_activated: bool
 
+    class Config:
+        orm_mode = True
 
+# QUEST ACTIVATION crud
+
+class QuestActivationBaseScheme(BaseModel):
+    id: uuid.UUID
+    user_requested: UserResponse
+    quest_requested: QuestResponseSchemeForActivation

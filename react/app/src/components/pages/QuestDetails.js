@@ -114,7 +114,9 @@ const QuestDetails = () => {
                         )
                         : null
                     }
-                    <Typography gutterBottom variant="body1">{quest.full_description}</Typography>
+                    <Box sx={{ minHeight: { xs: 200, sm: 400, md: 450, lg: 550 }}}>
+                        <Typography gutterBottom variant="body1">{quest.full_description}</Typography>
+                    </Box>
                     <hr/>
                     <Typography gutterBottom variant="h6">Telegram address: <i>@{quest.telegram_url}</i></Typography>
                     <Button component={Link} to={`/library?tag=${quest.url}`} variant="text">#{quest.url} </Button>
@@ -131,7 +133,7 @@ const QuestDetails = () => {
 													<Avatar alt="User photo" src={comment.user.photo} />
 												</div>
 												<div>
-													<Typography variant="h5">{comment.user.username}</Typography>
+													<Typography variant="body1">{comment.user.username}</Typography>
 													<Typography gutterBottom variant="body2" color="text.secondary">{moment(new Date(comment.created_at)).format('MM/DD/YY HH:mm:ss')}</Typography>
 												</div>
 											</Stack>
@@ -145,7 +147,7 @@ const QuestDetails = () => {
 												: null
 											}
 										</div>
-										<Typography variant="body1">{comment.text_comment}</Typography>
+										<Typography variant="body2">{comment.text_comment}</Typography>
 		                            </Paper>
 								</Col>
 							</Row>

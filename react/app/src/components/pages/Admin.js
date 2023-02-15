@@ -23,13 +23,13 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Slide from '@mui/material/Slide';
 
 const Admin = () => {
-	const [rows, setRows] = useState([])
+	const [rowsUsers, setRowsUsers] = useState([])
 
     const axiosPrivate = useAxiosPrivate()
     const location = useLocation()
     const redirectLogin = useRedirectLogin(location)
 
-    const columns = [
+    const columnsUsers = [
 		{ field: 'username', headerName: 'Username', flex: 0.7 },
 		{ field: 'email', headerName: 'Email', flex: 0.7 },
 		{ field: 'role', headerName: 'Role', flex: 0.7 },
@@ -99,7 +99,7 @@ const Admin = () => {
     			const response = await axiosPrivate.get("/user/all", {
     				signal: controller.signal
     			})
-    			isMounted && setRows(response.data)
+    			isMounted && setRowsUsers(response.data)
     		} catch (err) {
     			if (err?.response?.status === 400) {
 					redirectLogin()
@@ -108,6 +108,12 @@ const Admin = () => {
 				}
     		}
     	}
+
+        // const getActivationRequests = async () => {
+        //     try {
+        //         const respone = await axiosPrivate.get("")
+        //     }
+        // }
 
     	getUsers()
 
@@ -125,8 +131,8 @@ const Admin = () => {
 	                <DataGrid
 	                	disableSelectionOnClick
 	                	className="mt-2"
-				        rows={rows}
-				        columns={columns}
+				        rows={rowsUsers}
+				        columns={columnsUsers}
 				        autoHeight={true}
 				    />
 				      <hr/>
@@ -134,8 +140,8 @@ const Admin = () => {
 				      <DataGrid
 	                	disableSelectionOnClick
 	                	className="mt-2"
-				        rows={rows}
-				        columns={columns}
+				        rows={rowsUsers}
+				        columns={columnsUsers}
 				        autoHeight={true}
 				    />
 	            </CardContent>

@@ -38,6 +38,16 @@ class Quest(Base):
 	quest_comments = relationship('Comment', back_populates='quest', order_by='Comment.created_at')
 	quest_lines = relationship('QuestLine', back_populates='quest', order_by='QuestLine.unique_number')
 
+class QuestActivationRequest(Base):
+    __tablename__ = 'quest_activation_requests'
+
+    id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    quest_id = Column(UUID(as_uuid=True), ForeignKey('quests.id', ondelete='CASCADE'), nullable=False)
+
+    user_requested = relationship('User', backref=backref('user_requested', cascade="all,delete"), foreign_keys=[user_id])
+    quest_requested = relationship('Quest', backref=backref('quest_requested',cascade="all,delete"), foreign_keys=[quest_id])
+
 class Comment(Base):
 	__tablename__ = 'comments'
 

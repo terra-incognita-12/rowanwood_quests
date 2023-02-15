@@ -139,6 +139,14 @@ def delete_quest(url: str, db: Session = Depends(get_db)):
     
     return {'status': 'OK'}
 
+# QUEST ACTIVATION 
+
+# CREATE
+
+# @router.post('/create', status_code=status.HTTP_201_CREATED)
+# def create_quest_activation(payload: quest_scheme.QuestActivationBaseScheme, db: Session = Depends(get_db)):
+
+
 # LINES
 
 # CREATE
