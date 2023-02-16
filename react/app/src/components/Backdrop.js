@@ -10,6 +10,4 @@ const LoadingBackdrop = ({ open }) => {
 	)
 }
 
-// zIndex: (theme) => theme.zIndex.drawer + 1
-
 export default LoadingBackdrop

@@ -23,8 +23,8 @@ const EMAIL_REGEX = /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/
 const ChangeEmailDialog = ({ open, close, username }) => {
 	const navigate = useNavigate()
 	const location = useLocation()
-	const axiosPrivate = useAxiosPrivate()  
-    const redirectLogin = useRedirectLogin(location)
+	const axiosPrivate = useAxiosPrivate()
+	const redirectLogin = useRedirectLogin(location)
 
 	const [backdropOpen, setBackdropOpen] = useState(false)
 
@@ -75,9 +75,9 @@ const ChangeEmailDialog = ({ open, close, username }) => {
 			} else if (err?.response?.status) {
 				setErrMsg(err?.response?.data?.detail)
 			} else {
-                setErrMsg("Change email failed")
-            }
-            handleShowErr(true)
+				setErrMsg("Change email failed")
+			}
+			handleShowErr(true)
 		} finally {
 			setBackdropOpen(false)
 		}
@@ -87,59 +87,59 @@ const ChangeEmailDialog = ({ open, close, username }) => {
 		<>
 		<LoadingBackdrop open={backdropOpen} />
 		<Dialog open={open} onClose={close} maxWidth='sm' fullWidth={true} sx={{ zIndex: '2' }}>
-			{showErrMsg 
+			{showErrMsg
 				?
 				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
-			    : null
+					: null
 			}
-	        <DialogTitle>Change Email</DialogTitle>
-	        <Form onSubmit={handleSubmit}>
-		        <DialogContent>
-			        <DialogContentText>
-			        	Provide new email and confirm your password. You will recieve confirmation mail to complete changes
-	          		</DialogContentText>
-		          	<FormControl fullWidth>
-			          	<TextField
-				            autoFocus
-				            error={!validEmail && email}
-				            margin="dense"
-				            id="email"
-				            label="Email"
-				            type="email"
-				            fullWidth
-				            variant="standard"
-				            value={email}
+			<DialogTitle>Change Email</DialogTitle>
+			<Form onSubmit={handleSubmit}>
+				<DialogContent>
+					<DialogContentText>
+						Provide new email and confirm your password. You will recieve confirmation mail to complete changes
+					</DialogContentText>
+					<FormControl fullWidth>
+						<TextField
+							autoFocus
+							error={!validEmail && email}
+							margin="dense"
+							id="email"
+							label="Email"
+							type="email"
+							fullWidth
+							variant="standard"
+							value={email}
 							onChange={(e) => setEmail(e.target.value)}
 							required
-			          	/>
-			          	{!validEmail && email
-                        	?
-                        	<FormHelperText sx={{ color: "#fc0303" }}>Should be proper email format</FormHelperText>
-                        	: null
-                        }
-			        </FormControl>
-			        <FormControl fullWidth>
-			          	<TextField
-				            autoFocus
-				            margin="dense"
-				            id="password"
-				            label="Password"
-				            type="password"
-				            fullWidth
-				            variant="standard"
-				            value={pass}
+						/>
+						{!validEmail && email
+							?
+							<FormHelperText sx={{ color: "#fc0303" }}>Should be proper email format</FormHelperText>
+							: null
+						}
+					</FormControl>
+					<FormControl fullWidth>
+						<TextField
+							autoFocus
+							margin="dense"
+							id="password"
+							label="Password"
+							type="password"
+							fullWidth
+							variant="standard"
+							value={pass}
 							onChange={(e) => setPass(e.target.value)}
 							required
-			          	/>
-			        </FormControl>
-		        </DialogContent>
-		        <DialogActions>
-		        	<Button onClick={closeDialog}>Cancel</Button>
-		        	<Button type="submit" color="success">Change</Button>
-		        </DialogActions>
-		    </Form>
-      </Dialog>
-      </>
+						/>
+					</FormControl>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeDialog}>Cancel</Button>
+					<Button type="submit" color="success">Change</Button>
+				</DialogActions>
+			</Form>
+		</Dialog>
+		</>
 	)
 }
 

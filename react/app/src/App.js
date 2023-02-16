@@ -40,14 +40,14 @@ import ChangePass from "./components/pages/recoverPass/ChangePass"
 import Unauthorized from "./components/pages/Unauthorized"
 
 const darkTheme = createTheme({
-    palette: {
-      mode: "dark",
-    },
-    typography: {
-      fontFamily: "QuattrocentoRegular",
-      fontSize: 15,
-    },
-  });
+  palette: {
+    mode: "dark",
+  },
+  typography: {
+    fontFamily: "QuattrocentoRegular",
+    fontSize: 15,
+  },
+})
 
 function App() {
   return (

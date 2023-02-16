@@ -3,8 +3,6 @@ import { useNavigate, Link } from "react-router-dom"
 import Alert from "react-bootstrap/Alert"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
-// import Card from "react-bootstrap/Card"
-// import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
 
 import Button from '@mui/material/Button';
@@ -70,7 +68,7 @@ const Register = () => {
 	}, [pass])
 
 	useEffect(() => {
-		setValidConfPass(pass === confPass && validPass) 
+		setValidConfPass(pass === confPass && validPass)
 	}, [confPass])
 
 	const handleShowErr = (e) => {
@@ -78,23 +76,23 @@ const Register = () => {
 	}
 
 	const handlePhotoUploaded = (e) => {
-        if (!e.target.files[0]) {
-            setIsPhotoUploaded(false)
-            setPhoto("")
-        } else {
-            setIsPhotoUploaded(true)
-            setPhoto(e.target.files[0])
-        }   
-    }
+		if (!e.target.files[0]) {
+				setIsPhotoUploaded(false)
+				setPhoto("")
+		} else {
+				setIsPhotoUploaded(true)
+				setPhoto(e.target.files[0])
+		}
+	}
 
-    const handleCleanPhotoUpload = (e) => {
-        e.target.value = ""
-    }
+	const handleCleanPhotoUpload = (e) => {
+			e.target.value = ""
+	}
 
-    const handleRemovePhotoBeforeUpload = (e) => {
-        setIsPhotoUploaded(false)
-        setPhoto("")
-    }
+	const handleRemovePhotoBeforeUpload = (e) => {
+			setIsPhotoUploaded(false)
+			setPhoto("")
+	}
 
 	const handleSubmit = async (e) => {
 		setBackdropOpen(true)
@@ -125,146 +123,145 @@ const Register = () => {
 			userId = response.data.id
 		} catch (err) {
 			if (!err?.response) {
-                setErrMsg("No server respone")
-            } else if (err?.response?.status) {
-                setErrMsg(err?.response?.data?.detail)
-            } else {
-                setErrMsg("Registration Failed")
-            }
-            handleShowErr(true)
-            setBackdropOpen(false)
-            window.scrollTo(0, 0)
-            return
+				setErrMsg("No server respone")
+			} else if (err?.response?.status) {
+				setErrMsg(err?.response?.data?.detail)
+			} else {
+				setErrMsg("Registration Failed")
+			}
+			handleShowErr(true)
+			setBackdropOpen(false)
+			window.scrollTo(0, 0)
+			return
 		}
 
 		if (!isPhotoUploaded) {
-            alert("Email with confirmation was sent to you!")
-        } else {
-            let photo_data = new FormData();
-            photo_data.append("photo", photo)
+			alert("Email with confirmation was sent to you!")
+		} else {
+			let photo_data = new FormData();
+			photo_data.append("photo", photo)
 
-            try {
-                await axios.patch(`/auth/update_photo/${userId}`, photo_data, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                })
-                alert("Email with confirmation was sent to you!")
-            } catch (err) {
-                console.log(err)
-                alert("Main info on record created successfully, but it was issue with update photo, please try again")
-            }
-        }		
+			try {
+				await axios.patch(`/auth/update_photo/${userId}`, photo_data, {
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+				})
+				alert("Email with confirmation was sent to you!")
+			} catch (err) {
+				console.log(err)
+				alert("Main info on record created successfully, but it was issue with update photo, please try again")
+			}
+		}
 
-        navigate("/login", { replace: true})
+		navigate("/login", { replace: true})
 	}
 
 	return (
 		<>
-        <LoadingBackdrop open={backdropOpen} />
+		<LoadingBackdrop open={backdropOpen} />
 		<Row className="justify-content-center mt-5">
 			<Col xs={12} lg={5}>
-				{showErrMsg 
-					?
-					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
-				    : null
-				}
-				<Card>
-                	<CardContent>
-						<Form onSubmit={handleSubmit} className="mb-2">
-							<FormControl fullWidth className="mb-3">
-		                        <InputLabel htmlFor="username">Username</InputLabel>
-		                        <OutlinedInput
-		                        	error={!validUsername && username}
-		                            id="username"
-		                            type="text"
-		                            value={username}
-		                            onChange={(e) => setUsername(e.target.value)}
-		                            label="Username"
-		                            required
-		                        />
-		                        {!validUsername && username
-		                        	?
-		                        	<FormHelperText sx={{ color: "#fc0303" }}>
-		                        		Username must start with the lower or upper case letter and after must followed by 3 to 23 char that can be lowercase, upper, number, - and _
-                                	</FormHelperText>
-                                	: null
-		                        }
-		                    </FormControl>
-		                    <FormControl fullWidth className="mb-3">
-		                        <InputLabel htmlFor="email">Email</InputLabel>
-		                        <OutlinedInput
-		                        	error={!validEmail && email}
-		                            id="email"
-		                            type="email"
-		                            value={email}
-		                            onChange={(e) => setEmail(e.target.value)}
-		                            label="Email"
-		                            required
-		                        />
-		                        {!validEmail && email
-		                        	?
-		                        	<FormHelperText sx={{ color: "#fc0303" }}>Should be proper email format</FormHelperText>
-                                	: null
-		                        }
-		                    </FormControl>
-		                    <FormControl fullWidth className="mb-3">
-		                        <InputLabel htmlFor="password">Password</InputLabel>
-		                        <OutlinedInput
-		                        	error={!validPass && pass}
-		                            id="password"
-		                            type="password"
-		                            value={pass}
-		                            onChange={(e) => setPass(e.target.value)}
-		                            label="Password"
-		                            required
-		                        />
-		                        {!validPass && pass
-		                        	?
-		                        	<FormHelperText sx={{ color: "#fc0303" }}>
-		                        		Password must be at least one lowercase letter, one uppercase letter, one digit, and one special character and size is 8 to 24
-                                	</FormHelperText>
-                                	: null
-		                        }
-		                    </FormControl>
-		                    <FormControl fullWidth className="mb-3">
-		                        <InputLabel htmlFor="confPass">Confirm Password</InputLabel>
-		                        <OutlinedInput
-		                        	error={!validConfPass && confPass}
-		                            id="confPass"
-		                            type="password"
-		                            value={confPass}
-		                            onChange={(e) => setConfPass(e.target.value)}
-		                            label="Confirm Password"
-		                            required
-		                        />
-		                        {!validConfPass && confPass
-		                        	?
-		                        	<FormHelperText sx={{ color: "#fc0303" }}>Passwords should be matching</FormHelperText>
-                                	: null
-		                        }
-		                    </FormControl>
-		                    <Stack spacing={2} direction="row" className="mb-2">
-		                        <Button variant="contained" component="label">
-		                            Upload Photo
-		                            <input hidden accept="image/*" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload} />
-		                        </Button>
-		                        {isPhotoUploaded && photo.name
-		                            ? (
-		                                <Stack spacing={1} direction="row">
-		                                    <Typography gutterBottom variant="overline" component="div">{photo.name}</Typography>
-		                                    <IconButton edge="end" color="error" onClick={handleRemovePhotoBeforeUpload}>
-		                                        <CloseIcon />
-		                                    </IconButton>
-		                                </Stack>
-		                            )
-		                            : null
-		                        }   
-		                    </Stack>
-							<Button variant="contained" color="success" type="submit" fullWidth>Create Account</Button>
-						</Form>
-						<Typography display="flex" justifyContent="center" alignItems="center"><Button component={Link} to="/login">Back to Login</Button></Typography>
-                	</CardContent>
+			{showErrMsg
+				?
+				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
+				: null
+			}
+			<Card>
+				<CardContent>
+				<Form onSubmit={handleSubmit} className="mb-2">
+					<FormControl fullWidth className="mb-3">
+						<InputLabel htmlFor="username">Username</InputLabel>
+						<OutlinedInput
+							error={!validUsername && username}
+							id="username"
+							type="text"
+							value={username}
+							onChange={(e) => setUsername(e.target.value)}
+							label="Username"
+							required
+						/>
+						{!validUsername && username
+							?
+							<FormHelperText sx={{ color: "#fc0303" }}>
+								Username must start with the lower or upper case letter and after must followed by 3 to 23 char that can be lowercase, upper, number, - and _
+									</FormHelperText>
+							: null
+						}
+					</FormControl>
+					<FormControl fullWidth className="mb-3">
+						<InputLabel htmlFor="email">Email</InputLabel>
+						<OutlinedInput
+							error={!validEmail && email}
+							id="email"
+							type="email"
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
+							label="Email"
+							required
+						/>
+						{!validEmail && email
+							?
+							<FormHelperText sx={{ color: "#fc0303" }}>Should be proper email format</FormHelperText>
+							: null
+						}
+					</FormControl>
+					<FormControl fullWidth className="mb-3">
+						<InputLabel htmlFor="password">Password</InputLabel>
+						<OutlinedInput
+							error={!validPass && pass}
+							id="password"
+							type="password"
+							value={pass}
+							onChange={(e) => setPass(e.target.value)}
+							label="Password"
+							required
+						/>
+						{!validPass && pass
+							?
+							<FormHelperText sx={{ color: "#fc0303" }}>
+								Password must be at least one lowercase letter, one uppercase letter, one digit, and one special character and size is 8 to 24
+									</FormHelperText>
+							: null
+						}
+					</FormControl>
+					<FormControl fullWidth className="mb-3">
+						<InputLabel htmlFor="confPass">Confirm Password</InputLabel>
+						<OutlinedInput
+							error={!validConfPass && confPass}
+							id="confPass"
+							type="password"
+							value={confPass}
+							onChange={(e) => setConfPass(e.target.value)}
+							label="Confirm Password"
+							required
+						/>
+						{!validConfPass && confPass
+							?
+							<FormHelperText sx={{ color: "#fc0303" }}>Passwords should be matching</FormHelperText>
+							: null
+						}
+						</FormControl>
+						<Stack spacing={2} direction="row" className="mb-2">
+							<Button variant="contained" component="label">
+								Upload Photo
+								<input hidden accept="image/*" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload} />
+							</Button>
+							{isPhotoUploaded && photo.name
+								? (
+								<Stack spacing={1} direction="row">
+										<Typography gutterBottom variant="overline" component="div">{photo.name}</Typography>
+										<IconButton edge="end" color="error" onClick={handleRemovePhotoBeforeUpload}>
+												<CloseIcon />
+										</IconButton>
+								</Stack>
+								) : null
+							}
+						</Stack>
+						<Button variant="contained" color="success" type="submit" fullWidth>Create Account</Button>
+					</Form>
+					<Typography display="flex" justifyContent="center" alignItems="center"><Button component={Link} to="/login">Back to Login</Button></Typography>
+									</CardContent>
 				</Card>
 			</Col>
 		</Row>

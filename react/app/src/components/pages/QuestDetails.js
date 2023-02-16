@@ -33,8 +33,8 @@ const QuestDetails = () => {
 	const { auth } = useAuth()
 	const navigate = useNavigate()
 	const axiosPrivate = useAxiosPrivate()
-    const location = useLocation()
-    const redirectLogin = useRedirectLogin(location)
+	const location = useLocation()
+	const redirectLogin = useRedirectLogin(location)
 
 	const handleCommentChanged = () => setCommentChanged(true)
  
@@ -50,78 +50,77 @@ const QuestDetails = () => {
 			} else if (err?.response?.status) {
 				console.log(err?.response?.data?.detail)
 			} else {
-                console.log("Delete comment failed")
-            }
+				console.log("Delete comment failed")
+			}
 		}
 	}
 
 	useEffect(() => {
 		setBackdropOpen(true)
-        let isMounted = true
-        const controller = new AbortController()
+				let isMounted = true
+				const controller = new AbortController()
 
-        const getQuest = async () => {
-            
-            try {
-                const response = await axios.get(`/quest/${url}`, {
-                    signal: controller.signal
-                })
-                isMounted && setQuest(response.data)
-                commentChanged && setCommentChanged(false)
-            } catch (err) {
-            	if (err?.response?.status === 404) {
-            		navigate(`/notexist?err=${err?.response?.data?.detail}`)
-            	} else {
-                	console.log(err)
-            	}
-            } finally {
-            	setBackdropOpen(false)
-            }
-        }
+				const getQuest = async () => {
+					try {
+						const response = await axios.get(`/quest/${url}`, {
+								signal: controller.signal
+						})
+						isMounted && setQuest(response.data)
+						commentChanged && setCommentChanged(false)
+					} catch (err) {
+						if (err?.response?.status === 404) {
+							navigate(`/notexist?err=${err?.response?.data?.detail}`)
+						} else {
+								console.log(err)
+						}
+					} finally {
+						setBackdropOpen(false)
+					}
+				}
 
-        getQuest()
+				getQuest()
 
-        return () => {
-            isMounted = false
-            controller.abort()
-        }
-    }, [commentChanged])
+				return () => {
+					isMounted = false
+					controller.abort()
+				}
+		}, [commentChanged])
 
 	return (
 		<>
 		<LoadingBackdrop open={backdropOpen} />
 		<div className="mt-3">
-            <Button component={Link} to="/" variant="text" size="large">&lt;&lt; Back</Button>
-            <Card className="mt-3">
-                <CardContent>
-                    <Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">{quest.name}</Typography>
-                    {quest.photo
-                        ? (
-                            <Box className="figure w-50 float-end m-3">
-                                <Box
-                                    component="img"
-                                    sx={{
-                                        height: 550,
-                                        width: 550,
-                                        maxHeight: { xs: 200, sm: 400, md: 450, lg: 550 },
-                                        maxWidth: { xs: 200, sm: 400, md: 450, lg: 550 },
-                                    }}
-                                    alt="Photo"
-                                    src={quest.photo}
-                                    className="figure-img img-fluid rounded img-thumbnail"
-                                />
-                            </Box>
-                        )
-                        : null
-                    }
-                    <Box sx={{ minHeight: { xs: 200, sm: 400, md: 450, lg: 550 }}}>
-                        <Typography gutterBottom variant="body1">{quest.full_description}</Typography>
-                    </Box>
-                    <hr/>
-                    <Typography gutterBottom variant="h6">Telegram address: <i>@{quest.telegram_url}</i></Typography>
-                    <Button component={Link} to={`/library?tag=${quest.url}`} variant="text">#{quest.url} </Button>
-                    <hr/>
-                    {quest.quest_comments?.length
+			<Button component={Link} to="/" variant="text" size="large">&lt;&lt; Back</Button>
+			<Card className="mt-3">
+				<CardContent>
+					<Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">{quest.name}</Typography>
+					{quest.photo
+						? (
+							<Box className="figure w-50 float-end m-3">
+								<Box
+									component="img"
+									sx={{
+										height: 550,
+										width: 550,
+										maxHeight: { xs: 200, sm: 400, md: 450, lg: 550 },
+										maxWidth: { xs: 200, sm: 400, md: 450, lg: 550 },
+									}}
+									alt="Photo"
+									src={quest.photo}
+									className="figure-img img-fluid rounded img-thumbnail"
+								/>
+							</Box>
+						)
+						: null
+					}
+					<Box sx={{ minHeight: { xs: 200, sm: 400, md: 450, lg: 550 }}}>
+						<Typography gutterBottom variant="body1">{quest.full_description}</Typography>
+					</Box>
+					<hr/>
+					<Typography gutterBottom variant="h6">Telegram address: <i>@{quest.telegram_url}</i></Typography>
+					<Button component={Link} to={`/library?tag=${quest.url}`} variant="text">#{quest.url} </Button>
+					<hr/>
+					{quest.quest_comments?.length
 						?
 						quest.quest_comments.map((comment, i) =>
 							<Row key={i} className="mb-3">
@@ -141,30 +140,30 @@ const QuestDetails = () => {
 												?
 												<div>
 													<IconButton edge="start" color="error" onClick={() => handleCommentDelete(comment.id)}>
-                            							<DeleteForeverIcon />
-                            						</IconButton>
+														<DeleteForeverIcon />
+													</IconButton>
 												</div>
 												: null
 											}
 										</div>
 										<Typography variant="body2">{comment.text_comment}</Typography>
-		                            </Paper>
+									</Paper>
 								</Col>
 							</Row>
 						) : <Typography gutterBottom variant="body1">No comments yet, be first!</Typography>
 					}
 					<Row className="mt-3">
-			 			<Col xs={12} md={8}>
-			 				{auth?.user
+            <Col xs={12} md={8}>
+              {auth?.user
 								? <CommentForm url={url} handleCommentChanged={handleCommentChanged} />
 								: <Typography variant="h6">Sign in to leave comments!</Typography>
 							}
 						</Col>
 					</Row>
-                </CardContent>
-            </Card>
-        </div>
-        </>
+        </CardContent>
+      </Card>
+    </div>
+    </>
 	)
 }
 

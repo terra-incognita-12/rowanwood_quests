@@ -7,7 +7,6 @@ from .user_scheme import ForeignKeyUserResponse
 
 class CommentsBaseScheme(BaseModel):
 	text_comment: str
-	# user_id: Union[uuid.UUID, None] = None
 
 	class Config:
 		orm_mode = True

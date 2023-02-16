@@ -20,7 +20,9 @@ router = APIRouter()
 
 FOLDER = 'user/'
 
-# USER/EDITOR
+# ALL USERS
+
+# CHANGE USERNAME
 
 @router.patch('/change_username')
 def change_username(payload: user_scheme.ChangeUsernameScheme, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
@@ -42,6 +44,8 @@ def change_username(payload: user_scheme.ChangeUsernameScheme, db: Session = Dep
 	db.commit()
 
 	return {'success': 'OK'}
+
+# CHANGE EMAIL
 
 @router.patch('/change_email')
 async def change_email(payload: user_scheme.ChangeEmailScheme, request: Request, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
@@ -68,6 +72,8 @@ async def change_email(payload: user_scheme.ChangeEmailScheme, request: Request,
 		print(error)
 		raise HTTPException(status_code=500, detail='There was an error sending email')
 
+# VERIFY EMAIL ADDRESS TO CHANGE EMAIL
+
 @router.get('/verify_change_email/{token}', response_class=RedirectResponse, status_code=302)
 def email_verification(token: str, request: Request, db: Session = Depends(get_db)):
 	token_decode = EmailToken.decode_change_email_token(token)
@@ -86,6 +92,8 @@ def email_verification(token: str, request: Request, db: Session = Depends(get_d
 	db.commit()
 
 	return f"{settings.SITE_ADDRESS}/profile"
+
+# CHANGE PASSWORD WITN NO TOKEN
 
 @router.patch('/change_password_notoken')
 def change_password_notoken(payload: user_scheme.ChangePasswordWithoutTokenUserScheme, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
@@ -149,12 +157,16 @@ def delete_user_photo(db: Session = Depends(get_db), user_id: str = Depends(requ
 
 	return {'status': 'OK'}
 
-# ADMIN 
+# ADMIN
+
+# GET ALL USERS
 
 @router.get('/all', response_model=List[user_scheme.UserResponse])
 def get_all_users(db: Session = Depends(get_db), user_id: str = Depends(require_user)):
 	users = db.query(User).filter(User.role != 'admin').order_by(asc(User.username)).all()
 	return users
+
+# CHANGE USERS'S ROLE
 
 @router.patch('/change_role/{username}')
 def update_user_role(username: str, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
@@ -173,6 +185,8 @@ def update_user_role(username: str, db: Session = Depends(get_db), user_id: str 
 	db.refresh(check_user)
 
 	return {'status': 'success', 'message': 'OK'}
+
+# DELETE USER
 
 @router.delete('/delete/{username}')
 def delete_user(username: str, db: Session = Depends(get_db), user_id: str = Depends(require_user)):

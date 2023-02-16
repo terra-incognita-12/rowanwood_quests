@@ -1,17 +1,14 @@
 import { useState, useEffect } from "react"
 import { useLocation, Link } from "react-router-dom"
 import Form from "react-bootstrap/Form"
-// import Button from "react-bootstrap/Button"
 
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
-
+import InputLabel from '@mui/material/InputLabel'
 
 import useAuth from "../../hooks/useAuth"
-
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import useRedirectLogin from "../../hooks/useRedirectLogin"
@@ -21,27 +18,20 @@ import ErrMsg from '../ErrMsg'
 const CommentForm = ({ url, handleCommentChanged }) => {
 	const [backdropOpen, setBackdropOpen] = useState(false)
 	const [comment, setComment] = useState("")
-    const location = useLocation()
-	const axiosPrivate = useAxiosPrivate()  
-    const redirectLogin = useRedirectLogin(location)
+	const location = useLocation()
+	const axiosPrivate = useAxiosPrivate()
+	const redirectLogin = useRedirectLogin(location)
 
-    const [errMsg, setErrMsg] = useState("")
+	const [errMsg, setErrMsg] = useState("")
 	const [showErrMsg, setShowErrMsg] = useState(false)
-
-
-
+	
 	const { auth } = useAuth()
-
 
 	const handleShowErr = (e) => {
 		setShowErrMsg(e)
 	}
 
 	const handleSubmit = async (e) => {
-		console.log(auth)
-
-
-
 		setBackdropOpen(true)
 		
 		e.preventDefault()
@@ -59,10 +49,10 @@ const CommentForm = ({ url, handleCommentChanged }) => {
 			} else if (err.response?.status) {
 				setErrMsg(err?.response?.data?.detail)
 			} else {
-                setErrMsg("Create Comment Failed")
-            }
-            handleShowErr(true)
-            return
+				setErrMsg("Create Comment Failed")
+			}
+			handleShowErr(true)
+			return
 		} finally {
 			setBackdropOpen(false)
 		}
@@ -71,27 +61,27 @@ const CommentForm = ({ url, handleCommentChanged }) => {
 		<>
 		<LoadingBackdrop open={backdropOpen} />
 		<Form onSubmit={handleSubmit}>
-			{showErrMsg 
+			{showErrMsg
 				?
 				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
-			    : null
+				: null
 			}
-  			<FormControl fullWidth>
-                <InputLabel htmlFor="comment">Comment</InputLabel>
-                <OutlinedInput
-                    id="comment"
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    label="Comment"
-                    required
-                    multiline
-      				rows={6}
-                />
-            </FormControl>
-            <div className="mt-3">
-                <Button variant="contained" color="success" type="submit">Send Comment</Button>
-            </div>
-		</Form>	
+			<FormControl fullWidth>
+				<InputLabel htmlFor="comment">Comment</InputLabel>
+				<OutlinedInput
+					id="comment"
+					value={comment}
+					onChange={(e) => setComment(e.target.value)}
+					label="Comment"
+					required
+					multiline
+					rows={6}
+				/>
+			</FormControl>
+			<div className="mt-3">
+				<Button variant="contained" color="success" type="submit">Send Comment</Button>
+			</div>
+		</Form>
 		</>
 	)
 }

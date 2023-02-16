@@ -30,12 +30,12 @@ import useRedirectLogin from "../../hooks/useRedirectLogin"
 const EditLibraryTagForm = ({ tag }) => {
 	const navigate = useNavigate()
 	const location = useLocation()
-	const axiosPrivate = useAxiosPrivate()  
-    const redirectLogin = useRedirectLogin(location)
+	const axiosPrivate = useAxiosPrivate()
+	const redirectLogin = useRedirectLogin(location)
 
-    const tagId = tag?.id
-    const tagName = tag?.name
-    const tagRecords = tag?.library_records
+	const tagId = tag?.id
+	const tagName = tag?.name
+	const tagRecords = tag?.library_records
 
 	const [name, setName] = useState("")
 	const [records, setRecords] = useState([])
@@ -61,86 +61,86 @@ const EditLibraryTagForm = ({ tag }) => {
 			window.location.reload(false);
 		} catch (err) {
 			if (!err?.response) {
-                setErrMsg("No server respone")
-            } else if (err?.response?.status === 400) {
-                redirectLogin()
-            } else if (err?.response?.status) {
-                setErrMsg(err?.response?.data?.detail)
-            } else {
-                setErrMsg("Update Tag Failed")
-            }
-            handleShowErr(true)
-            window.scrollTo(0, 0);
-            return
+					setErrMsg("No server respone")
+			} else if (err?.response?.status === 400) {
+					redirectLogin()
+			} else if (err?.response?.status) {
+					setErrMsg(err?.response?.data?.detail)
+			} else {
+					setErrMsg("Update Tag Failed")
+			}
+			handleShowErr(true)
+			window.scrollTo(0, 0);
+			return
 		}
 	}
 
-    const handleDelete = async () => {
-        const answer = window.confirm("Are you sure to delete this tag?")
-        if (!answer) { return }
+	const handleDelete = async () => {
+		const answer = window.confirm("Are you sure to delete this tag?")
+		if (!answer) { return }
 
-        try {
-            await axiosPrivate.delete(`/library/tags/delete/${tagId}`)
-            window.location.reload(false);
-        } catch (err) {
-            if (!err?.response) {
-                setErrMsg("No server respone")
-            } else if (err?.response?.status === 400) {
-                redirectLogin()
-            } else if (err?.response?.status) {
-                setErrMsg(err?.response?.data?.detail)
-            } else {
-                setErrMsg("Delete Tag Failed")
-            }
-            handleShowErr(true)
-            window.scrollTo(0, 0);
-        }
-    }
+		try {
+				await axiosPrivate.delete(`/library/tags/delete/${tagId}`)
+				window.location.reload(false);
+		} catch (err) {
+				if (!err?.response) {
+						setErrMsg("No server respone")
+				} else if (err?.response?.status === 400) {
+						redirectLogin()
+				} else if (err?.response?.status) {
+						setErrMsg(err?.response?.data?.detail)
+				} else {
+						setErrMsg("Delete Tag Failed")
+				}
+				handleShowErr(true)
+				window.scrollTo(0, 0);
+		}
+	}
 
 	return (
 		<>
-			{showErrMsg 
-				?
-				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
-			    : null
-			}
-            <Card className="mt-3">
-                <CardContent>
-                    <Row>
-                        <Col xs={12} lg={6} className="mb-2">
-                            <Typography gutterBottom variant="h3" component="div">{tagName}</Typography>
-                            <Button variant="contained" color="error" onClick={handleDelete}>Delete Tag</Button>
-                            <Form onSubmit={handleSubmit} className="mt-3">      
-                                <FormControl fullWidth>
-                                    <InputLabel htmlFor="component-outlined">Name</InputLabel>
-                                    <OutlinedInput
-                                        id="name"
-                                        value={name || ""}
-                                        onChange={(e) => setName(e.target.value)}
-                                        label="Name"
-                                        required
-                                    />
-                                </FormControl>
-                                <div className="mt-3">
-                                    <Button variant="contained" color="success" type="submit">Update Tag</Button>
-                                </div>
-                            </Form>
-                        </Col>
-                        <Col xs={12} lg={6}>
-                            <Typography gutterBottom variant="h5" component="div">Tag used in:</Typography>
-                            <Paper elevation={3}>
-                                <List sx={{ height: 200, position: 'relative', overflow: 'auto', maxHeight: 200}}>
-                                    {records.map((record, i) => 
-                                        <ListItem key={i} component="div">
-                                            <ListItemText primary={`${record.name}`} />
-                                        </ListItem>
-                                    )}
-                                </List>
-                            </Paper>
-                        </Col>
-                    </Row>
-                </CardContent>
-            </Card>
+		{showErrMsg
+			?
+			<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
+				: null
+		}
+		<Card className="mt-3">
+			<CardContent>
+				<Row>
+					<Col xs={12} lg={6} className="mb-2">
+						<Typography gutterBottom variant="h3" component="div">{tagName}</Typography>
+						<Button variant="contained" color="error" onClick={handleDelete}>Delete Tag</Button>
+						<Form onSubmit={handleSubmit} className="mt-3">
+							<FormControl fullWidth>
+								<InputLabel htmlFor="component-outlined">Name</InputLabel>
+								<OutlinedInput
+										id="name"
+										value={name || ""}
+										onChange={(e) => setName(e.target.value)}
+										label="Name"
+										required
+								/>
+							</FormControl>
+							<div className="mt-3">
+								<Button variant="contained" color="success" type="submit">Update Tag</Button>
+							</div>
+						</Form>
+					</Col>
+					<Col xs={12} lg={6}>
+						<Typography gutterBottom variant="h5" component="div">Tag used in:</Typography>
+						<Paper elevation={3}>
+							<List sx={{ height: 200, position: 'relative', overflow: 'auto', maxHeight: 200}}>
+								{records.map((record, i) =>
+									<ListItem key={i} component="div">
+											<ListItemText primary={`${record.name}`} />
+									</ListItem>
+								)}
+							</List>
+						</Paper>
+					</Col>
+				</Row>
+			</CardContent>
+		</Card>
 		</>
 	)
 }

@@ -3,8 +3,6 @@ import { useParams } from "react-router"
 import { useNavigate } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
-// import Card from "react-bootstrap/Card"
-// import Button from "react-bootstrap/Button"
 import Form from "react-bootstrap/Form"
 
 import Button from '@mui/material/Button';
@@ -61,7 +59,7 @@ const ChangePass = () => {
 	}, [pass])
 
 	useEffect(() => {
-		setValidConfPass(pass === confPass && validPass) 
+		setValidConfPass(pass === confPass && validPass)
 	}, [confPass])
 
 	const handleShowErr = (e) => {
@@ -93,14 +91,14 @@ const ChangePass = () => {
 			navigate("/login", { replace: true})
 		} catch (err) {
 			if (!err?.response) {
-                setErrMsg("No server respone")
-            } else if (err?.response?.status) {
-                setErrMsg(err?.response?.data?.detail)
-            } else {
-                setErrMsg("Change Password Failed")
-            }
-            setBackdropOpen(false)
-            handleShowErr(true)
+				setErrMsg("No server respone")
+			} else if (err?.response?.status) {
+				setErrMsg(err?.response?.data?.detail)
+			} else {
+				setErrMsg("Change Password Failed")
+			}
+			setBackdropOpen(false)
+			handleShowErr(true)
 		}
 	}
 
@@ -109,53 +107,53 @@ const ChangePass = () => {
 		<LoadingBackdrop open={backdropOpen} />
 		<Row className="justify-content-center mt-5">
 			<Col xs={12} lg={5}>
-				{showErrMsg 
+				{showErrMsg
 					?
 					<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
-				    : null
+					: null
 				}
 				<Card>
-                	<CardContent>
+					<CardContent>
 						<Form onSubmit={handleSubmit} className="mb-2">
-		                    <FormControl fullWidth className="mb-3">
-		                        <InputLabel htmlFor="password">New Password</InputLabel>
-		                        <OutlinedInput
-		                        	error={!validPass && pass}
-		                            id="password"
-		                            type="password"
-		                            value={pass}
-		                            onChange={(e) => setPass(e.target.value)}
-		                            label="New Password"
-		                            required
-		                        />
-		                        {!validPass && pass
-		                        	?
-		                        	<FormHelperText sx={{ color: "#fc0303" }}>
-		                        		Password must be at least one lowercase letter, one uppercase letter, one digit, and one special character and size is 8 to 24
-                                	</FormHelperText>
-                                	: null
-		                        }
-		                    </FormControl>
-		                    <FormControl fullWidth className="mb-3">
-		                        <InputLabel htmlFor="confPass">Confirm New Password</InputLabel>
-		                        <OutlinedInput
-		                        	error={!validConfPass && confPass}
-		                            id="confPass"
-		                            type="password"
-		                            value={confPass}
-		                            onChange={(e) => setConfPass(e.target.value)}
-		                            label="Confirm New Password"
-		                            required
-		                        />
-		                        {!validConfPass && confPass
-		                        	?
-		                        	<FormHelperText sx={{ color: "#fc0303" }}>Passwords should be matching</FormHelperText>
-                                	: null
-		                        }
-		                    </FormControl>
+							<FormControl fullWidth className="mb-3">
+								<InputLabel htmlFor="password">New Password</InputLabel>
+								<OutlinedInput
+									error={!validPass && pass}
+									id="password"
+									type="password"
+									value={pass}
+									onChange={(e) => setPass(e.target.value)}
+									label="New Password"
+									required
+								/>
+								{!validPass && pass
+									?
+									<FormHelperText sx={{ color: "#fc0303" }}>
+										Password must be at least one lowercase letter, one uppercase letter, one digit, and one special character and size is 8 to 24
+									</FormHelperText>
+									: null
+								}
+							</FormControl>
+							<FormControl fullWidth className="mb-3">
+								<InputLabel htmlFor="confPass">Confirm New Password</InputLabel>
+								<OutlinedInput
+									error={!validConfPass && confPass}
+									id="confPass"
+									type="password"
+									value={confPass}
+									onChange={(e) => setConfPass(e.target.value)}
+									label="Confirm New Password"
+									required
+								/>
+								{!validConfPass && confPass
+									?
+									<FormHelperText sx={{ color: "#fc0303" }}>Passwords should be matching</FormHelperText>
+									: null
+								}
+							</FormControl>
 							<Button variant="contained" color="success" type="submit" fullWidth>Change Password</Button>
 						</Form>
-                	</CardContent>
+					</CardContent>
 				</Card>
 			</Col>
 		</Row>

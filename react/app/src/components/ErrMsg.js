@@ -1,7 +1,5 @@
-// import Alert from "react-bootstrap/Alert"
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
-
 
 const ErrMsg = ({ msg, handleShowErr }) => {
 	return (

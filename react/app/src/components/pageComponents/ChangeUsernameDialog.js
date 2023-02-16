@@ -23,10 +23,10 @@ const USERNAME_REGEX = /^[a-zA-Z][a-zA-Z0-9-_]{3,23}$/
 const ChangeUsernameDialog = ({ open, close, user }) => {
 	const navigate = useNavigate()
 	const location = useLocation()
-	const axiosPrivate = useAxiosPrivate()  
-    const redirectLogin = useRedirectLogin(location)
+	const axiosPrivate = useAxiosPrivate()
+	const redirectLogin = useRedirectLogin(location)
 
-    const [backdropOpen, setBackdropOpen] = useState(false)
+	const [backdropOpen, setBackdropOpen] = useState(false)
 
 	const [username, setUsername] = useState("")
 	const [validUsername, setValidUsername] = useState(false)
@@ -74,9 +74,9 @@ const ChangeUsernameDialog = ({ open, close, user }) => {
 			} else if (err?.response?.status) {
 				setErrMsg(err?.response?.data?.detail)
 			} else {
-                setErrMsg("Chagne username failed")
-            }
-            handleShowErr(true)
+				setErrMsg("Chagne username failed")
+			}
+			handleShowErr(true)
 		} finally {
 			setBackdropOpen(false)
 		}
@@ -86,60 +86,58 @@ const ChangeUsernameDialog = ({ open, close, user }) => {
 		<>
 		<LoadingBackdrop open={backdropOpen} />
 		<Dialog open={open} onClose={close} maxWidth='sm' fullWidth={true} sx={{ zIndex: '2' }}>
-			{showErrMsg 
+			{showErrMsg
 				?
 				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
-			    : null
+					: null
 			}
-	        <DialogTitle>Change Username</DialogTitle>
-	        <Form onSubmit={handleSubmit}>
-		        <DialogContent>
-			        <DialogContentText>
-			        	Provide new username and confirm your password
-	          		</DialogContentText>
-		          	<FormControl fullWidth>
-			          	<TextField
-				            autoFocus
-				            error={!validUsername && username}
-				            margin="dense"
-				            id="username"
-				            label="Username"
-				            type="text"
-				            fullWidth
-				            variant="standard"
-				            value={username}
+			<DialogTitle>Change Username</DialogTitle>
+			<Form onSubmit={handleSubmit}>
+				<DialogContent>
+					<DialogContentText>Provide new username and confirm your password</DialogContentText>
+					<FormControl fullWidth>
+						<TextField
+							autoFocus
+							error={!validUsername && username}
+							margin="dense"
+							id="username"
+							label="Username"
+							type="text"
+							fullWidth
+							variant="standard"
+							value={username}
 							onChange={(e) => setUsername(e.target.value)}
 							required
-			          	/>
-			          	{!validUsername && username
-                        	?
-                        	<FormHelperText sx={{ color: "#fc0303" }}>
-                        		Username must start with the lower or upper case letter and after must followed by 3 to 23 char that can be lowercase, upper, number, - and _
-                        	</FormHelperText>
-                        	: null
-                        }
-			        </FormControl>
-			        <FormControl fullWidth>
-			          	<TextField
-				            margin="dense"
-				            id="password"
-				            label="Password"
-				            type="password"
-				            fullWidth
-				            variant="standard"
-				            value={pass}
+						/>
+						{!validUsername && username
+							?
+							<FormHelperText sx={{ color: "#fc0303" }}>
+								Username must start with the lower or upper case letter and after must followed by 3 to 23 char that can be lowercase, upper, number, - and _
+							</FormHelperText>
+							: null
+						}
+					</FormControl>
+					<FormControl fullWidth>
+						<TextField
+							margin="dense"
+							id="password"
+							label="Password"
+							type="password"
+							fullWidth
+							variant="standard"
+							value={pass}
 							onChange={(e) => setPass(e.target.value)}
 							required
-			          	/>
-			        </FormControl>
-		        </DialogContent>
-		        <DialogActions>
-		        	<Button onClick={closeDialog}>Cancel</Button>
-		        	<Button type="submit" color="success">Change</Button>
-		        </DialogActions>
-		    </Form>
-      </Dialog>
-      </>
+						/>
+					</FormControl>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={closeDialog}>Cancel</Button>
+					<Button type="submit" color="success">Change</Button>
+				</DialogActions>
+			</Form>
+		</Dialog>
+		</>
 	)
 }
 

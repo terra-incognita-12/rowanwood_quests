@@ -28,13 +28,13 @@ import useRedirectLogin from "../../../../hooks/useRedirectLogin"
 
 const columns = [
 	{ field: 'id', headerName: 'ID', width: 70 },
-	{ 
-		field: 'name', 
-		headerName: 'Name', 
-		minWidth: 130, 
+	{
+		field: 'name',
+		headerName: 'Name',
+		minWidth: 130,
 		flex: 1,
-		renderCell: (params) => 
-      		<Button component={Link} to={`${params.row.id}`} size="small">{params.row.name}</Button>, 
+		renderCell: (params) =>
+					<Button component={Link} to={`${params.row.id}`} size="small">{params.row.name}</Button>,
 	},
 ];
 
@@ -43,7 +43,6 @@ const Transition = forwardRef(function Transition(props, ref) {
 });
 
 const QuestLinesList = () => {
-
 	const { url } = useParams()
 	const navigate = useNavigate()
 
@@ -63,85 +62,84 @@ const QuestLinesList = () => {
 	}
 	
 	useEffect(() => {
-        let isMounted = true
-        const controller = new AbortController()
+		let isMounted = true
+		const controller = new AbortController()
 
-        const getLines = async () => {
-            try {
-                const response = await axios.get(`/quest/lines/all/${url}`, {
-                    signal: controller.signal
-                })
-                let dataRows = []
-                let dataQuestLines = [] 
-                for (const line of response.data) {
-                    dataRows.push({"id": line.unique_number, "name": line.name})
-                    dataQuestLines.push({"id": line.id, "name": line.name})
-                }
-                if (isMounted) {
-                	setRows(dataRows)
-                	setQuestsLinesList(dataQuestLines)
-                }
-              
-            } catch (err) {
-               if (err?.response?.status === 404) {
-                    navigate(`/notexist?err=${err?.response?.data?.detail}`)
-                } else {
-                    console.log(err)
-                }
-            } 
-        }
+		const getLines = async () => {
+			try {
+				const response = await axios.get(`/quest/lines/all/${url}`, {
+						signal: controller.signal
+				})
+				let dataRows = []
+				let dataQuestLines = []
+				for (const line of response.data) {
+						dataRows.push({"id": line.unique_number, "name": line.name})
+						dataQuestLines.push({"id": line.id, "name": line.name})
+				}
+				if (isMounted) {
+					setRows(dataRows)
+					setQuestsLinesList(dataQuestLines)
+				}
+			} catch (err) {
+			 if (err?.response?.status === 404) {
+						navigate(`/notexist?err=${err?.response?.data?.detail}`)
+				} else {
+						console.log(err)
+				}
+			}
+		}
 
-        getLines()
+		getLines()
 
-        return () => {
-            isMounted = false
-            controller.abort()
-        }
+		return () => {
+				isMounted = false
+				controller.abort()
+		}
 
-    }, [])
+	}, [])
 
 	return (
 		<div className="mt-3">
 			<Button component={Link} to="/editor/quest/edit" variant="text" size="large">&lt;&lt; Back</Button>
 			<Card className="mt-3">
-	            <CardContent sx={{ height: 'auto', overflow: "auto" }}>
-	                <Typography gutterBottom variant="h3" component="div">Quest Lines</Typography>
-	                <Button variant="contained" color="primary" onClick={handleLineModalOpen}>Create New Line</Button>
-	                <DataGrid
-	                	disableSelectionOnClick
-	                	className="mt-2"
-				        rows={rows}
-				        columns={columns}
-				        autoHeight={true}
-				    />
-	            </CardContent>
-	        </Card>
+				<CardContent sx={{ height: 'auto', overflow: "auto" }}>
+					<Typography gutterBottom variant="h3" component="div">Quest Lines</Typography>
+					<Button variant="contained" color="primary" onClick={handleLineModalOpen}>Create New Line</Button>
+					<DataGrid
+						disableSelectionOnClick
+						className="mt-2"
+						rows={rows}
+						columns={columns}
+						autoHeight={true}
+					/>
+				</CardContent>
+			</Card>
 
-	        <Dialog
-		        fullScreen
-		        open={lineModalOpen}
-		        onClose={handleLineModalClose}
-		        TransitionComponent={Transition}
-		        disableScrollLock
-		    >
-		        <AppBar sx={{ position: 'relative' }}>
-		        	<Toolbar>
-			            <IconButton
-			            	edge="start"
-			            	color="inherit"
-			            	onClick={handleLineModalClose}
-			            	aria-label="close"
-			            >
-			            	<CloseIcon />
-			            </IconButton>
-			            <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-			            	Create New Line	
-			            </Typography>
-		          	</Toolbar>
-		        </AppBar>
-		        <CreateQuestLineForm handleLineModalClose={handleLineModalClose} questLinesList={questsLinesList} url={url}/>
-      		</Dialog>
-       	</div>
+			<Dialog
+				fullScreen
+				open={lineModalOpen}
+				onClose={handleLineModalClose}
+				TransitionComponent={Transition}
+				disableScrollLock
+			>
+			<AppBar sx={{ position: 'relative' }}>
+				<Toolbar>
+					<IconButton
+						edge="start"
+						color="inherit"
+						onClick={handleLineModalClose}
+						aria-label="close"
+					>
+						<CloseIcon />
+					</IconButton>
+					<Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+						Create New Line
+					</Typography>
+				</Toolbar>
+			</AppBar>
+			<CreateQuestLineForm handleLineModalClose={handleLineModalClose} questLinesList={questsLinesList} url={url}/>
+		</Dialog>
+ 	</div>
 	)
 }
 

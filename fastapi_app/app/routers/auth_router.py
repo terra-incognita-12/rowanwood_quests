@@ -32,6 +32,8 @@ REFRESH_X = int(settings.REFRESH_TOKEN_EXPIRES)
 
 FOLDER = 'user/'
 
+# REGISTER USER
+
 @router.post('/register', status_code=201)
 async def create_user(payload: user_scheme.CreateUserScheme, request: Request, db: Session = Depends(get_db)):
 	if payload.password != payload.password_confirm:
@@ -62,6 +64,8 @@ async def create_user(payload: user_scheme.CreateUserScheme, request: Request, d
 
 	return {'status': 'OK', 'id': new_user.id}
 
+# LOGIN
+
 @router.post('/login')
 async def login(payload: user_scheme.LoginUserScheme, request: Request, response: Response, db: Session = Depends(get_db), Authorize: AuthJWT = Depends()):
 	user = db.query(User).filter(User.email == EmailStr(payload.email.lower())).first()
@@ -90,6 +94,8 @@ async def login(payload: user_scheme.LoginUserScheme, request: Request, response
 
 	return {'id': user.id, 'username': user.username, 'status': 'success', 'role': user.role, 'access_token': access_token, 'photo': user.photo}
 
+# LOGOUT
+
 @router.get('/logout')
 def logout(response: Response, Authorize: AuthJWT = Depends()):
 	Authorize.jwt_required()
@@ -97,6 +103,8 @@ def logout(response: Response, Authorize: AuthJWT = Depends()):
 	response.delete_cookie('logged_in')
 
 	return {'status': 'OK'}
+
+# VERIFY EMAIL ADDRESS TO REGISTER
 
 @router.get('/verify_email/{token}', response_class=RedirectResponse, status_code=302)
 def email_verification(token: str, db: Session = Depends(get_db)):
@@ -117,6 +125,8 @@ def email_verification(token: str, db: Session = Depends(get_db)):
 	db.commit()
 
 	return f"{settings.SITE_ADDRESS}"
+
+# FORGET PASSWORD
 
 @router.post('/forget_password')
 async def forget_password(payload: user_scheme.ForgetPasswordUserScheme, request: Request, db: Session = Depends(get_db)):
@@ -140,6 +150,8 @@ async def forget_password(payload: user_scheme.ForgetPasswordUserScheme, request
 
 	raise HTTPException(status_code=401, detail='Your email is not verified, please verify your email address, link was sent on your email')
 
+# VERIFY EMAIL TO CHANGE PASSWORD MIDDLE STEP
+
 @router.get('/verify_change_password/{token}', response_class=RedirectResponse, status_code=302)
 def change_password_verification(token: str, db: Session = Depends(get_db)):
 	token_decode = EmailToken.decode_token(token)
@@ -158,6 +170,8 @@ def change_password_verification(token: str, db: Session = Depends(get_db)):
 	db.commit()
 
 	return f"{settings.SITE_ADDRESS}/changepass/{password_token}"
+
+# CREATE NEW PASSWORD
 
 @router.post('/confirm_change_password')
 def confirm_change_password(payload: user_scheme.ChangePasswordWithTokenUserScheme, db: Session = Depends(get_db)):
@@ -185,6 +199,8 @@ def confirm_change_password(payload: user_scheme.ChangePasswordWithTokenUserSche
 
 	return {"status": "OK"}
 
+# CHECK IF TOKEN DIDN'T EXPIRED FOR REPLACE PASSWORD
+
 @router.post('/check_valid_change_password_token')
 def check_valid_change_password_token(payload: user_scheme.ChangePasswordTokenScheme, db: Session = Depends(get_db)):
 	check_user = db.query(User).filter(User.password_token == payload.password_token).first()
@@ -192,6 +208,8 @@ def check_valid_change_password_token(payload: user_scheme.ChangePasswordTokenSc
 		raise HTTPException(status_code=404, detail="User doesn't exist")
 
 	return {"status": "OK"}
+
+# GET REFRESH TOKEN
 
 @router.get('/refresh')
 def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Depends(), db: Session = Depends(get_db)):
@@ -214,6 +232,8 @@ def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Dep
 	Authorize.set_access_cookies(access_token)
 
 	return {'id': user.id, 'username': user.username, 'email': user.email, 'role': user.role, 'access_token': access_token, 'photo': user.photo}
+
+# S3
 
 @router.patch('/update_photo/{id}')
 def update_user_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):
