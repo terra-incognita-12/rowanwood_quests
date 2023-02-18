@@ -56,7 +56,7 @@ const LibraryDetails = () => {
 						<Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">{record.name}</Typography>
 						{record.photo
 							? (
-							<Box className="figure w-50 float-end m-3">
+							<Box className="figure w-150 float-end m-3">
 								<Box
 									component="img"
 									sx={{

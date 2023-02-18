@@ -16,7 +16,7 @@ const Layout = () => {
 			sx={{ position: "relative", minHeight: "100vh", pb: 4 }}
 		>
 			<Sitenavbar />
-			<Container maxWidth="lg">
+			<Container maxWidth="xl">
 				<Outlet />
 			</Container>
 			<footer>

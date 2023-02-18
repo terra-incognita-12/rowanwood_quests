@@ -46,7 +46,7 @@ const Home = () => {
 
 	return (
 		<div className="mt-3">
-			<HeadQuote quote="VINCIT QUI PATITUR" translation="He conquers who endures" />
+			<HeadQuote quote="VINCIT QUI PATITUR" translation="He conquers who endures"/>
 			<Row>
 				{quests.length
 					?
