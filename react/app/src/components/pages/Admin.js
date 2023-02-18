@@ -1,25 +1,16 @@
-import { useState, useRef, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
-
-import useAuth from "../../hooks/useAuth"
-import useAxiosPrivate from "../../hooks/useAxiosPrivate"
-import useRedirectLogin from "../../hooks/useRedirectLogin"
 
 import Button from '@mui/material/Button';
 import { DataGrid } from '@mui/x-data-grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import Dialog from '@mui/material/Dialog';
-import ListItemText from '@mui/material/ListItemText';
-import ListItem from '@mui/material/ListItem';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import Slide from '@mui/material/Slide';
+
+import useAxiosPrivate from "../../hooks/useAxiosPrivate"
+import useRedirectLogin from "../../hooks/useRedirectLogin"
 
 const Admin = () => {
 	const [rowsUsers, setRowsUsers] = useState([])

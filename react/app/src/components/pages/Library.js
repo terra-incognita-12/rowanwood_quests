@@ -10,6 +10,9 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Stack from '@mui/material/Stack';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 import axios from "../../api/axios"
 import HeadQuote from "../HeadQuote"
@@ -113,8 +116,8 @@ const Library = () => {
 			setSearchParams(searchParams)
 		}
 		
-			setSearchRecords(searched_records)
-			setSearchResult(true)
+		setSearchRecords(searched_records)
+		setSearchResult(true)
 	}
 
 	const getRecordsByTag = () => {
@@ -132,8 +135,14 @@ const Library = () => {
 			setSearchParams(searchParams)
 		}
 		
+		console.log(2)
+
 		setSearchRecords(records)
 		setSearchResult(true)
+	}
+
+	const closeSearchResults = () => {
+		setSearchResult(false)
 	}
 
 	return (
@@ -159,7 +168,7 @@ const Library = () => {
 			</Stack>
 		</Col>
 		<Col xs={12} md={6}>
-				<Stack spacing={2} direction="row">
+			<Stack spacing={2} direction="row">
 				<Autocomplete fullWidth
 				disablePortal
 				options={dropDownTags}
@@ -169,28 +178,38 @@ const Library = () => {
 				getOptionLabel={(option) => option.name}
 				renderInput={(params) => <TextField fullWidth {...params} label="Search by Tags" />}
 			/>
-	<Button variant="contained" color="primary" size="large" onClick={getRecordsByTag}>Search</Button>
+				<Button variant="contained" color="primary" size="large" onClick={getRecordsByTag}>Search</Button>
 			</Stack>
 		</Col>
 			</Row>
 			{searchResult
 		?
 		(
-				<Row>
+		<Row>
 			<Card className="mt-3">
-					<CardContent>
-				<Typography gutterBottom variant="h5">Search Results</Typography>
-				{searchRecords.length
-						?
-						searchRecords.map((record, i) =>
-					<div key={i}>
-							<Button component={Link} to={`${record.url}`} variant="text">{record.name}</Button>
-					</div>
-						) : <Typography gutterBottom variant="h7">No results found</Typography>
-				}
-					</CardContent>
+				<Toolbar>
+					<IconButton
+						edge="start"
+						color="inherit"
+						onClick={closeSearchResults}
+						aria-label="close"
+					>
+						<CloseIcon />
+					</IconButton>
+					<Typography sx={{ ml: 2, flex: 1 }} variant="h5">Search Results</Typography>
+				</Toolbar>
+				<CardContent>
+					{searchRecords.length
+							?
+							searchRecords.map((record, i) =>
+						<div key={i}>
+								<Button component={Link} to={`${record.url}`} variant="text">{record.name}</Button>
+						</div>
+							) : <Typography gutterBottom variant="h7">No results found...</Typography>
+					}
+				</CardContent>
 			</Card>
-				</Row>
+		</Row>
 		)
 		: null
 

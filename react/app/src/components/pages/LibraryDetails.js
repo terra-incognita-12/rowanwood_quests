@@ -1,8 +1,6 @@
 import { useParams } from "react-router"
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import Row from "react-bootstrap/Row"
-import Col from "react-bootstrap/Col"
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Box from '@mui/material/Box';

@@ -3,7 +3,6 @@ import { useState, useEffect } from "react"
 import Form from "react-bootstrap/Form"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
-import { Link } from "react-router-dom"
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -20,7 +19,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 
 import ErrMsg from "../ErrMsg"
-import axios from "../../api/axios"
 import useAxiosPrivate from "../../hooks/useAxiosPrivate"
 import useAxiosPrivateMultipart from "../../hooks/useAxiosPrivateMultipart"
 import useRedirectLogin from "../../hooks/useRedirectLogin"

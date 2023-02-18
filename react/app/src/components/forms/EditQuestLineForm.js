@@ -21,7 +21,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import Toolbar from '@mui/material/Toolbar';
 
 import ErrMsg from "../ErrMsg"
-import axios from "../../api/axios"
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
 import useAxiosPrivateMultipart from "../../hooks/useAxiosPrivateMultipart"
 import useRedirectLogin from '../../hooks/useRedirectLogin'

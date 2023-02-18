@@ -3,8 +3,6 @@ import { Outlet } from "react-router-dom"
 import Container from '@mui/material/Container'
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import BottomNavigation from '@mui/material/BottomNavigation';
-import Box from '@mui/material/Box';
 
 import Sitenavbar from "./Sitenavbar"
 

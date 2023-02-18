@@ -2,19 +2,12 @@ import { useState, useEffect, forwardRef } from "react"
 import { useLocation, useNavigate, Link } from "react-router-dom"
 import { useParams } from "react-router"
 
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
-
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Dialog from '@mui/material/Dialog';
-import ListItemText from '@mui/material/ListItemText';
-import ListItem from '@mui/material/ListItem';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';

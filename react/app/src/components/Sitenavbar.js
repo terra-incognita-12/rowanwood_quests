@@ -15,7 +15,6 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 
 import useAuth from "../hooks/useAuth"
-import axios from "../api/axios"
 import useAxiosPrivate from "../hooks/useAxiosPrivate"
 import useRedirectLogin from "../hooks/useRedirectLogin"
 
@@ -44,7 +43,7 @@ const Sitenavbar = () => {
 
 	const logout = async () => {
 		try {
-			const response = await axiosPrivate('/auth/logout', {
+			await axiosPrivate('/auth/logout', {
 				withCredentials: true
 			})
 			setAuth({})

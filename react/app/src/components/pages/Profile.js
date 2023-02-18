@@ -2,7 +2,6 @@ import { useState, useEffect } from "react"
 import { useLocation, Link } from "react-router-dom"
 import Row from "react-bootstrap/Row"
 import Col from "react-bootstrap/Col"
-import moment from 'moment'
 
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';

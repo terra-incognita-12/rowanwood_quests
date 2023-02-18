@@ -14,7 +14,6 @@ import Stack from '@mui/material/Stack';
 import Avatar from '@mui/material/Avatar';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import IconButton from '@mui/material/IconButton';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import Box from '@mui/material/Box';
 
 import axios from "../../api/axios"
