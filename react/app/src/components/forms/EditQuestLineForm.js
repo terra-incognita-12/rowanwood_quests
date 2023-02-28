@@ -174,7 +174,7 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 	return (
 		<>
 		<LoadingBackdrop open={backdropOpen} />
-		<Container className="mt-5">
+		<Container className="mt-5" maxWidth="xl">
 			{showErrMsg
 				?
 				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />

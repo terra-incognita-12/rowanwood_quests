@@ -18,6 +18,7 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Toolbar from '@mui/material/Toolbar';
+import Container from '@mui/material/Container';
 
 import ErrMsg from "../ErrMsg"
 import useAxiosPrivate from '../../hooks/useAxiosPrivate'
@@ -125,124 +126,126 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 	return (
 		<>
 		<LoadingBackdrop open={backdropOpen} />
-		{showErrMsg
-			?
-			<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
-				: null
-		}
-		<Form onSubmit={handleSubmit}>
-			<Row className="mb-2">
-				<Col xs={12} lg={6} className="mb-2">
-					<FormControl fullWidth>
-						<InputLabel htmlFor="component-outlined">Name</InputLabel>
-						<OutlinedInput
-								id="name"
-								value={name}
-								onChange={(e) => setName(e.target.value)}
-								label="Name"
-								required
-						/>
-						<FormHelperText>Name of line</FormHelperText>
-					</FormControl>
-				</Col>
-				<Col xs={12} lg={6}>
-					<FormControl fullWidth>
-							<InputLabel htmlFor="url">Unique Number</InputLabel>
-							<OutlinedInput
-									id="unique_num"
-									value={uniqueNum}
-									type="number"
-									onChange={(e) => setUniqueNum(e.target.value)}
-									label="URL (Unique Name)"
-									required
-							/>
-							<FormHelperText>Number like a page in a book, should be unique within quest</FormHelperText>
-					</FormControl>
-				</Col>
-			</Row>
-			<Row className="mb-2">
-				<Col xs={12}>
-					<FormControl fullWidth>
-						<InputLabel htmlFor="description">Description</InputLabel>
-						<OutlinedInput
-							id="description"
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-							label="Description"
-							multiline
-							rows={7}
-							required
-						/>
-					</FormControl>
-				</Col>
-			</Row>
-			<hr/>
-			<div className="mb-3">
-				<Button variant="contained" color="success" onClick={addNewOptionField}>Add options</Button>
-			</div>
-			{questOptions.map((elem, i) => (
-				<Row key={i} className="mt-1">
-					<Toolbar>
-						<IconButton edge="start" color="error" onClick={() => removeOptionField(i)}>
-							<RemoveCircleOutlineIcon />
-						</IconButton>
-						<Typography sx={{ ml: 2, flex: 1 }} variant="h6">Option #{i+1}</Typography>
-					</Toolbar>
+		<Container className="mt-5" maxWidth="xl">
+			{showErrMsg
+				?
+				<ErrMsg msg={errMsg} handleShowErr={handleShowErr} />
+					: null
+			}
+			<Form onSubmit={handleSubmit}>
+				<Row className="mb-2">
 					<Col xs={12} lg={6} className="mb-2">
 						<FormControl fullWidth>
-							<InputLabel htmlFor="url">Quest Option Name</InputLabel>
+							<InputLabel htmlFor="component-outlined">Name</InputLabel>
 							<OutlinedInput
-								name="name"
-								value={elem.name}
-								onChange={(e) => {
-									let newQuestOptions = [...questOptions]
-									newQuestOptions[i]["name"] = e.target.value
-									setQuestOptions(newQuestOptions)
-								}}
-								label="Quest Option Name"
-								required
+									id="name"
+									value={name}
+									onChange={(e) => setName(e.target.value)}
+									label="Name"
+									required
 							/>
+							<FormHelperText>Name of line</FormHelperText>
 						</FormControl>
 					</Col>
 					<Col xs={12} lg={6}>
 						<FormControl fullWidth>
-							<Autocomplete
-								disablePortal
-								id="combo-box-demo"
-								options={questLinesList}
-								onChange={(e, newValue) => {
-									let newQuestOptions = [...questOptions]
-									newQuestOptions[i]["quest_next_line_id"] = newValue.id
-									setQuestOptions(newQuestOptions)
-								}}
-								getOptionLabel={(option) => option.name}
-								renderInput={(params) => <TextField fullWidth {...params} label="Next Line" />}
+								<InputLabel htmlFor="url">Unique Number</InputLabel>
+								<OutlinedInput
+										id="unique_num"
+										value={uniqueNum}
+										type="number"
+										onChange={(e) => setUniqueNum(e.target.value)}
+										label="URL (Unique Name)"
+										required
+								/>
+								<FormHelperText>Number like a page in a book, should be unique within quest</FormHelperText>
+						</FormControl>
+					</Col>
+				</Row>
+				<Row className="mb-2">
+					<Col xs={12}>
+						<FormControl fullWidth>
+							<InputLabel htmlFor="description">Description</InputLabel>
+							<OutlinedInput
+								id="description"
+								value={description}
+								onChange={(e) => setDescription(e.target.value)}
+								label="Description"
+								multiline
+								rows={7}
+								required
 							/>
 						</FormControl>
 					</Col>
 				</Row>
-			))}
-			<Stack spacing={2} direction="row">
-				<Button variant="contained" component="label">
-					Upload Photo
-					<input hidden accept="image/jpeg" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload} />
-				</Button>
-				{isPhotoUploaded && photo.name
-					? (
-							<Stack spacing={1} direction="row">
-									<Typography gutterBottom variant="overline" component="div">{photo.name}</Typography>
-									<IconButton edge="end" color="error" onClick={handleRemovePhotoBeforeUpload}>
-											<CloseIcon />
-									</IconButton>
-							</Stack>
-					)
-					: null
-				}
-			</Stack>
-			<div className="mt-3">
-				<Button variant="contained" color="success" type="submit">Create Line</Button>
-			</div>
-		</Form>
+				<hr/>
+				<div className="mb-3">
+					<Button variant="contained" color="success" onClick={addNewOptionField}>Add options</Button>
+				</div>
+				{questOptions.map((elem, i) => (
+					<Row key={i} className="mt-1">
+						<Toolbar>
+							<IconButton edge="start" color="error" onClick={() => removeOptionField(i)}>
+								<RemoveCircleOutlineIcon />
+							</IconButton>
+							<Typography sx={{ ml: 2, flex: 1 }} variant="h6">Option #{i+1}</Typography>
+						</Toolbar>
+						<Col xs={12} lg={6} className="mb-2">
+							<FormControl fullWidth>
+								<InputLabel htmlFor="url">Quest Option Name</InputLabel>
+								<OutlinedInput
+									name="name"
+									value={elem.name}
+									onChange={(e) => {
+										let newQuestOptions = [...questOptions]
+										newQuestOptions[i]["name"] = e.target.value
+										setQuestOptions(newQuestOptions)
+									}}
+									label="Quest Option Name"
+									required
+								/>
+							</FormControl>
+						</Col>
+						<Col xs={12} lg={6}>
+							<FormControl fullWidth>
+								<Autocomplete
+									disablePortal
+									id="combo-box-demo"
+									options={questLinesList}
+									onChange={(e, newValue) => {
+										let newQuestOptions = [...questOptions]
+										newQuestOptions[i]["quest_next_line_id"] = newValue.id
+										setQuestOptions(newQuestOptions)
+									}}
+									getOptionLabel={(option) => option.name}
+									renderInput={(params) => <TextField fullWidth {...params} label="Next Line" />}
+								/>
+							</FormControl>
+						</Col>
+					</Row>
+				))}
+				<Stack spacing={2} direction="row">
+					<Button variant="contained" component="label">
+						Upload Photo
+						<input hidden accept="image/jpeg" type="file" onChange={handlePhotoUploaded} onClick={handleCleanPhotoUpload} />
+					</Button>
+					{isPhotoUploaded && photo.name
+						? (
+								<Stack spacing={1} direction="row">
+										<Typography gutterBottom variant="overline" component="div">{photo.name}</Typography>
+										<IconButton edge="end" color="error" onClick={handleRemovePhotoBeforeUpload}>
+												<CloseIcon />
+										</IconButton>
+								</Stack>
+						)
+						: null
+					}
+				</Stack>
+				<div className="mt-3">
+					<Button variant="contained" color="success" type="submit">Create Line</Button>
+				</div>
+			</Form>
+		</Container>
 		</>
 	)
 }
