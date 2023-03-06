@@ -1,20 +1,20 @@
 version: '3.8'
 
 services:
-  localstack:
-    image: localstack/localstack:latest
-    environment:
-      - DEBUG=1
-      - SERVICES=s3
-      - AWS_DEFAULT_REGION=us-east-1
-      - AWS_ACCESS_KEY_ID=1
-      - AWS_SECRET_ACCESS_KEY=1
-    ports:
-      - '4566:4566'
-    volumes:
-      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
-      - "/var/run/docker.sock:/var/run/docker.sock"
-      - ./aws/buckets.sh:/docker-entrypoint-initaws.d/buckets.sh
+  # localstack:
+  #   image: localstack/localstack:latest
+  #   environment:
+  #     - DEBUG=1
+  #     - SERVICES=s3
+  #     - AWS_DEFAULT_REGION=us-east-1
+  #     - AWS_ACCESS_KEY_ID=1
+  #     - AWS_SECRET_ACCESS_KEY=1
+  #   ports:
+  #     - '4566:4566'
+  #   volumes:
+  #     - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+  #     - "/var/run/docker.sock:/var/run/docker.sock"
+  #     - ./aws/buckets.sh:/docker-entrypoint-initaws.d/buckets.sh
   
   db:
     image: postgres:15-alpine
@@ -23,22 +23,22 @@ services:
     env_file:
       - ./fastapi_app/.env.dev
   
-  adminer:
-    image: adminer
-    ports:
-      - '8080:8080'
+  # adminer:
+  #   image: adminer
+  #   ports:
+  #     - '8080:8080'
 
-  smtp4dev:
-    image: rnwood/smtp4dev:v3
-    restart: always
-    ports:
-      - '5000:80'
-      - '25:25'
-      - '143:143'
-    volumes:
-      - smtp4dev-data:/smtp4dev
-    environment:
-      - ServerOptions__HostName=smtp4dev
+  # smtp4dev:
+  #   image: rnwood/smtp4dev:v3
+  #   restart: always
+  #   ports:
+  #     - '5000:80'
+  #     - '25:25'
+  #     - '143:143'
+  #   volumes:
+  #     - smtp4dev-data:/smtp4dev
+  #   environment:
+  #     - ServerOptions__HostName=smtp4dev
 
   fastapi:
     build:
@@ -50,20 +50,20 @@ services:
     env_file:
       - ./fastapi_app/.env.dev
 
-  react:
-    build:
-      context: ./react/app
-      dockerfile: Dockerfile
-    stdin_open: true
-    ports:
-      - '3000:3000'
+  # react:
+  #   build:
+  #     context: ./react/app
+  #     dockerfile: Dockerfile
+  #   stdin_open: true
+  #   ports:
+  #     - '3000:3000'
 
-  bot:
-    build:
-      context: ./bot
-      dockerfile: Dockerfile
-    ports:
-      - '9000:9000'
+  # bot:
+  #   build:
+  #     context: ./bot
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - '9000:9000'
 
 volumes:
   postgres_data:
