@@ -29,10 +29,10 @@ class Email:
             MAIL_FROM=settings.EMAIL_FROM,
             MAIL_PORT=settings.EMAIL_PORT,
             MAIL_SERVER=settings.EMAIL_HOST,
-            MAIL_STARTTLS=True,
-            MAIL_SSL_TLS=False,
-            USE_CREDENTIALS=True,
-            VALIDATE_CERTS=True
+            MAIL_STARTTLS=settings.EMAIL_STARTTLS,
+            MAIL_SSL_TLS=settings.EMAIL_SSL_TLS,
+            USE_CREDENTIALS=settings.EMAIL_USE_CREDENTIALS,
+            VALIDATE_CERTS=settings.EMAIL_VALIDATE_CERTS
 		)
 		template = env.get_template(f'{template}.html')
 

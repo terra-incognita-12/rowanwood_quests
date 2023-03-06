@@ -63,7 +63,8 @@ async def change_email(payload: user_scheme.ChangeEmailScheme, request: Request,
 
 	token = EmailToken.get_change_email_token(check_user.email, payload.email, settings.EMAIL_TOKEN_EXPIRES_SECONDS)
 	try:
-		url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/user/verify_change_email/{token}"
+		# url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/user/verify_change_email/{token}"
+		url = f"{settings.SITE_ADDRESS}:{settings.BACKEND_PORT}/user/verify_change_email/{token}"
 		await Email(check_user, url, [payload.email]).send_verification_change_email_link()
 		
 		return {'status': 'success', 'message': 'Change email link was sent to your new email'}
@@ -91,7 +92,7 @@ def email_verification(token: str, request: Request, db: Session = Depends(get_d
 	user_query.update({'email': new_email}, synchronize_session=False)
 	db.commit()
 
-	return f"{settings.SITE_ADDRESS}/profile"
+	return f"{settings.SITE_ADDRESS}:{settings.CLIENT_PORT}/profile"
 
 # CHANGE PASSWORD WITN NO TOKEN
 
