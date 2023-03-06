@@ -1,6 +1,4 @@
 import logging
-import asyncio
-from urllib import response
 import requests
 from time import sleep
 
@@ -18,15 +16,16 @@ from telegram.ext import (
 	ConversationHandler,
 )
 
+from telegram.error import BadRequest
+
 from telegram.constants import ChatAction
 
-BACKEND_URL = 'http://127.0.0.1:8000'
+BACKEND_URL = 'http://fastapi:8000'
 QUEST_URL = 'training'
 TOKEN='5962491186:AAERx0YPEL2kbOsKhYywIeP-7J9xCRpjcL4'
 
 SLEEP_BEFORE_MESSAGE = 0.5
 NEXT_STEP = 1
-
 
 logging.basicConfig(
 	format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -70,16 +69,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	first_line = get_line(1)
 
 	await update.message.reply_text(f"Hello {user.first_name}! Welcome to the quest \"{quest_info['name']}\" by Rowan Wood! Enjoy and don't forget to write your review on it on the website!")
-	sleep(3)
 
 	if quest_info['photo']:
-		await current_chat_action(context, update.effective_chat.id, ChatAction.UPLOAD_PHOTO)
-		await context.bot.sendPhoto(update.effective_chat.id, quest_info['photo'])
-		sleep(3)
+		try:
+			await current_chat_action(context, update.effective_chat.id, ChatAction.UPLOAD_PHOTO)
+			await context.bot.sendPhoto(update.effective_chat.id, quest_info['photo'])
+		except BadRequest: print('DEV MODE OR BAD REQUEST')
 
 	await current_chat_action(context, update.effective_chat.id, ChatAction.TYPING)
 	await update.message.reply_text(f"QUEST INFO \n\n {quest_info['full_description']} \n\n")
-	sleep(3)
 
 	keyboard = []
 	for elem in first_line['quest_current_options']:
@@ -88,8 +86,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	reply_markup = InlineKeyboardMarkup(keyboard)
 
 	if first_line['photo']:
-		await current_chat_action(context, update.effective_chat.id, ChatAction.UPLOAD_PHOTO)
-		await context.bot.sendPhoto(update.effective_chat.id, first_line['photo'])
+		try:
+			await current_chat_action(context, update.effective_chat.id, ChatAction.UPLOAD_PHOTO)
+			await context.bot.sendPhoto(update.effective_chat.id, first_line['photo'])
+		except BadRequest: print('DEV MODE OR BAD REQUEST')
 
 	await current_chat_action(context, update.effective_chat.id, ChatAction.TYPING)
 	await update.message.reply_text(first_line['description'], reply_markup=reply_markup)
@@ -109,9 +109,11 @@ async def next_step(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	reply_markup = InlineKeyboardMarkup(keyboard)
 
 	if current_line['photo']:
-		await current_chat_action(context, update.effective_chat.id, ChatAction.UPLOAD_PHOTO)
-		await context.bot.sendPhoto(update.effective_chat.id, current_line['photo'])
-
+		try:
+			await current_chat_action(context, update.effective_chat.id, ChatAction.UPLOAD_PHOTO)
+			await context.bot.sendPhoto(update.effective_chat.id, current_line['photo'])
+		except BadRequest: print('DEV MODE OR BAD REQUEST')
+	
 	await current_chat_action(context, update.effective_chat.id, ChatAction.TYPING)
 	await query.message.reply_text(current_line['description'], reply_markup=reply_markup)
 	if not keyboard:

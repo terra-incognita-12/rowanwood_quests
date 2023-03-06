@@ -168,7 +168,7 @@ const EditQuestLineForm = ({ handleNewLineModalClose, questLine, questLinesList,
 				alert("Main info on quest line updated successfully, but it was issue with update photo, please try again")
 			}
 		}
-		navigate("/editor/quest/edit/training", { replace: true})
+		window.location.reload(false);
 	}
 
 	return (

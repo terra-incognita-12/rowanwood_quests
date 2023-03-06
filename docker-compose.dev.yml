@@ -58,6 +58,13 @@ services:
     ports:
       - '3000:3000'
 
+  bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    ports:
+      - '9000:9000'
+
 volumes:
   postgres_data:
   smtp4dev-data:
