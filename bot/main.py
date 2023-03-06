@@ -1,6 +1,7 @@
 import logging
 import requests
 from time import sleep
+from decouple import config
 
 from telegram import (
 	InlineKeyboardButton, 
@@ -20,9 +21,9 @@ from telegram.error import BadRequest
 
 from telegram.constants import ChatAction
 
-BACKEND_URL = 'http://fastapi:8000'
-QUEST_URL = 'training'
-TOKEN='5962491186:AAERx0YPEL2kbOsKhYywIeP-7J9xCRpjcL4'
+BACKEND_URL = config('BACKEND_URL')
+QUEST_URL = config('QUEST_URL')
+TOKEN=config('TOKEN')
 
 SLEEP_BEFORE_MESSAGE = 0.5
 NEXT_STEP = 1
