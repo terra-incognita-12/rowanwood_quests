@@ -103,20 +103,20 @@ const CreateQuestForm = () => {
 		}
 
 		if (!isPhotoUploaded) {
-			navigate(`/quest/${url}`, { replace: true})
+			window.location.reload(false)
 		} else {
 			let photo_data = new FormData();
 			photo_data.append("photo", photo)
 
 			try {
 				const response = await axiosPrivateMultipart.patch(`/quest/update/photo/${questId}`, photo_data)
-				navigate(`/quest/${url}`, { replace: true});
 			} catch (err) {
 				console.log(err)
 				alert("Main info on record created successfully, but it was issue with update photo, please try again")
 			}
 		}
 		setBackdropOpen(false)
+		window.location.reload(false)
 	}
 
 	return (

@@ -60,6 +60,7 @@ const ChangeEmailDialog = ({ open, close, username }) => {
 		if (!valid) {
 			setErrMsg("Invalid entry")
 			handleShowErr(true)
+			setBackdropOpen(false)
 			return
 		}
 

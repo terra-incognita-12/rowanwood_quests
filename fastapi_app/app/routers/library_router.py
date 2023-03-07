@@ -54,7 +54,7 @@ def get_record(url: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Enter Correct Record")
         
     record = db.query(LibraryRecord).filter(LibraryRecord.url == url).first()
-    
+
     if not record:
         raise HTTPException(status_code=404, detail="Record doesn't exist")
     

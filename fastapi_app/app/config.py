@@ -40,5 +40,5 @@ class Settings:
 		S3_FULL_URL=f'{SITE_ADDRESS}:4566/{S3_BUCKET_NAME}/'
 	else:
 		S3_FULL_URL=S3_HOST_NAME
-	
+
 settings = Settings()

@@ -60,6 +60,7 @@ const ChangeUsernameDialog = ({ open, close, user }) => {
 		if (!valid) {
 			setErrMsg("Invalid entry")
 			handleShowErr(true)
+			setBackdropOpen(false)
 			return
 		}
 

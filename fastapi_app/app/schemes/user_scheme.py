@@ -11,26 +11,26 @@ class UserBaseScheme(BaseModel):
 		orm_mode = True
 
 class CreateUserScheme(UserBaseScheme):
-	password: constr(min_length=8)
+	password: str
 	password_confirm: str
 	role: str = 'user'
 	is_email_verified: bool = False
 
 class LoginUserScheme(BaseModel):
 	email: EmailStr
-	password: constr(min_length=8)
+	password: str
 
 class ForgetPasswordUserScheme(BaseModel):
 	email: EmailStr
 
 class ChangePasswordWithTokenUserScheme(BaseModel):
 	password_token: str
-	new_password: constr(min_length=8)
+	new_password: str
 	new_password_confirm: str
 
 class ChangePasswordWithoutTokenUserScheme(BaseModel):
 	old_password: str
-	new_password: constr(min_length=8)
+	new_password: str
 	new_password_confirm: str
 
 class ChangePasswordTokenScheme(BaseModel):
@@ -46,8 +46,8 @@ class ForeignKeyUserResponse(UserBaseScheme):
 
 class ChangeUsernameScheme(BaseModel):
 	username: str
-	password: constr(min_length=8)
+	password: str
 
 class ChangeEmailScheme(BaseModel):
 	email: EmailStr
-	password: constr(min_length=8)
+	password: str
