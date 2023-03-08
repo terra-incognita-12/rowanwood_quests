@@ -23,6 +23,7 @@ import NotExist from "./components/pages/NotExist"
 import OtherError from "./components/pages/OtherErrors"
 
 import Editor from "./components/pages/editor/Editor"
+import EditorInfo from "./components/pages/editor/EditorInfo"
 
 import CreateQuest from "./components/pages/editor/quest/CreateQuest"
 import EditQuestsList from "./components/pages/editor/quest/EditQuestsList"
@@ -79,6 +80,7 @@ function App() {
 
             <Route element={<RequireAuth allowedRoles={['admin', 'editor']} />}>
               <Route path="editor" element={<Editor />} />
+              <Route exact path="editor/info" element={<EditorInfo />} />
               <Route exact path="editor/quest/create" element={<CreateQuest />} />
               <Route exact path="editor/quest/edit" element={<EditQuestsList />} />
               

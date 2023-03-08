@@ -11,8 +11,10 @@ const About = () => {
 		<HeadQuote quote="OMNE INITIVM DIFFICILE EST" translation="Every beginning is difficult" />
 		<Card className="mt-3">
 			<CardContent>
-				<Typography gutterBottom variant="h6" color="text.secondary">ANTONIVS GAIVS ADMINVS TO BRAVE TRAVELLER</Typography>
-				<Typography gutterBottom variant="h6" sx={{ "font-style": "oblique" }}>Hello o brave guest of my virtual coliseum</Typography>
+				<Typography gutterBottom variant="h6" color="text.secondary">INSTRUCTIONS</Typography>
+				<Typography gutterBottom variant="h6" sx={{ "font-style": "oblique" }}>1) To play a quest - add Telegram bot with a given name under "Telegram address"</Typography>
+				<Typography gutterBottom variant="h6" sx={{ "font-style": "oblique" }}>2) You can register to leave your comments in quest description</Typography>
+				<Typography gutterBottom variant="h6" sx={{ "font-style": "oblique" }}>3) Use the library section to get more information about certain details inside the quest</Typography>
 			</CardContent>
 		</Card>
 	</div>
