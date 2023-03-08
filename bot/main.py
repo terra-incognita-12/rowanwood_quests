@@ -34,26 +34,28 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def get_quest_info():
-	try:
-		response = requests.get(f'{BACKEND_URL}/quest/{QUEST_URL}')
-		data = response.json()
-		return data
-	except requests.exceptions.RequestException as e:
-		print(e)
-	
-	return "error"
+class GetQuestInfoException(Exception):
+	def __init__(self, message):
+		self.message = message
 
-# Get line API
-def get_line(unique_number: int):
+def get_quest_info(unique_number: int = None):
 	try:
-		response = requests.get(f'{BACKEND_URL}/quest/lines/{QUEST_URL}/{unique_number}')
-		data = response.json()
-		return data
+		if unique_number:
+			response = response = requests.get(f'{BACKEND_URL}/quest/lines/{QUEST_URL}/{unique_number}')
+		else:
+			response = requests.get(f'{BACKEND_URL}/quest/{QUEST_URL}')
+		
+		if response.status_code == 200:
+			return response.json()
+		else:
+			print(f'{response.status_code}: {response.content}')
+			
 	except requests.exceptions.RequestException as e:
-		print(e)
+		print(f'Request error: {e}')
+	except Exception as e:
+		print(f'Error: {e}')
 	
-	return "error"
+	raise GetQuestInfoException('⚠️ ERROR ⚠️ : Sorry, it was an error while pulling quest, we are already working on that issue, please come back later!')
 
 # Sending text with action and sleep
 async def current_chat_action(context, id, action):
@@ -66,8 +68,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	
 	logger.info(f'User {user.first_name} started the conversation.')
 	
-	quest_info = get_quest_info()
-	first_line = get_line(1)
+	try:
+		quest_info = get_quest_info()
+	except GetQuestInfoException as e:
+		await update.message.reply_text(e.message)
+		return ConversationHandler.END
 
 	await update.message.reply_text(f"Hello {user.first_name}! Welcome to the quest \"{quest_info['name']}\" by Rowan Wood! Enjoy and don't forget to write your review on it on the website!")
 
@@ -79,6 +84,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 	await current_chat_action(context, update.effective_chat.id, ChatAction.TYPING)
 	await update.message.reply_text(f"QUEST INFO \n\n {quest_info['full_description']} \n\n")
+
+	try:
+		first_line = get_quest_info(1)
+	except GetQuestInfoException as e:
+		await update.message.reply_text(e.message)
+		return ConversationHandler.END
 
 	keyboard = []
 	for elem in first_line['quest_current_options']:
@@ -101,7 +112,11 @@ async def next_step(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 	query = update.callback_query
 	await query.answer()
 
-	current_line = get_line(int(query.data))
+	try:
+		current_line = get_quest_info(int(query.data))
+	except GetQuestInfoException as e:
+		await update.message.reply_text(e.message)
+		return ConversationHandler.END
 
 	keyboard = []
 	for elem in current_line['quest_current_options']:

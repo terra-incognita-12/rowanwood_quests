@@ -62,12 +62,15 @@ services:
     volumes:
       - ./react/app/:/src/app/react/
 
-  # bot:
-  #   build:
-  #     context: ./bot
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - '9000:9000'
+  bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    command: python main.py
+    ports:
+      - '9000:9000'
+    volumes:
+      - ./bot/:/src/app/bot/
 
 volumes:
   postgres_data:
