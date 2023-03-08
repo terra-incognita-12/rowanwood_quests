@@ -284,7 +284,11 @@ const EditQuestForm = ({ quest }) => {
 						}
 						<Stack spacing={1} direction="row" className="mt-1">
 							<Button component={Link} to={`${questUrl}`} variant="contained" color="primary">Edit Lines</Button>
-							<Button variant="contained" color="error" onClick={handleDelete}>Delete Quest</Button>
+							{auth?.role === 'admin'
+								?
+								<Button variant="contained" color="error" onClick={handleDelete}>Delete Quest</Button>
+								: null
+							}
 						</Stack>
 					</Box>
 					{questPhoto
