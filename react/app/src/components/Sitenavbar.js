@@ -142,7 +142,7 @@ const Sitenavbar = () => {
 						</Menu>
 					</Box>
 					<Typography
-						variant="h5"
+						variant="body2"
 						noWrap
 						component={Link}
 						to="/"

@@ -21,9 +21,14 @@ from telegram.error import BadRequest
 
 from telegram.constants import ChatAction
 
+DEV = config('DEV', cast=bool)
 BACKEND_URL = config('BACKEND_URL')
 QUEST_URL = config('QUEST_URL')
-TOKEN=config('TOKEN')
+TOKEN = config('TOKEN')
+HOST_URL = config('HOST_URL')
+PORT = config('PORT')
+
+HOOK_URL = HOST_URL + '/' + TOKEN
 
 SLEEP_BEFORE_MESSAGE = 0.5
 NEXT_STEP = 1
@@ -39,6 +44,8 @@ class GetQuestInfoException(Exception):
 		self.message = message
 
 def get_quest_info(unique_number: int = None):
+	err_msg = 'Sorry, it was an error while pulling quest, we are already working on that issue, please come back later!'
+
 	try:
 		if unique_number:
 			response = response = requests.get(f'{BACKEND_URL}/quest/lines/{QUEST_URL}/{unique_number}')
@@ -46,7 +53,11 @@ def get_quest_info(unique_number: int = None):
 			response = requests.get(f'{BACKEND_URL}/quest/{QUEST_URL}')
 		
 		if response.status_code == 200:
-			return response.json()
+			res = response.json()
+			activated = res.get('is_activated', None)
+			if activated is not None and not activated:
+				err_msg = 'Sorry, this quest is not activated yet, please come back later!'
+			else: return res
 		else:
 			print(f'{response.status_code}: {response.content}')
 			
@@ -54,8 +65,8 @@ def get_quest_info(unique_number: int = None):
 		print(f'Request error: {e}')
 	except Exception as e:
 		print(f'Error: {e}')
-	
-	raise GetQuestInfoException('⚠️ ERROR ⚠️ : Sorry, it was an error while pulling quest, we are already working on that issue, please come back later!')
+
+	raise GetQuestInfoException(f'⚠️ ERROR ⚠️ : {err_msg}')
 
 # Sending text with action and sleep
 async def current_chat_action(context, id, action):
@@ -158,7 +169,10 @@ def main():
 	application.add_handler(quest_handler)
 	application.updater.bot.set_my_commands(commands)
 
-	application.run_polling()
-
+	if DEV:
+		application.run_polling()
+	else:
+		application.run_webhook(listen='0.0.0.0', port=PORT, url_path=TOKEN, webhook_url=HOOK_URL)
+	
 if __name__ == '__main__':
 	main()

@@ -116,8 +116,8 @@ const Profile = () => {
 					<Typography gutterBottom variant="h4" display="flex" justifyContent="center" alignItems="center">Profile</Typography>
 					<Row>
 						<Col xs={12} md={6}>
-							<Typography gutterBottom variant="h6" display="flex" alignItems="center" sx={{ ml: 1 }}>
-								Username:
+							<Typography gutterBottom display="flex" alignItems="center" sx={{ ml: 1, typography: { sm: 'h6', xs: 'body1' } }}>
+								<Box sx={{ display: { xs: 'none', sm: 'block' } }}>Username:</Box>
 								<Paper elevation={3} sx={{ ml: 2, pl: 1 }}>
 									{auth.username}
 									<IconButton onClick={handleChangeUsernameDialogOpen}>
@@ -126,8 +126,8 @@ const Profile = () => {
 								</Paper>
 							</Typography>
 							<hr/>
-							<Typography gutterBottom variant="h6" display="flex" alignItems="center" sx={{ ml: 1 }}>
-								Email:
+							<Typography gutterBottom display="flex" alignItems="center" sx={{ ml: 1, typography: { sm: 'h6', xs: 'body1' } }}>
+								<Box sx={{ display: { xs: 'none', sm: 'block' } }}>Email</Box>
 								<Paper elevation={3} sx={{ ml: 2, pl: 1 }}>
 									{auth.user}
 									<IconButton onClick={handleChangeEmailDialogOpen}>
@@ -136,8 +136,8 @@ const Profile = () => {
 								</Paper>
 							</Typography>
 							<hr/>
-							<Typography gutterBottom variant="h6" display="flex" alignItems="center" sx={{ ml: 1 }}>
-								Role:
+							<Typography gutterBottom display="flex" alignItems="center" sx={{ ml: 1, typography: { sm: 'h6', xs: 'body1' } }}>
+								<Box sx={{ display: { xs: 'none', sm: 'block' } }}>Role:</Box>
 								<Paper elevation={3} sx={{ ml: 2, pl: 1, pr: 1 }}>
 									{auth.role}
 								</Paper>

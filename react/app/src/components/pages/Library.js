@@ -134,8 +134,6 @@ const Library = () => {
 			searchParams.delete("tag")
 			setSearchParams(searchParams)
 		}
-		
-		console.log(2)
 
 		setSearchRecords(records)
 		setSearchResult(true)
@@ -149,7 +147,7 @@ const Library = () => {
 		<div className="mt-3">
 			<HeadQuote quote="SAPIENTIA POTENTIA EST" translation="Wisdom is power"/>
 			<Row>
-		<Col xs={12} md={6}>
+		<Col xs={12} md={6} className="mt-2">
 			<Stack spacing={2} direction="row">
 				<Autocomplete fullWidth
 						disablePortal
@@ -167,7 +165,7 @@ const Library = () => {
 				<Button variant="contained" color="primary" size="large" onClick={getMatchingRecords}>Search</Button>
 			</Stack>
 		</Col>
-		<Col xs={12} md={6}>
+		<Col xs={12} md={6}  className="mt-2">
 			<Stack spacing={2} direction="row">
 				<Autocomplete fullWidth
 				disablePortal

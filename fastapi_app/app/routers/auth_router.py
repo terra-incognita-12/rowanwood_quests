@@ -58,7 +58,7 @@ async def create_user(payload: user_scheme.CreateUserScheme, request: Request, d
 	try:
 		token = EmailToken.get_email_token(payload.username, settings.EMAIL_TOKEN_EXPIRES_SECONDS)
 		# url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/auth/verify_email/{token}"
-		url = f"{settings.SITE_ADDRESS}:{settings.BACKEND_PORT}/auth/verify_email/{token}"
+		url = f"{settings.HOST_BACKEND}/auth/verify_email/{token}"
 		await Email(new_user, url, [payload.email]).send_verification_email_link()
 	except Exception as error:
 		raise HTTPException(status_code=500, detail='There was an error sending email, login with your credentials and activation link will be sent again')
@@ -77,7 +77,7 @@ async def login(payload: user_scheme.LoginUserScheme, request: Request, response
 		try:
 			token = EmailToken.get_email_token(user.username, settings.EMAIL_TOKEN_EXPIRES_SECONDS)
 			# url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/auth/verify_email/{token}"
-			url = f"{settings.SITE_ADDRESS}:{settings.BACKEND_PORT}/auth/verify_email/{token}"
+			url = f"{settings.HOST_BACKEND}/auth/verify_email/{token}"
 			await Email(user, url, [payload.email]).send_verification_email_link()
 		except Exception as error:
 			print(error)
@@ -123,7 +123,7 @@ def email_verification(token: str, db: Session = Depends(get_db)):
 		raise HTTPException(status_code=403, detail='Email can only be verified once')
 	user_query.update({'is_email_verified': True}, synchronize_session=False)
 	db.commit()
-	return f"{settings.SITE_ADDRESS}:{settings.CLIENT_PORT}/"
+	return f"{settings.HOST_FRONTEND}/"
 
 # FORGET PASSWORD
 
@@ -137,11 +137,11 @@ async def forget_password(payload: user_scheme.ForgetPasswordUserScheme, request
 	try:
 		if not user.is_email_verified:
 			# url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/auth/verify_email/{token}"
-			url = f"{settings.SITE_ADDRESS}:{settings.BACKEND_PORT}/auth/verify_email/{token}"
+			url = f"{settings.HOST_BACKEND}/auth/verify_email/{token}"
 			await Email(user, url, [payload.email]).send_verification_email_link()
 		else:
 			# url = f"{request.url.scheme}://{request.client.host}:{request.url.port}/auth/verify_change_password/{token}"
-			url = f"{settings.SITE_ADDRESS}:{settings.BACKEND_PORT}/auth/verify_change_password/{token}"
+			url = f"{settings.HOST_BACKEND}/auth/verify_change_password/{token}"
 			await Email(user, url, [payload.email]).send_verification_change_password_link()
 			return {'status': 'OK'}
 
@@ -170,7 +170,7 @@ def change_password_verification(token: str, db: Session = Depends(get_db)):
 	user_query.update({'password_token': password_token}, synchronize_session=False)
 	db.commit()
 
-	return f"{settings.SITE_ADDRESS}:{settings.CLIENT_PORT}/changepass/{password_token}"
+	return f"{settings.HOST_FRONTEND}/changepass/{password_token}"
 
 # CREATE NEW PASSWORD
 
