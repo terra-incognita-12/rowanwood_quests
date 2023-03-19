@@ -44,20 +44,14 @@ class GetQuestInfoException(Exception):
 		self.message = message
 
 def get_quest_info(unique_number: int = None):
-	err_msg = 'Sorry, it was an error while pulling quest, we are already working on that issue, please come back later!'
-
 	try:
 		if unique_number:
-			response = response = requests.get(f'{BACKEND_URL}/quest/lines/{QUEST_URL}/{unique_number}')
+			response = requests.get(f'{BACKEND_URL}/quest/lines/{QUEST_URL}/{unique_number}', verify=False)
 		else:
-			response = requests.get(f'{BACKEND_URL}/quest/{QUEST_URL}')
+			response = requests.get(f'{BACKEND_URL}/quest/{QUEST_URL}', verify=False)
 		
 		if response.status_code == 200:
-			res = response.json()
-			activated = res.get('is_activated', None)
-			if activated is not None and not activated:
-				err_msg = 'Sorry, this quest is not activated yet, please come back later!'
-			else: return res
+			return response.json()
 		else:
 			print(f'{response.status_code}: {response.content}')
 			
@@ -65,8 +59,8 @@ def get_quest_info(unique_number: int = None):
 		print(f'Request error: {e}')
 	except Exception as e:
 		print(f'Error: {e}')
-
-	raise GetQuestInfoException(f'⚠️ ERROR ⚠️ : {err_msg}')
+	
+	raise GetQuestInfoException('⚠️ ERROR ⚠️ : Sorry, it was an error while pulling quest, we are already working on that issue, please come back later!')
 
 # Sending text with action and sleep
 async def current_chat_action(context, id, action):

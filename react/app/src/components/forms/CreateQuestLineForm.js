@@ -107,9 +107,7 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 			return
 		}
 
-		if (!isPhotoUploaded) {
-			window.location.reload(false);
-		} else {
+		if (isPhotoUploaded) {
 			let photo_data = new FormData();
 			photo_data.append("photo", photo)
 			try {
@@ -117,8 +115,8 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 			} catch (err) {
 					console.log(err)
 					alert("Main info on quest line created successfully, but it was issue with update photo, please try again")
+					window.location.reload(false);
 			}
-			window.location.reload(false);
 		}
 		setBackdropOpen(false)
 	}

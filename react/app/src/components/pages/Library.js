@@ -42,6 +42,12 @@ const Library = () => {
 	}
 
 	useEffect(() => {
+		if (tagParam) {
+			setSearchResult(true)	
+		}
+	}, [tagParam])
+
+	useEffect(() => {
 		let isMounted = true
 		const controller = new AbortController()
 	
@@ -69,7 +75,7 @@ const Library = () => {
 			for (const tag of response.data) {
 					tagsOnlyName.push({"name": tag.name})
 			}
-		
+
 			// If page opened with get-request tag
 			if (tagParam) {
 				for (const tag of response.data) {
@@ -91,15 +97,20 @@ const Library = () => {
 		}
 	}
 
+	console.log("FIRST")
+	console.log(tagParam)
+	console.log(searchResult)
+
 	getRecords()
 	getTags()
+
+	console.log("SECOND")
+	console.log(tagParam)
+	console.log(searchResult)
 
 	return () => {
 		isMounted = false
 		controller.abort()
-		if (tagParam) {
-			setSearchResult(true)
-		}
 	}}, [])
 
 	const getMatchingRecords = () => {
@@ -141,6 +152,9 @@ const Library = () => {
 
 	const closeSearchResults = () => {
 		setSearchResult(false)
+		// tagParam = null
+		console.log(searchResult)
+		console.log(tagParam)
 	}
 
 	return (

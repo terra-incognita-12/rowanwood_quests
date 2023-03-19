@@ -26,7 +26,7 @@ import useRedirectLogin from '../../hooks/useRedirectLogin'
 import LoadingBackdrop from "../Backdrop"
 
 // Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _
-const URL_REGEX = /^[a-z][a-z0-9-_]{3,23}$/
+const URL_REGEX = /^[a-z][a-zA-Z0-9-_]{3,23}$/
 
 const CreateLibraryRecordForm = () => {
 	const [backdropOpen, setBackdropOpen] = useState(false)
@@ -145,10 +145,12 @@ const CreateLibraryRecordForm = () => {
 			} catch (err) {
 				console.log(err)
 				alert("Main info on record created successfully, but it was issue with update photo, please try upload photo again")
+				window.location.reload(false)
 			}
 		}
 		setBackdropOpen(false)
-		navigate(`/library/${url}`, { replace: true})
+		alert("Record created successfuly")
+		window.location.reload(false)
 	}
 
 	return (

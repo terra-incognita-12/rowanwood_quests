@@ -25,7 +25,7 @@ import useRedirectLogin from "../../hooks/useRedirectLogin"
 import LoadingBackdrop from "../Backdrop"
 
 // Must start with the lower case letter and after must followed by 3 to 23 char that can be lowercase, number, - and _
-const URL_REGEX = /^[a-z][a-z0-9-_]{3,23}$/
+const URL_REGEX = /^[a-z][a-zA-Z0-9-_]{3,23}$/
 
 const EditLibraryRecordForm = ({ record }) => {
 	const [backdropOpen, setBackdropOpen] = useState(false)
@@ -147,15 +147,12 @@ const EditLibraryRecordForm = ({ record }) => {
 			return
 		}
 
-		if (!isPhotoUploaded) {
-			navigate(`/library/${url}`, { replace: true})
-		} else {
+		if (isPhotoUploaded) {
 			let photo_data = new FormData();
 			photo_data.append("photo", photo)
 
 			try {
 				const response = await axiosPrivateMultipart.patch(`/library/records/update/photo/${recordId}`, photo_data)
-				navigate(`/library/${url}`, { replace: true})
 			} catch (err) {
 				if (!err?.response) {
 						setErrMsg("No server respone")
@@ -167,10 +164,14 @@ const EditLibraryRecordForm = ({ record }) => {
 						setErrMsg("Main info on record updated successfully, but it was issue with update photo, please try again")
 				}
 				handleShowErr(true)
+				setBackdropOpen(false)
 				window.scrollTo(0, 0)
+				return
 			}
 		}
 		setBackdropOpen(false)
+		alert("Record updated successfuly")
+		window.location.reload(false)
 	}
 
 	const handleDeletePhoto = async () => {

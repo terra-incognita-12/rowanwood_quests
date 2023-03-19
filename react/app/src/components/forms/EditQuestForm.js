@@ -182,15 +182,12 @@ const EditQuestForm = ({ quest }) => {
 			return
 		}
 
-		if (!isPhotoUploaded) {
-				navigate(`/quest/${url}`, { replace: true});
-		} else {
+		if (isPhotoUploaded) {
 			let photo_data = new FormData();
 			photo_data.append("photo", photo)
 
 			try {
 				const response = await axiosPrivateMultipart.patch(`/quest/update/photo/${questId}`, photo_data)
-				navigate(`/quest/${url}`, { replace: true});
 			} catch (err) {
 				if (!err?.response) {
 						setErrMsg("No server respone")
@@ -206,6 +203,8 @@ const EditQuestForm = ({ quest }) => {
 			}
 		}
 		setBackdropOpen(false)
+		alert("Quest updated successfuly")
+		window.location.reload(false);
 	}
 
 	const handleDeletePhoto = async () => {

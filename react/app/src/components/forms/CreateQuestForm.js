@@ -23,7 +23,7 @@ import useRedirectLogin from "../../hooks/useRedirectLogin"
 import LoadingBackdrop from "../Backdrop"
 
 // Must start with the lower case letter and after must followed by 3 to 30 char that can be lowercase, number, - and _
-const URL_REGEX = /^[a-z][a-z0-9-_]{3,30}$/
+const URL_REGEX = /^[a-z][a-zA-Z0-9-_]{3,30}$/
 
 const CreateQuestForm = () => {
 	const [backdropOpen, setBackdropOpen] = useState(false)
@@ -78,7 +78,7 @@ const CreateQuestForm = () => {
 		if (!URL_REGEX.test(url)) {
 			setErrMsg("Invaid quest url. Must start with the lower case letter and after must followed by 3 to 30 char that can be lowercase, number, - and _")
 			handleShowErr(true)
-			setBackdropOpen(true)
+			setBackdropOpen(false)
 			return
 		}
 
@@ -102,9 +102,7 @@ const CreateQuestForm = () => {
 			return
 		}
 
-		if (!isPhotoUploaded) {
-			window.location.reload(false)
-		} else {
+		if (isPhotoUploaded) {
 			let photo_data = new FormData();
 			photo_data.append("photo", photo)
 
@@ -113,9 +111,11 @@ const CreateQuestForm = () => {
 			} catch (err) {
 				console.log(err)
 				alert("Main info on record created successfully, but it was issue with update photo, please try again")
+				window.location.reload(false)
 			}
 		}
 		setBackdropOpen(false)
+		alert("Quest created successfuly")
 		window.location.reload(false)
 	}
 

@@ -51,7 +51,7 @@ const EditLibraryTagForm = ({ tag }) => {
 
 		try {
 			const response = await axiosPrivate.patch(`/library/tags/update/${tagId}`, JSON.stringify({"name": name}))
-
+			alert("Tag updated successfuly")
 			window.location.reload(false);
 		} catch (err) {
 			if (!err?.response) {
