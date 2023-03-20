@@ -179,6 +179,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.env.dev
+.env.prod
 
 # Spyder project settings
 .spyderproject
@@ -262,5 +264,7 @@ pip-selfcheck.json
 
 # Ignore code-workspaces
 *.code-workspace
+
+volume/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,macos,react,linux,visualstudiocode,venv
