@@ -97,16 +97,8 @@ const Library = () => {
 		}
 	}
 
-	console.log("FIRST")
-	console.log(tagParam)
-	console.log(searchResult)
-
 	getRecords()
 	getTags()
-
-	console.log("SECOND")
-	console.log(tagParam)
-	console.log(searchResult)
 
 	return () => {
 		isMounted = false
@@ -152,9 +144,6 @@ const Library = () => {
 
 	const closeSearchResults = () => {
 		setSearchResult(false)
-		// tagParam = null
-		console.log(searchResult)
-		console.log(tagParam)
 	}
 
 	return (
