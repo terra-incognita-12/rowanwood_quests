@@ -111,7 +111,7 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 			let photo_data = new FormData();
 			photo_data.append("photo", photo)
 			try {
-					const response = await axiosPrivateMultipart.patch(`/quest/lines/update/photo/${questLineId}`)
+					const response = await axiosPrivateMultipart.patch(`/quest/lines/update/photo/${questLineId}`, photo_data)
 			} catch (err) {
 					console.log(err)
 					alert("Main info on quest line created successfully, but it was issue with update photo, please try again")
