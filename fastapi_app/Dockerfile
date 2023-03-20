@@ -8,6 +8,6 @@ RUN pip install --no-cache-dir --upgrade -r ./requirements.txt
 COPY ./entrypoint.sh .
 RUN chmod +x /src/app/fastapi_app/entrypoint.sh
 
-# COPY . .
+COPY . .
 
 ENTRYPOINT ["/src/app/fastapi_app/entrypoint.sh"]
