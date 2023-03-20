@@ -118,7 +118,7 @@ const CreateQuestLineForm = ({ handleLineModalClose, questLinesList, url }) => {
 					window.location.reload(false);
 			}
 		}
-		setBackdropOpen(false)
+		window.location.reload(false);
 	}
 
 	return (

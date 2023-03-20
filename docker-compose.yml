@@ -69,6 +69,8 @@ services:
     command: python main.py
     ports:
       - '9000:9000'
+    env_file:
+      - ./bot/.env
     # volumes:
     #   - ./bot/:/src/app/bot/
 
