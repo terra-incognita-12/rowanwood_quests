@@ -49,8 +49,8 @@ services:
       - '8000:8000'
     env_file:
       - ./fastapi_app/.env.dev
-    volumes:
-      - ./fastapi_app/:/src/app/fastapi_app/
+    # volumes:
+    #   - ./fastapi_app/:/src/app/fastapi_app/
 
   react:
     build:
@@ -59,8 +59,8 @@ services:
     stdin_open: true
     ports:
       - '3000:3000'
-    volumes:
-      - ./react/app/:/src/app/react/
+    # volumes:
+    #   - ./react/app/:/src/app/react/
 
   bot:
     build:
@@ -69,8 +69,8 @@ services:
     command: python main.py
     ports:
       - '9000:9000'
-    volumes:
-      - ./bot/:/src/app/bot/
+    # volumes:
+    #   - ./bot/:/src/app/bot/
 
 volumes:
   postgres_data:
