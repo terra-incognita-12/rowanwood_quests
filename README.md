@@ -9,7 +9,7 @@ INSTALL:
 USAGE:
 
 0) Website react frontend is available on localhost:3000. Admin credentials are: email=admin@admin.com pass=adminadmin
-1) Website fastapi backend is avaliable on localhost:8000
+1) Website fastapi backend is avaliable on localhost:8000. Swagger for API is on localhost:8000/docs
 2) Database is available on port 5432
 3) Mailing service is available on localhost:5000.
 4) DB adminer is available on localhost:8080. Syetem=PostgreSQL Server=db Username=postgres Password=postgres Database=rowanwoodtestdb
