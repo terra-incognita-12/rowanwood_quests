@@ -13,7 +13,7 @@ from ..config import settings
 from ..database import get_db
 from ..models import Quest, Comment, QuestLine, QuestOption, User, QuestActivationRequest
 from ..schemes import quest_scheme
-from ..oauth2 import require_user, require_editor
+from ..oauth2 import require_editor, require_admin
 
 router = APIRouter()
 
@@ -24,8 +24,9 @@ FOLDER_QUESTLINE = 'quest_line/'
 
 # CREATE
 
+# role: editor,admin
 @router.post('/create', status_code=status.HTTP_201_CREATED)
-def create_quest(payload: quest_scheme.QuestSendScheme, db: Session = Depends(get_db)):
+def create_quest(payload: quest_scheme.QuestSendScheme, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
 
     check_quest_url = db.query(Quest).filter(Quest.url == payload.url).first()
     
@@ -37,7 +38,8 @@ def create_quest(payload: quest_scheme.QuestSendScheme, db: Session = Depends(ge
     if check_quest_telegram:
         raise HTTPException(status_code=403, detail='Quest with this telegram url already exists')
 
-    payload.is_activated = False
+    payload.name = payload.name.capitalize()
+
     new_quest = Quest(**payload.dict())
     db.add(new_quest)
     db.commit()
@@ -74,8 +76,9 @@ def get_quest(url: str, db: Session = Depends(get_db)):
 
 # UPDATE
 
+# role: editor,admin
 @router.patch('/update/{id}')
-def update_quest(id: str, payload:quest_scheme.QuestBaseScheme, db: Session = Depends(get_db)):
+def update_quest(id: str, payload:quest_scheme.QuestBaseScheme, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     quest_query = db.query(Quest).filter(Quest.id == id)
     check_quest = quest_query.first()
 
@@ -92,6 +95,8 @@ def update_quest(id: str, payload:quest_scheme.QuestBaseScheme, db: Session = De
     if check_quest_telegram and str(check_quest_telegram.id) != id:
         raise HTTPException(status_code=403, detail='Quest with this telegram url already exists')
 
+    payload.name = payload.name.capitalize()
+
     update_data = payload.dict(exclude_unset=True)
     quest_query.update(update_data, synchronize_session=False)
 
@@ -100,8 +105,9 @@ def update_quest(id: str, payload:quest_scheme.QuestBaseScheme, db: Session = De
 
     return {'status': 'OK'}
 
+# role: admin
 @router.patch('/update/activate/{id}')
-def update_activate_quest(id: str, db: Session = Depends(get_db)):
+def update_activate_quest(id: str, db: Session = Depends(get_db), user_id: str = Depends(require_admin)):
     quest_query = db.query(Quest).filter(Quest.id == id)
     check_quest = quest_query.first()
 
@@ -117,8 +123,9 @@ def update_activate_quest(id: str, db: Session = Depends(get_db)):
 
 # DELETE
 
+# role: admin
 @router.delete('/delete/{url}')
-def delete_quest(url: str, db: Session = Depends(get_db)):
+def delete_quest(url: str, db: Session = Depends(get_db), user_id: str = Depends(require_admin)):
     quest_query = db.query(Quest).filter(Quest.url == url)
     check_quest = quest_query.first()
 
@@ -143,8 +150,9 @@ def delete_quest(url: str, db: Session = Depends(get_db)):
 
 # CREATE
 
+# role: editor,admin
 @router.post('/activation/create', status_code=status.HTTP_201_CREATED)
-def create_quest_activation(payload: quest_scheme.QuestActivationSendScheme, db: Session = Depends(get_db)):
+def create_quest_activation(payload: quest_scheme.QuestActivationSendScheme, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     new_activation_request = QuestActivationRequest(**payload.dict())
     db.add(new_activation_request)
     db.commit()
@@ -154,13 +162,15 @@ def create_quest_activation(payload: quest_scheme.QuestActivationSendScheme, db:
 
 # READ
 
+# role: admin
 @router.get('/activation/all', response_model=List[quest_scheme.QuestActivationResponseScheme])
-def get_all_activation_requests(db: Session = Depends(get_db)):
+def get_all_activation_requests(db: Session = Depends(get_db), user_id: str = Depends(require_admin)):
     requests = db.query(QuestActivationRequest).all()
     return requests
 
+# role: editor,admin
 @router.get('/activation/{quest_id}')
-def get_if_quest_is_pending(quest_id: str, db: Session = Depends(get_db)):
+def get_if_quest_is_pending(quest_id: str, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     quest = db.query(QuestActivationRequest).filter(QuestActivationRequest.quest_id == quest_id).first()
     if quest:
         return {'status': True}
@@ -168,8 +178,9 @@ def get_if_quest_is_pending(quest_id: str, db: Session = Depends(get_db)):
 
 # DELETE
 
+# role: admin
 @router.delete('/activation/delete/{id}')
-def delete_activation_request(id: str, db: Session = Depends(get_db)):
+def delete_activation_request(id: str, db: Session = Depends(get_db), user_id: str = Depends(require_admin)):
 
     check_request = db.query(QuestActivationRequest).filter(QuestActivationRequest.id == id).first()
     
@@ -185,8 +196,9 @@ def delete_activation_request(id: str, db: Session = Depends(get_db)):
 
 # CREATE
 
+# role: editor,admin
 @router.post('/lines/create/{url}', status_code=status.HTTP_201_CREATED)
-def create_quest_line(url: str, payload: quest_scheme.QuestLineSendScheme, db: Session = Depends(get_db)):
+def create_quest_line(url: str, payload: quest_scheme.QuestLineSendScheme, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
 
     check_quest = db.query(Quest).filter(Quest.url == url).first()
     if not check_quest:
@@ -235,8 +247,9 @@ def get_line_for_quest(url: str, unique_number: int, db: Session = Depends(get_d
 
 # UPDATE
 
+# role: editor,admin
 @router.patch('/lines/update/{id}')
-def update_quest_line(id: str, payload: quest_scheme.QuestLineSendScheme, db: Session = Depends(get_db)):
+def update_quest_line(id: str, payload: quest_scheme.QuestLineSendScheme, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
 
     quest_line_query = db.query(QuestLine).filter(QuestLine.id == id)
     check_quest_line = quest_line_query.first()
@@ -271,8 +284,9 @@ def update_quest_line(id: str, payload: quest_scheme.QuestLineSendScheme, db: Se
 
 # DELETE
 
+# role: editor,admin
 @router.delete('/lines/delete/{id}')
-def delete_quest_line(id: str, db: Session = Depends(get_db)):
+def delete_quest_line(id: str, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
 
     check_quest_line = db.query(QuestLine).filter(QuestLine.id == id).first()
     
@@ -292,8 +306,9 @@ def delete_quest_line(id: str, db: Session = Depends(get_db)):
 
 # BASE QUEST
 
+# role: editor,admin
 @router.patch('/update/photo/{id}')
-def update_quest_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):
+def update_quest_photo(id: str, photo: UploadFile, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
 
     quest_query = db.query(Quest).filter(Quest.id == id)
     check_quest = quest_query.first()
@@ -315,8 +330,9 @@ def update_quest_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)
 
     return {'status': 'OK'}
 
+# role: editor,admin
 @router.delete('/delete/photo/{id}')
-def delete_quest_photo(id: str, db: Session = Depends(get_db)):
+def delete_quest_photo(id: str, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
 
     quest_query = db.query(Quest).filter(Quest.id == id)
     check_quest = quest_query.first()
@@ -335,8 +351,9 @@ def delete_quest_photo(id: str, db: Session = Depends(get_db)):
 
 # LINES
 
+# role: editor,admin
 @router.patch('/lines/update/photo/{id}')
-def update_quest_line_photo(id: str, photo: UploadFile, db: Session = Depends(get_db)):
+def update_quest_line_photo(id: str, photo: UploadFile, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
 
     quest_line_query = db.query(QuestLine).filter(QuestLine.id == id)
     check_quest_line = quest_line_query.first()
@@ -358,8 +375,9 @@ def update_quest_line_photo(id: str, photo: UploadFile, db: Session = Depends(ge
 
     return {'status': 'OK'}
 
+# role: editor,admin
 @router.delete('/lines/delete/photo/{id}')
-def delete_quest_line_photo(id: str, db: Session = Depends(get_db)):
+def delete_quest_line_photo(id: str, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
 
     quest_line_query = db.query(QuestLine).filter(QuestLine.id == id)
     check_quest_line = quest_line_query.first()

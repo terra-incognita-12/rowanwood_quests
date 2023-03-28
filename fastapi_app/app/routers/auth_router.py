@@ -87,12 +87,12 @@ async def login(payload: user_scheme.LoginUserScheme, request: Request, response
 	access_token = Authorize.create_access_token(subject=str(user.id), expires_time=timedelta(minutes=ACCESS_X))
 	refresh_token = Authorize.create_refresh_token(subject=str(user.id), expires_time=timedelta(minutes=REFRESH_X))
 
-	Authorize.set_access_cookies(access_token)
-	Authorize.set_refresh_cookies(refresh_token)
+	# Authorize.set_access_cookies(access_token)
+	# Authorize.set_refresh_cookies(refresh_token)
 
-	# response.set_cookie('access_token', access_token, ACCESS_X*60, ACCESS_X*60, '/', None, False, True, 'lax')
-	# response.set_cookie('refresh_token', refresh_token, REFRESH_X*60, REFRESH_X*60, '/', None, False, True, 'lax')
-	response.set_cookie('logged_in', 'True', REFRESH_X*60, REFRESH_X*60, '/', None, False, False, 'lax')
+	response.set_cookie('access_token', access_token, ACCESS_X*60, ACCESS_X*60, '/', None, True, True, 'lax')
+	response.set_cookie('refresh_token', refresh_token, REFRESH_X*60, REFRESH_X*60, '/', None, True, True, 'lax')
+	response.set_cookie('logged_in', 'True', REFRESH_X*60, REFRESH_X*60, '/', None, True, False, 'lax')
 
 	return {'id': user.id, 'username': user.username, 'status': 'success', 'role': user.role, 'access_token': access_token, 'photo': user.photo}
 
@@ -103,6 +103,8 @@ def logout(response: Response, Authorize: AuthJWT = Depends()):
 	Authorize.jwt_required()
 	Authorize.unset_jwt_cookies()
 	response.delete_cookie('logged_in')
+	response.delete_cookie('access_token')
+	response.delete_cookie('refresh_token')
 
 	return {'status': 'OK'}
 
@@ -230,7 +232,8 @@ def refresh_token(response: Response, request: Request, Authorize: AuthJWT = Dep
 			raise HTTPException(status_code=400, detail='Please provide refresh token')
 		raise HTTPException(status_code=400, detail=error)
 
-	Authorize.set_access_cookies(access_token)
+	# Authorize.set_access_cookies(access_token)
+	response.set_cookie('access_token', access_token, ACCESS_X*60, ACCESS_X*60, '/', None, True, True, 'lax')
 
 	return {'id': user.id, 'username': user.username, 'email': user.email, 'role': user.role, 'access_token': access_token, 'photo': user.photo}
 

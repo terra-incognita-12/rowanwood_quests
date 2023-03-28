@@ -64,6 +64,9 @@ const QuestDetails = () => {
 						const response = await axios.get(`/quest/${url}`, {
 								signal: controller.signal
 						})
+						if (!response.data['is_activated']) {
+							navigate(`/notactivated`)
+						}
 						isMounted && setQuest(response.data)
 						commentChanged && setCommentChanged(false)
 					} catch (err) {

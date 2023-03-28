@@ -89,6 +89,11 @@ const CreateLibraryRecordForm = () => {
 		if (!e.target.files[0]) {
 			setIsPhotoUploaded(false)
 			setPhoto("")
+		} else if (e.target.files[0].size > 1048576) {
+			alert("Photo is too big!")
+			setIsPhotoUploaded(false)
+			setPhoto("")
+			return
 		} else {
 			setIsPhotoUploaded(true)
 			setPhoto(e.target.files[0])

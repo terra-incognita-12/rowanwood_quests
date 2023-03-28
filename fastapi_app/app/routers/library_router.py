@@ -24,6 +24,7 @@ FOLDER = 'record/'
 
 # CREATE
 
+# role: editor,admin
 @router.post('/records/create')
 def create_record(payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
 
@@ -32,6 +33,8 @@ def create_record(payload: library_scheme.LibraryRecordSendScheme, db: Session =
         raise HTTPException(status_code=403, detail='Record with this url already exists')
 
     payload.library_tags = prepare_library_tags(payload.library_tags, db)
+
+    payload.name = payload.name.capitalize()
 
     new_library_record = LibraryRecord(**payload.dict())
     
@@ -73,6 +76,7 @@ def get_records_by_tag(tag: str, db: Session = Depends(get_db)):
 
 # UPDATE
 
+# role: editor,admin
 @router.patch('/records/update/{id}')
 def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)
@@ -88,6 +92,8 @@ def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: 
     payload_temp = prepare_library_tags(payload.library_tags, db)
     del payload.library_tags
 
+    payload.name = payload.name.capitalize()
+
     update_data = payload.dict(exclude_unset=True)
     check_record.library_tags = payload_temp
 
@@ -99,6 +105,7 @@ def update_record(id: str, payload: library_scheme.LibraryRecordSendScheme, db: 
 
 # DELETE
 
+# role: editor,admin
 @router.delete('/records/delete/{url}')
 def delete_record(url: str, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     record_query = db.query(LibraryRecord).filter(LibraryRecord.url == url)
@@ -142,6 +149,7 @@ def get_tag(id: str, db: Session = Depends(get_db)):
 
 # UPDATE
 
+# role: editor,admin
 @router.patch('/tags/update/{id}')
 def update_tag(id: str, payload: library_scheme.LibraryTagSendScheme, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     tag_query = db.query(LibraryTag).filter(LibraryTag.id == id)
@@ -164,6 +172,7 @@ def update_tag(id: str, payload: library_scheme.LibraryTagSendScheme, db: Sessio
 
 # DELETE
 
+# role: editor,admin
 @router.delete('/tags/delete/{id}')
 def delete_tag(id: str, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     tag_query = db.query(LibraryTag).filter(LibraryTag.id == id)
@@ -181,6 +190,7 @@ def delete_tag(id: str, db: Session = Depends(get_db), user_id: str = Depends(re
 
 # S3
 
+# role: editor,admin
 @router.patch('/records/update/photo/{id}')
 def update_record_photo(id: str, photo: UploadFile, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)
@@ -202,6 +212,7 @@ def update_record_photo(id: str, photo: UploadFile, db: Session = Depends(get_db
 
     return {'status': 'OK'}
 
+# role: editor,admin
 @router.delete('/records/delete/photo/{id}')
 def delete_record_photo(id: str, db: Session = Depends(get_db), user_id: str = Depends(require_editor)):
     record_query = db.query(LibraryRecord).filter(LibraryRecord.id == id)

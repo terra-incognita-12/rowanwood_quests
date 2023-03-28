@@ -99,6 +99,11 @@ const EditLibraryRecordForm = ({ record }) => {
 		if (!e.target.files[0]) {
 			setIsPhotoUploaded(false)
 			setPhoto("")
+		} else if (e.target.files[0].size > 2097152) {
+			alert("Photo is too big!")
+			setIsPhotoUploaded(false)
+			setPhoto("")
+			return
 		} else {
 			setIsPhotoUploaded(true)
 			setPhoto(e.target.files[0])
