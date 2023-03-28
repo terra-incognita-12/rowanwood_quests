@@ -13,7 +13,6 @@ class QuestBaseScheme(BaseModel):
     telegram_url: str
     brief_description: str
     full_description: str
-    is_activated: bool
 
     class Config:
         orm_mode = True
@@ -70,6 +69,7 @@ class QuestLineResponseScheme(QuestLineBaseScheme):
 
 class QuestResponseSchemePreview(QuestBaseScheme):
     id: uuid.UUID
+    is_activated: bool
     photo: Union[str, None] = None
 
 class QuestDropDownResponseScheme(BaseModel):
@@ -81,11 +81,13 @@ class QuestDropDownResponseScheme(BaseModel):
 
 class QuestResponseSchemeWithComments(QuestBaseScheme):
     id: uuid.UUID
+    is_activated: bool
     photo: Union[str, None] = None
     quest_comments: List[CommentResponseScheme] = []
 
 class QuestResponseSchemeWithLines(QuestBaseScheme):
     id: uuid.UUID
+    is_activated: bool
     photo: Union[str, None] = None
     quest_lines: List[QuestLineResponseScheme] = []
 

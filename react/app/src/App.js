@@ -19,7 +19,10 @@ import QuestDetails from "./components/pages/QuestDetails"
 import LibraryDetails from "./components/pages/LibraryDetails"
 import Profile from "./components/pages/Profile"
 import Admin from "./components/pages/Admin"
+
+import Unauthorized from "./components/pages/Unauthorized"
 import NotExist from "./components/pages/NotExist"
+import NotActivated from "./components/pages/NotActivated"
 import OtherError from "./components/pages/OtherErrors"
 
 import Editor from "./components/pages/editor/Editor"
@@ -37,8 +40,6 @@ import EditLibraryTagsList from "./components/pages/editor/library/EditLibraryTa
 
 import ForgetPass from "./components/pages/recoverPass/ForgetPass"
 import ChangePass from "./components/pages/recoverPass/ChangePass"
-
-import Unauthorized from "./components/pages/Unauthorized"
 
 const darkTheme = createTheme({
   palette: {
@@ -64,6 +65,7 @@ function App() {
           <Route exact path="changepass/:token" element={<ChangePass />} />
           <Route path="unauthorized" element={<Unauthorized />} />
           <Route path="notexist" element={<NotExist />} />
+          <Route path="notactivated" element={<NotActivated />} />
           <Route path="othererror" element={<OtherError />} />
           
           <Route element={<PersistLogin />}>

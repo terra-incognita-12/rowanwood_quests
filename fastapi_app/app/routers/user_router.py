@@ -12,7 +12,7 @@ from ..s3 import s3
 from ..config import settings
 from ..models import User
 from ..schemes import user_scheme
-from ..oauth2 import require_user
+from ..oauth2 import require_user, require_editor, require_admin
 from ..hasher import Hasher
 from ..email_token import EmailToken
 
@@ -163,19 +163,19 @@ def delete_user_photo(db: Session = Depends(get_db), user_id: str = Depends(requ
 # GET ALL USERS
 
 @router.get('/all', response_model=List[user_scheme.UserResponse])
-def get_all_users(db: Session = Depends(get_db), user_id: str = Depends(require_user)):
+def get_all_users(db: Session = Depends(get_db), user_id: str = Depends(require_admin)):
 	users = db.query(User).filter(User.role != 'admin').order_by(asc(User.username)).all()
 	return users
 
 # CHANGE USERS'S ROLE
 
 @router.patch('/change_role/{username}')
-def update_user_role(username: str, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
+def update_user_role(username: str, db: Session = Depends(get_db), user_id: str = Depends(require_admin)):
 	user_query = db.query(User).filter(User.username == username)
 	check_user = user_query.first()
 
 	if not check_user:
-		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User doesn't exist")
+		raise HTTPException(status_code=404, detail="User doesn't exist")
 
 	if check_user.role == 'user':
 		user_query.update({'role': 'editor'}, synchronize_session=False)
@@ -190,12 +190,12 @@ def update_user_role(username: str, db: Session = Depends(get_db), user_id: str 
 # DELETE USER
 
 @router.delete('/delete/{username}')
-def delete_user(username: str, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
+def delete_user(username: str, db: Session = Depends(get_db), user_id: str = Depends(require_admin)):
 	user_query = db.query(User).filter(User.username == username)
 	check_user = user_query.first()
 
 	if not check_user:
-		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User doesn't exist")
+		raise HTTPException(status_code=404, detail="User doesn't exist")
 
 	if check_user.photo:
 		key = check_user.photo.replace(settings.S3_FULL_URL,'')

@@ -65,6 +65,10 @@ const Profile = () => {
 	const handleUploadPhoto = (e) => {
 		if (!e.target.files[0]) {
 			setPhoto("")
+		} else if (e.target.files[0].size > 1048576) {
+			alert("Photo is too big!")
+			setPhoto("")
+			return
 		} else {
 				setPhoto(e.target.files[0])
 		}

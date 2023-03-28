@@ -14,6 +14,7 @@ from ..oauth2 import require_user
 
 router = APIRouter()
 
+# role: user,editor,admin
 @router.post('/create')
 def create_comment(payload: comment_scheme.CreateCommentScheme, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
     quest = db.query(Quest).filter(Quest.url == payload.quest_url).first()
@@ -32,6 +33,7 @@ def create_comment(payload: comment_scheme.CreateCommentScheme, db: Session = De
 
     return {'status': 'OK'}
 
+# role: user,editor,admin
 @router.post('/delete')
 def delete_comment(payload: comment_scheme.DeleteCommentScheme, db: Session = Depends(get_db), user_id: str = Depends(require_user)):
     comment = db.query(Comment).filter(Comment.id == payload.id).first()
